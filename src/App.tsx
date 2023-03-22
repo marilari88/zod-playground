@@ -2,6 +2,7 @@ import {Box, Button, Center, Header, Stack, Text, Textarea} from '@mantine/core'
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useRef, useState} from 'react'
+import {HiOutlineRocketLaunch, HiOutlineSquaresPlus} from 'react-icons/hi2'
 import {z, ZodSchema} from 'zod'
 import {generateErrorMessage} from 'zod-error'
 
@@ -123,8 +124,9 @@ function App() {
               onClick={() => {
                 setValues((values) => [...values, {value: ''}])
               }}
+              title="Add a value to validate"
             >
-              +
+              <HiOutlineSquaresPlus />
             </Button>
           </Box>
           <Stack>
@@ -148,7 +150,9 @@ function App() {
         </Box>
         <Box sx={{gridColumn: '1 / -1'}}>
           <Center w="100%" p="md">
-            <Button type="submit">Validate</Button>
+            <Button leftIcon={<HiOutlineRocketLaunch />} type="submit">
+              Validate
+            </Button>
           </Center>
           {error && <div>{JSON.stringify(error)}</div>}
         </Box>
