@@ -1,13 +1,4 @@
-import {
-  AppShell,
-  Button,
-  Center,
-  Group,
-  Header,
-  Stack,
-  Text,
-  Textarea,
-} from '@mantine/core'
+import {Box, Button, Center, Header, Stack, Text, Textarea} from '@mantine/core'
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useRef, useState} from 'react'
@@ -56,66 +47,87 @@ function App() {
   const [values, setValues] = useState<Values[]>([{value: ''}])
   const formRef = useRef<HTMLFormElement>(null)
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
+
   return (
-    <AppShell
-      header={
-        <Header height={{base: 60}} p="md" bg="blue">
+    <form
+      style={{height: '100%', width: '100%'}}
+      ref={formRef}
+      onSubmit={(e) => {
+        e.preventDefault()
+
+        if (formRef.current == null) return
+
+        const formData = new FormData(formRef.current)
+
+        try {
+          const schema = schemaSchema.parse(editorRef.current?.getValue())
+
+          const values = formData.getAll('value')
+
+          const newValues: Values[] = values.map((v) => {
+            const parsedValue = valueSchema.parse(v)
+            const validationRes = schema.safeParse(
+              new Function(`return ${parsedValue}`)(),
+            )
+            return {
+              value: parsedValue,
+              response: !!validationRes.success
+                ? {success: true, data: validationRes.data}
+                : {
+                    success: false,
+                    error: generateErrorMessage(validationRes.error.issues),
+                  },
+            }
+          })
+          setValues(newValues)
+          setError(null)
+        } catch (e) {
+          setError(e instanceof Error ? e.message : 'error')
+        }
+      }}
+    >
+      <Box
+        h="100vh"
+        sx={(theme) => ({
+          display: 'grid',
+          gridTemplateRows: ' 60px 1fr auto',
+          gridTemplateColumns: '1fr 1fr',
+          columnGap: theme.spacing.md,
+        })}
+      >
+        <Header
+          height={{base: 60}}
+          p="md"
+          bg="blue"
+          sx={{gridColumn: '1 / -1'}}
+        >
           <Text color="white">Zod Playground</Text>
         </Header>
-      }
-    >
-      <form
-        ref={formRef}
-        onSubmit={(e) => {
-          e.preventDefault()
+        <Box p="md">
+          <label>
+            Zod schema
+            <Editor
+              height="90%"
+              defaultLanguage="typescript"
+              onMount={(editor) => {
+                editorRef.current = editor
+              }}
+              options={editorOptions}
+            />
+          </label>
+        </Box>
 
-          if (formRef.current == null) return
-
-          const formData = new FormData(formRef.current)
-
-          try {
-            const schema = schemaSchema.parse(editorRef.current?.getValue())
-
-            const values = formData.getAll('value')
-
-            const newValues: Values[] = values.map((v) => {
-              const parsedValue = valueSchema.parse(v)
-              const validationRes = schema.safeParse(
-                new Function(`return ${parsedValue}`)(),
-              )
-              return {
-                value: parsedValue,
-                response: !!validationRes.success
-                  ? {success: true, data: validationRes.data}
-                  : {
-                      success: false,
-                      error: generateErrorMessage(validationRes.error.issues),
-                    },
-              }
-            })
-            setValues(newValues)
-            setError(null)
-          } catch (e) {
-            setError(e instanceof Error ? e.message : 'error')
-          }
-        }}
-      >
-        <Group w="100%" spacing="md" grow align="stretch">
+        <Box p="md" sx={{overflow: 'auto', maxHeight: '100%'}}>
+          <Box sx={{width: '100%', textAlign: 'right'}}>
+            <Button
+              onClick={() => {
+                setValues((values) => [...values, {value: ''}])
+              }}
+            >
+              +
+            </Button>
+          </Box>
           <Stack>
-            <label>
-              Zod schema
-              <Editor
-                height="70vh"
-                width="100%"
-                defaultLanguage="typescript"
-                onMount={(editor) => {
-                  editorRef.current = editor
-                }}
-                options={editorOptions}
-              />
-            </label>
-          </Stack>
-          <Stack align="stretch" justify="flex-start">
             {values.map((value, index) => {
               return (
                 <div key={`val${index}`}>
@@ -132,21 +144,16 @@ function App() {
                 </div>
               )
             })}
-            <Button
-              onClick={() => {
-                setValues((values) => [...values, {value: ''}])
-              }}
-            >
-              Add value
-            </Button>
           </Stack>
-        </Group>
-        <Center w="100%" p="md">
-          <Button type="submit">Validate</Button>
-        </Center>
-        {error && <div>{JSON.stringify(error)}</div>}
-      </form>
-    </AppShell>
+        </Box>
+        <Box sx={{gridColumn: '1 / -1'}}>
+          <Center w="100%" p="md">
+            <Button type="submit">Validate</Button>
+          </Center>
+          {error && <div>{JSON.stringify(error)}</div>}
+        </Box>
+      </Box>
+    </form>
   )
 }
 
