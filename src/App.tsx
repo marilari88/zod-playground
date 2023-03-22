@@ -1,8 +1,18 @@
-import {AppShell, Button, Header, Text, Textarea} from '@mantine/core'
+import {
+  AppShell,
+  Button,
+  Center,
+  Group,
+  Header,
+  Stack,
+  Text,
+  Textarea,
+} from '@mantine/core'
 import Editor, {loader} from '@monaco-editor/react'
+import {editor} from 'monaco-editor'
 import {useRef, useState} from 'react'
 import {z, ZodSchema} from 'zod'
-import {editor} from 'monaco-editor'
+import {generateErrorMessage} from 'zod-error'
 
 import str2 from '../node_modules/zod/lib/types.d.ts?raw'
 
@@ -34,16 +44,22 @@ const schemaSchema = z
   .min(2)
   .transform((s) => eval(s))
   .pipe(z.custom<ZodSchema>())
-const valueSchema = z.string().transform((s) => new Function(`return ${s}`))
+const valueSchema = z.string()
+
+type Values = {
+  value: string
+  response?: {success: true; data: unknown} | {success: false; error: string}
+}
 
 function App() {
-  const [res, setRes] = useState('')
+  const [error, setError] = useState<string | null>()
+  const [values, setValues] = useState<Values[]>([{value: ''}])
   const formRef = useRef<HTMLFormElement>(null)
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   return (
     <AppShell
       header={
-        <Header height={{base: 60}} p="md" bg="violet">
+        <Header height={{base: 60}} p="md" bg="blue">
           <Text color="white">Zod Playground</Text>
         </Header>
       }
@@ -59,35 +75,76 @@ function App() {
 
           try {
             const schema = schemaSchema.parse(editorRef.current?.getValue())
-            const value = valueSchema.parse(formData.get('value'))()
 
-            const res = schema.safeParse(value)
-            setRes(res.success ? res.data : res.error)
+            const values = formData.getAll('value')
+
+            const newValues: Values[] = values.map((v) => {
+              const parsedValue = valueSchema.parse(v)
+              const validationRes = schema.safeParse(
+                new Function(`return ${parsedValue}`)(),
+              )
+              return {
+                value: parsedValue,
+                response: !!validationRes.success
+                  ? {success: true, data: validationRes.data}
+                  : {
+                      success: false,
+                      error: generateErrorMessage(validationRes.error.issues),
+                    },
+              }
+            })
+            setValues(newValues)
+            setError(null)
           } catch (e) {
-            setRes(e instanceof Error ? e.message : 'error')
+            setError(e instanceof Error ? e.message : 'error')
           }
         }}
       >
-        <label>
-          Zod schema
-          <Editor
-            height="30vh"
-            defaultLanguage="typescript"
-            onMount={(editor) => {
-              editorRef.current = editor
-            }}
-            options={editorOptions}
-          />
-        </label>
-        <label>
-          Value
-          <Textarea name="value" />
-        </label>
-        <Button color="violet" type="submit">
-          Validate
-        </Button>
-        <hr />
-        <div>{JSON.stringify(res)}</div>
+        <Group w="100%" spacing="md" grow align="stretch">
+          <Stack>
+            <label>
+              Zod schema
+              <Editor
+                height="70vh"
+                width="100%"
+                defaultLanguage="typescript"
+                onMount={(editor) => {
+                  editorRef.current = editor
+                }}
+                options={editorOptions}
+              />
+            </label>
+          </Stack>
+          <Stack align="stretch" justify="flex-start">
+            {values.map((value, index) => {
+              return (
+                <div key={`val${index}`}>
+                  <label>
+                    Value
+                    <Textarea name="value" />
+                  </label>
+                  {!!value.response?.success && (
+                    <div>{JSON.stringify(value.response?.data)}</div>
+                  )}
+                  {!value.response?.success && (
+                    <div>{JSON.stringify(value.response?.error)}</div>
+                  )}
+                </div>
+              )
+            })}
+            <Button
+              onClick={() => {
+                setValues((values) => [...values, {value: ''}])
+              }}
+            >
+              Add value
+            </Button>
+          </Stack>
+        </Group>
+        <Center w="100%" p="md">
+          <Button type="submit">Validate</Button>
+        </Center>
+        {error && <div>{JSON.stringify(error)}</div>}
       </form>
     </AppShell>
   )
