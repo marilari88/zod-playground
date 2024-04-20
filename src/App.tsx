@@ -1,8 +1,9 @@
-import {Box, Button, Center, Header, Stack, Text, Textarea} from '@mantine/core'
+import {Box, Button, Center, Stack, Text, Textarea} from '@mantine/core'
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useRef, useState} from 'react'
-import {z, ZodSchema} from 'zod'
+import {HiOutlineSquaresPlus} from 'react-icons/hi2'
+import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
 
 import str2 from '../node_modules/zod/lib/types.d.ts?raw'
@@ -88,21 +89,16 @@ function App() {
     >
       <Box
         h="100vh"
-        sx={(theme) => ({
+        style={(theme) => ({
           display: 'grid',
           gridTemplateRows: ' 60px 1fr auto',
           gridTemplateColumns: '1fr 1fr',
           columnGap: theme.spacing.md,
         })}
       >
-        <Header
-          height={{base: 60}}
-          p="md"
-          bg="blue"
-          sx={{gridColumn: '1 / -1'}}
-        >
-          <Text color="white">Zod Playground</Text>
-        </Header>
+        <Box p="md" bg="blue" style={{gridColumn: '1 / -1', height: '60px'}}>
+          <Text style={{color: 'white'}}>Zod Playground</Text>
+        </Box>
         <Box p="md">
           <label>
             Zod schema
@@ -117,14 +113,15 @@ function App() {
           </label>
         </Box>
 
-        <Box p="md" sx={{overflow: 'auto', maxHeight: '100%'}}>
-          <Box sx={{width: '100%', textAlign: 'right'}}>
+        <Box p="md" style={{overflow: 'auto', maxHeight: '100%'}}>
+          <Box style={{width: '100%', textAlign: 'right'}}>
             <Button
               onClick={() => {
                 setValues((values) => [...values, {value: ''}])
               }}
+              title="Add a value to validate"
             >
-              +
+              <HiOutlineSquaresPlus />
             </Button>
           </Box>
           <Stack>
@@ -146,7 +143,7 @@ function App() {
             })}
           </Stack>
         </Box>
-        <Box sx={{gridColumn: '1 / -1'}}>
+        <Box style={{gridColumn: '1 / -1'}}>
           <Center w="100%" p="md">
             <Button type="submit">Validate</Button>
           </Center>
