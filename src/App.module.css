@@ -1,0 +1,38 @@
+.layout {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100dvh;
+}
+
+.leftPanel {
+  border-right: 1px solid var(--mantine-color-gray-2);
+}
+
+.sectionTitle {
+  padding: var(--mantine-spacing-md);
+  font-weight: 500;
+  color: var(--mantine-color-gray-7);
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+}
+
+.editor {
+  padding-block: var(--mantine-spacing-lg);
+  height: 90%;
+}
+
+.valuesStack {
+  padding: var(--mantine-spacing-lg);
+}
+
+.valueCards {
+  padding-block: var(--mantine-spacing-lg);
+  padding-inline: var(--mantine-spacing-sm);
+  background-color: var(--mantine-color-gray-1);
+  border-radius: var(--mantine-radius-md);
+}
+
+.valueResult {
+  color: var(--mantine-color-gray-8);
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 500;
+}

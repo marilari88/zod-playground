@@ -1,0 +1,18 @@
+.header {
+  color: var(--mantine-color-primary-5);
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+  padding: var(--mantine-spacing-md) var(--mantine-spacing-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--mantine-spacing-md);
+}
+
+.header__title {
+  font-size: var(--mantine-font-size-xl);
+  font-weight: 800;
+  margin: 0;
+}
+
+.header__logo {
+  width: 40px;
+}
