@@ -146,11 +146,12 @@ function App() {
                       name="value"
                       autosize={true}
                       rightSection={
-                        !!value.response?.success ? (
+                        value.response &&
+                        (value.response?.success ? (
                           <FiCheckCircle color={theme.colors.green[8]} />
                         ) : (
                           <FiXCircle color={theme.colors.red[8]} />
-                        )
+                        ))
                       }
                     />
                     {value.response && (

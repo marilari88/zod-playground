@@ -21,7 +21,8 @@
 }
 
 .valuesStack {
-  padding: var(--mantine-spacing-lg);
+  padding-block: var(--mantine-spacing-lg);
+  padding-inline: var(--mantine-spacing-sm);
 }
 
 .valueCards {
