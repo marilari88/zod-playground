@@ -1,4 +1,7 @@
+import {Anchor, Box} from '@mantine/core'
+import {FiGithub} from 'react-icons/fi'
 import classes from './Header.module.css'
+import {FaGithub} from 'react-icons/fa'
 
 export const ZodLogo = () => (
   <svg
@@ -145,6 +148,17 @@ export function Header() {
     <header className={classes.header}>
       <ZodLogo />
       <div className={classes.header__title}>Zod Playground</div>
+      <Box ml="auto">
+        <Anchor
+          href="https://github.com/marilari88/zod-playground"
+          target="_blank"
+        >
+          <FaGithub
+            className={classes.githubLink}
+            title="Go to zod playground github repo"
+          />
+        </Anchor>
+      </Box>
     </header>
   )
 }
