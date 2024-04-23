@@ -50,23 +50,28 @@ const schemaSchema = z
 const valueSchema = z.string()
 
 type Values = {
-  value: string
+  value?: string
+  defaultValue?: string
   response?: {success: true; data: unknown} | {success: false; error: string}
 }
 
 function App() {
-  const [error, setError] = useState<string | null>()
-  const [values, setValues] = useState<Values[]>([{value: ''}])
-  const formRef = useRef<HTMLFormElement>(null)
-  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
-
-  const theme = useMantineTheme()
-
   const defaultZodScheme: string =
 `z.object({
   name: z.string(),
   birth_year: z.number().optional()
 })`
+
+  const defaultTestValue: string = '{"name": "John"}'
+
+  const [error, setError] = useState<string | null>()
+  const [values, setValues] = useState<Values[]>([
+    {defaultValue: defaultTestValue},
+  ])
+  const formRef = useRef<HTMLFormElement>(null)
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
+
+  const theme = useMantineTheme()
 
   return (
     <Box className={classes.layout}>
@@ -134,7 +139,7 @@ function App() {
               <Button
                 size="compact-xs"
                 onClick={() => {
-                  setValues((values) => [...values, {value: ''}])
+                  setValues((values) => [...values, {}])
                 }}
               >
                 Add a value
@@ -160,6 +165,7 @@ function App() {
                           <FiXCircle color={theme.colors.red[8]} />
                         ))
                       }
+                      defaultValue={value.defaultValue}
                     />
                     {value.response && (
                       <div className={classes.valueResult}>
