@@ -62,6 +62,12 @@ function App() {
 
   const theme = useMantineTheme()
 
+  const defaultZodScheme: string =
+`z.object({
+  name: z.string(),
+  birth_year: z.number().optional()
+})`
+
   return (
     <Box className={classes.layout}>
       <Header />
@@ -113,6 +119,7 @@ function App() {
                   editorRef.current = editor
                 }}
                 options={editorOptions}
+                defaultValue={defaultZodScheme}
               />
             </div>
           </div>
