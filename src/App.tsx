@@ -33,7 +33,7 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   automaticLayout: true,
 }
 
-var libUri = 'file:///node_modules/zod/lib/index.d.ts'
+const libUri = 'file:///node_modules/zod/lib/index.d.ts'
 
 loader.init().then((monaco) => {
   monaco.languages.typescript.typescriptDefaults.addExtraLib(
@@ -87,7 +87,7 @@ function App() {
               )
               return {
                 value: parsedValue,
-                response: !!validationRes.success
+                response: validationRes.success
                   ? {success: true, data: validationRes.data}
                   : {
                       success: false,
@@ -156,7 +156,7 @@ function App() {
                     />
                     {value.response && (
                       <div className={classes.valueResult}>
-                        {!!value.response.success && (
+                        {value.response.success && (
                           <div>{JSON.stringify(value.response?.data)}</div>
                         )}
                         {!value.response.success && (

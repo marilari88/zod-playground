@@ -1,5 +1,4 @@
 import {Anchor, Box} from '@mantine/core'
-import {FiGithub} from 'react-icons/fi'
 import classes from './Header.module.css'
 import {FaGithub} from 'react-icons/fa'
 
