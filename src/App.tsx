@@ -83,9 +83,11 @@ const schemaSchema = z
     try {
       return eval(s)
     } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : 'Invalid schema'
+
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'Invalid schema',
+        message: errorMessage,
         path: ['schema'],
       })
       return z.NEVER
@@ -174,9 +176,10 @@ function App() {
               )
               if (schemaIssue) {
                 setSchemaError(schemaIssue.message)
+                return
               }
             }
-            setSchemaError('Generic error')
+            setSchemaError('Invalid schema')
           }
         }}
         onChange={(e) => {
