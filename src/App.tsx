@@ -215,7 +215,7 @@ function App() {
               align="center"
               justify="space-between"
             >
-              Value to be parsed using the Zod schema
+              Value to be parsed
               <Button
                 size="compact-xs"
                 onClick={() => {
