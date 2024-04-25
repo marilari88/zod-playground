@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Flex,
@@ -18,6 +19,10 @@ import {generateErrorMessage} from 'zod-error'
 import str2 from '../node_modules/zod/lib/types.d.ts?raw'
 import classes from './App.module.css'
 import {Header} from './ui/Header/Header'
+
+import {dependencies} from '../package.json'
+
+const ZOD_VERSION = dependencies.zod.split('^')[1]
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -187,7 +192,12 @@ function App() {
               justify="space-between"
               bg={schemaError ? theme.colors.red[0] : 'transparent'}
             >
-              Zod schema{' '}
+              <Flex gap="sm">
+                Zod schema
+                <Badge variant="default" size="lg" tt="none">
+                  v{ZOD_VERSION}
+                </Badge>
+              </Flex>
               {schemaError && (
                 <Tooltip label={schemaError}>
                   <Flex align="center">
@@ -215,7 +225,7 @@ function App() {
               align="center"
               justify="space-between"
             >
-              Value to be parsed using the Zod schema
+              Value to be parsed
               <Button
                 size="compact-xs"
                 onClick={() => {
