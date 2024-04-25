@@ -20,8 +20,7 @@ import str2 from '../node_modules/zod/lib/types.d.ts?raw'
 import classes from './App.module.css'
 import {Header} from './ui/Header/Header'
 
-// @ts-ignore
-import {dependencies} from '#package.json'
+import {dependencies} from '../package.json'
 
 const ZOD_VERSION = dependencies.zod.split('^')[1]
 
