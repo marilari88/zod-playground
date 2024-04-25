@@ -1,17 +1,17 @@
 import {
   Box,
   Button,
-  Center,
   Flex,
   SimpleGrid,
   Stack,
   Textarea,
+  Tooltip,
   useMantineTheme,
 } from '@mantine/core'
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
-import {useRef, useState} from 'react'
-import {FiCheckCircle, FiXCircle} from 'react-icons/fi'
+import {useEffect, useRef, useState} from 'react'
+import {FiAlertCircle, FiCheckCircle} from 'react-icons/fi'
 import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
 
@@ -31,6 +31,8 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
     horizontalScrollbarSize: 10,
   },
   automaticLayout: true,
+  formatOnType: true,
+  formatOnPaste: true,
 }
 
 const libUri = 'file:///node_modules/zod/lib/index.d.ts'
@@ -42,36 +44,84 @@ loader.init().then((monaco) => {
   )
 })
 
+const evaluateExpression = (expression: string) => {
+  try {
+    const evaluatedExpression = new Function(`return ${expression}`)()
+    return {success: true, data: evaluatedExpression} as const
+  } catch (e) {
+    return {
+      success: false,
+      error:
+        e instanceof SyntaxError
+          ? 'Invalid syntax'
+          : e instanceof ReferenceError
+            ? 'Invalid reference'
+            : 'Invalid value',
+    } as const
+  }
+}
+
+const validateData = (schema: ZodSchema, data: unknown) => {
+  const validationRes = schema.safeParse(data)
+  return validationRes.success
+    ? ({success: true, data: validationRes.data} as const)
+    : ({
+        success: false,
+        error: generateErrorMessage(validationRes.error.issues),
+      } as const)
+}
+
 const schemaSchema = z
   .string()
   .min(2)
-  .transform((s) => eval(s))
+  .transform((s, ctx) => {
+    try {
+      return eval(s)
+    } catch (e) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Invalid schema',
+        path: ['schema'],
+      })
+      return z.NEVER
+    }
+  })
   .pipe(z.custom<ZodSchema>())
-const valueSchema = z.string()
 
-type Values = {
+const dataSchema = z.object({
+  schema: schemaSchema,
+  values: z.array(z.string()),
+})
+
+type Value = {
   value?: string
   defaultValue?: string
-  response?: {success: true; data: unknown} | {success: false; error: string}
+  validationResult?:
+    | {success: true; data: unknown}
+    | {success: false; error: string}
 }
 
-function App() {
-  const defaultZodScheme: string =
-`z.object({
+const defaultZodScheme = `z.object({
   name: z.string(),
   birth_year: z.number().optional()
 })`
 
-  const defaultTestValue: string = '{"name": "John"}'
+const defaultTestValue = '{name: "John"}'
 
-  const [error, setError] = useState<string | null>()
-  const [values, setValues] = useState<Values[]>([
+function App() {
+  const [values, setValues] = useState<Value[]>([
     {defaultValue: defaultTestValue},
   ])
+  const [schemaText, setSchemaText] = useState<string>(defaultZodScheme)
+  const [schemaError, setSchemaError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
-  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
 
   const theme = useMantineTheme()
+
+  useEffect(() => {
+    if (schemaText == '') return
+    formRef.current?.requestSubmit()
+  }, [schemaText])
 
   return (
     <Box className={classes.layout}>
@@ -82,50 +132,80 @@ function App() {
         onSubmit={(e) => {
           e.preventDefault()
 
-          if (formRef.current == null) return
-
-          const formData = new FormData(formRef.current)
+          const formData = new FormData(e.currentTarget)
 
           try {
-            const schema = schemaSchema.parse(editorRef.current?.getValue())
+            const data = {
+              schema: formData.get('schema'),
+              values: formData.getAll('value'),
+            }
 
-            const values = formData.getAll('value')
+            const {values, schema} = dataSchema.parse(data)
+            setSchemaError(null)
 
-            const newValues: Values[] = values.map((v) => {
-              const parsedValue = valueSchema.parse(v)
-              const validationRes = schema.safeParse(
-                new Function(`return ${parsedValue}`)(),
+            const newValues = values.map((v): Value => {
+              const evaluatedExpression = evaluateExpression(v)
+              if (!evaluatedExpression.success) {
+                return {
+                  value: v,
+                  validationResult: evaluatedExpression,
+                }
+              }
+
+              const validationResult = validateData(
+                schema,
+                evaluatedExpression.data,
               )
               return {
-                value: parsedValue,
-                response: validationRes.success
-                  ? {success: true, data: validationRes.data}
-                  : {
-                      success: false,
-                      error: generateErrorMessage(validationRes.error.issues),
-                    },
-              }
+                value: v,
+                validationResult,
+              } as const
             })
             setValues(newValues)
-            setError(null)
           } catch (e) {
-            setError(e instanceof Error ? e.message : 'error')
+            if (e instanceof z.ZodError) {
+              const schemaIssue = e.issues.find((issue) =>
+                issue.path.some((p) => p === 'schema'),
+              )
+              if (schemaIssue) {
+                setSchemaError(schemaIssue.message)
+              }
+            }
+            setSchemaError('Generic error')
           }
         }}
+        onChange={(e) => {
+          const form = e.currentTarget
+          form.requestSubmit()
+        }}
       >
-        <SimpleGrid cols={2} h="80%" spacing={0}>
+        <SimpleGrid cols={2} h="100%" spacing={0}>
           <div className={classes.leftPanel}>
-            <div className={classes.sectionTitle}>Zod schema</div>
+            <Flex
+              className={classes.sectionTitle}
+              align="center"
+              justify="space-between"
+              bg={schemaError ? theme.colors.red[0] : 'transparent'}
+            >
+              Zod schema{' '}
+              {schemaError && (
+                <Tooltip label={schemaError}>
+                  <Flex align="center">
+                    <FiAlertCircle color="red" size="1.5rem" />
+                  </Flex>
+                </Tooltip>
+              )}
+            </Flex>
             <div className={classes.editor}>
               <Editor
-                height="90%"
-                defaultLanguage="typescript"
-                onMount={(editor) => {
-                  editorRef.current = editor
+                onChange={(value) => {
+                  setSchemaText(value ?? '')
                 }}
+                defaultLanguage="typescript"
                 options={editorOptions}
-                defaultValue={defaultZodScheme}
+                value={schemaText}
               />
+              <input type="hidden" name="schema" value={schemaText} />
             </div>
           </div>
 
@@ -154,26 +234,33 @@ function App() {
                     className={classes.valueCards}
                   >
                     <Textarea
-                      error={!!value.response && !value.response.success}
+                      error={
+                        !!value.validationResult &&
+                        !value.validationResult.success
+                      }
                       name="value"
                       autosize={true}
                       rightSection={
-                        value.response &&
-                        (value.response?.success ? (
+                        value.validationResult &&
+                        (value.validationResult?.success ? (
                           <FiCheckCircle color={theme.colors.green[8]} />
                         ) : (
-                          <FiXCircle color={theme.colors.red[8]} />
+                          <FiAlertCircle color={theme.colors.red[8]} />
                         ))
                       }
                       defaultValue={value.defaultValue}
                     />
-                    {value.response && (
+                    {value.validationResult && (
                       <div className={classes.valueResult}>
-                        {value.response.success && (
-                          <div>{JSON.stringify(value.response?.data)}</div>
+                        {value.validationResult.success && (
+                          <div>
+                            {JSON.stringify(value.validationResult?.data)}
+                          </div>
                         )}
-                        {!value.response.success && (
-                          <div>{JSON.stringify(value.response?.error)}</div>
+                        {!value.validationResult.success && (
+                          <div>
+                            {JSON.stringify(value.validationResult?.error)}
+                          </div>
                         )}
                       </div>
                     )}
@@ -183,12 +270,6 @@ function App() {
             </Stack>
           </div>
         </SimpleGrid>
-        <Box style={{gridColumn: '1 / -1'}}>
-          <Center w="100%" p="md">
-            <Button type="submit">Validate</Button>
-          </Center>
-          {error && <div>{JSON.stringify(error)}</div>}
-        </Box>
       </form>
     </Box>
   )
