@@ -20,7 +20,6 @@
 }
 
 .editor {
-  display: grid;
   flex-grow: 1;
 }
 
