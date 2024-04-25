@@ -1,6 +1,6 @@
 import {Anchor, Box} from '@mantine/core'
-import classes from './Header.module.css'
 import {FaGithub} from 'react-icons/fa'
+import classes from './Header.module.css'
 
 export const ZodLogo = () => (
   <svg
