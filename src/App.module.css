@@ -7,6 +7,8 @@
 
 .leftPanel {
   border-right: 1px solid var(--mantine-color-gray-2);
+  display: flex;
+  flex-direction: column;
 }
 
 .sectionTitle {
@@ -18,7 +20,8 @@
 }
 
 .editor {
-  display: 'grid'
+  display: grid;
+  flex-grow: 1;
 }
 
 .valuesStack {
