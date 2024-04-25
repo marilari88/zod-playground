@@ -11,7 +11,7 @@ import {
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useEffect, useRef, useState} from 'react'
-import {FiAlertCircle, FiCheckCircle, FiXCircle} from 'react-icons/fi'
+import {FiAlertCircle, FiCheckCircle} from 'react-icons/fi'
 import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
 
@@ -101,12 +101,12 @@ type Value = {
     | {success: false; error: string}
 }
 
-const defaultZodScheme: string = `z.object({
+const defaultZodScheme = `z.object({
   name: z.string(),
   birth_year: z.number().optional()
 })`
 
-const defaultTestValue: string = '{name: "John"}'
+const defaultTestValue = '{name: "John"}'
 
 function App() {
   const [values, setValues] = useState<Value[]>([
@@ -163,7 +163,6 @@ function App() {
             })
             setValues(newValues)
           } catch (e) {
-            console.log({e})
             if (e instanceof z.ZodError) {
               const schemaIssue = e.issues.find((issue) =>
                 issue.path.some((p) => p === 'schema'),
@@ -246,7 +245,7 @@ function App() {
                         (value.validationResult?.success ? (
                           <FiCheckCircle color={theme.colors.green[8]} />
                         ) : (
-                          <FiXCircle color={theme.colors.red[8]} />
+                          <FiAlertCircle color={theme.colors.red[8]} />
                         ))
                       }
                       defaultValue={value.defaultValue}
