@@ -1,0 +1,31 @@
+.valueContainer {
+  display: flex;
+  flex-direction: column;
+  grid-template-rows: auto 1fr auto;
+}
+
+.valueTitle {
+  padding-block: 2px;
+  padding-inline: var(--mantine-spacing-lg);
+  font-weight: 500;
+  color: var(--mantine-color-gray-7);
+  background-color: var(--mantine-color-gray-0);
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+}
+
+
+.valueEditor {
+  height: 100%;
+  overflow: auto;
+  display: flex;
+
+  &>* {
+    flex-grow: 1;
+  }
+}
+
+.valueResult {
+  color: var(--mantine-color-gray-8);
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 500;
+}

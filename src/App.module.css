@@ -2,13 +2,27 @@
   display: grid;
   grid-template-rows: auto 1fr;
   height: 100dvh;
-  overflow: hidden;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-height: 100%;
+  overflow: auto;
 }
 
 .leftPanel {
   border-right: 1px solid var(--mantine-color-gray-2);
   display: flex;
   flex-direction: column;
+  overflow: auto;
+}
+
+.rightPanel {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100%;
+  overflow: auto;
 }
 
 .sectionTitle {
@@ -24,16 +38,17 @@
 }
 
 .valuesStack {
-  padding-block: var(--mantine-spacing-lg);
-  padding-inline: var(--mantine-spacing-sm);
-}
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
 
-.valueCards {
-  padding-inline: var(--mantine-spacing-sm);
-}
+  &>* {
+    flex-basis: 200px;
+    flex-shrink: 0;
+    flex-grow: 1;
+    border: 1px solid var(--mantine-color-gray-2);
 
-.valueResult {
-  color: var(--mantine-color-gray-8);
-  font-size: var(--mantine-font-size-sm);
-  font-weight: 500;
+    overflow-y: auto;
+  }
 }

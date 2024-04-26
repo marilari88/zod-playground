@@ -1,26 +1,17 @@
-import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  SimpleGrid,
-  Stack,
-  Textarea,
-  Tooltip,
-  useMantineTheme,
-} from '@mantine/core'
+import {Badge, Box, Button, Flex, Tooltip, useMantineTheme} from '@mantine/core'
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useEffect, useRef, useState} from 'react'
-import {FiAlertCircle, FiCheckCircle} from 'react-icons/fi'
+import {FiAlertCircle} from 'react-icons/fi'
 import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
 
 import str2 from '../node_modules/zod/lib/types.d.ts?raw'
-import classes from './App.module.css'
-import {Header} from './ui/Header/Header'
-
 import {dependencies} from '../package.json'
+import classes from './App.module.css'
+import {ValueEditor} from './features/ValueEditor/ValueEditor'
+import {Value} from './models/value'
+import {Header} from './ui/Header/Header'
 
 const ZOD_VERSION = dependencies.zod.split('^')[1]
 
@@ -100,14 +91,6 @@ const dataSchema = z.object({
   values: z.array(z.string()),
 })
 
-type Value = {
-  value?: string
-  defaultValue?: string
-  validationResult?:
-    | {success: true; data: unknown}
-    | {success: false; error: string}
-}
-
 const defaultZodScheme = `z.object({
   name: z.string(),
   birth_year: z.number().optional()
@@ -134,7 +117,7 @@ function App() {
     <Box className={classes.layout}>
       <Header />
       <form
-        style={{height: '100%', width: '100%'}}
+        className={classes.form}
         ref={formRef}
         onSubmit={(e) => {
           e.preventDefault()
@@ -187,102 +170,74 @@ function App() {
           form.requestSubmit()
         }}
       >
-        <SimpleGrid cols={2} h="100%" spacing={0}>
-          <div className={classes.leftPanel}>
-            <Flex
-              className={classes.sectionTitle}
-              align="center"
-              justify="space-between"
-              bg={schemaError ? theme.colors.red[0] : 'transparent'}
-            >
-              <Flex gap="sm">
-                Zod schema
-                <Badge variant="default" size="lg" tt="none">
-                  v{ZOD_VERSION}
-                </Badge>
-              </Flex>
-              {schemaError && (
-                <Tooltip label={schemaError}>
-                  <Flex align="center">
-                    <FiAlertCircle color="red" size="1.5rem" />
-                  </Flex>
-                </Tooltip>
-              )}
+        <div className={classes.leftPanel}>
+          <Flex
+            className={classes.sectionTitle}
+            align="center"
+            justify="space-between"
+            bg={schemaError ? theme.colors.red[0] : 'transparent'}
+          >
+            <Flex gap="sm">
+              Zod schema
+              <Badge variant="default" size="lg" tt="none">
+                v{ZOD_VERSION}
+              </Badge>
             </Flex>
-            <div className={classes.editor}>
-              <Editor
-                onChange={(value) => {
-                  setSchemaText(value ?? '')
-                }}
-                defaultLanguage="typescript"
-                options={editorOptions}
-                value={schemaText}
-              />
-              <input type="hidden" name="schema" value={schemaText} />
-            </div>
-          </div>
+            {schemaError && (
+              <Tooltip label={schemaError}>
+                <Flex align="center">
+                  <FiAlertCircle color="red" size="1.5rem" />
+                </Flex>
+              </Tooltip>
+            )}
+          </Flex>
 
-          <div>
-            <Flex
-              className={classes.sectionTitle}
-              align="center"
-              justify="space-between"
+          <Editor
+            className={classes.editor}
+            onChange={(value) => {
+              setSchemaText(value ?? '')
+            }}
+            defaultLanguage="typescript"
+            options={editorOptions}
+            value={schemaText}
+          />
+          <input type="hidden" name="schema" value={schemaText} />
+        </div>
+
+        <div className={classes.rightPanel}>
+          <Flex
+            className={classes.sectionTitle}
+            align="center"
+            justify="space-between"
+          >
+            Value to be parsed
+            <Button
+              size="compact-xs"
+              onClick={() => {
+                setValues((values) => {
+                  return [...values, {}]
+                })
+              }}
             >
-              Value to be parsed
-              <Button
-                size="compact-xs"
-                onClick={() => {
-                  setValues((values) => [...values, {}])
-                }}
-              >
-                Add a value
-              </Button>
-            </Flex>
-            <Stack className={classes.valuesStack}>
-              {values.map((value, index) => {
-                return (
-                  <Stack
-                    gap={theme.spacing.sm}
-                    key={`val${index}`}
-                    className={classes.valueCards}
-                  >
-                    <Textarea
-                      error={
-                        !!value.validationResult &&
-                        !value.validationResult.success
-                      }
-                      name="value"
-                      autosize={true}
-                      rightSection={
-                        value.validationResult &&
-                        (value.validationResult?.success ? (
-                          <FiCheckCircle color={theme.colors.green[8]} />
-                        ) : (
-                          <FiAlertCircle color={theme.colors.red[8]} />
-                        ))
-                      }
-                      defaultValue={value.defaultValue}
-                    />
-                    {value.validationResult && (
-                      <div className={classes.valueResult}>
-                        {value.validationResult.success && (
-                          <div>
-                            {JSON.stringify(value.validationResult?.data)}
-                          </div>
-                        )}
-                        {!value.validationResult.success && (
-                          <div>
-                            {JSON.stringify(value.validationResult?.error)}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </Stack>
-                )
-              })}
-            </Stack>
+              Add a value
+            </Button>
+          </Flex>
+
+          <div className={classes.valuesStack}>
+            {values.map((value, index) => {
+              return (
+                <ValueEditor
+                  key={`val${index}`}
+                  value={value}
+                  index={index + 1}
+                  onChange={() => {
+                    formRef.current?.requestSubmit()
+                  }}
+                />
+              )
+            })}
           </div>
-        </SimpleGrid>
+        </div>
       </form>
     </Box>
   )
