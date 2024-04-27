@@ -38,6 +38,10 @@ loader.init().then((monaco) => {
     `declare namespace z{${str2}}`,
     libUri,
   )
+  monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+    noSemanticValidation: true,
+    noSyntaxValidation: true,
+  })
 })
 
 const evaluateExpression = (expression: string) => {

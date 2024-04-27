@@ -46,9 +46,15 @@ export const ValueEditor = ({
           defaultLanguage="typescript"
           options={editorOptions}
           value={valueState.value}
+          defaultValue={valueState.value}
         />
       </div>
-      <input type="hidden" name="value" ref={inputRef} />
+      <input
+        type="hidden"
+        name="value"
+        defaultValue={valueState.defaultValue}
+        ref={inputRef}
+      />
       {valueState.validationResult && (
         <div className={classes.valueResult}>
           {valueState.validationResult.success && (
