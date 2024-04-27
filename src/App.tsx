@@ -214,7 +214,7 @@ function App() {
             align="center"
             justify="space-between"
           >
-            Value to be parsed
+            Values to be parsed
             <Button
               size="compact-xs"
               onClick={() => {

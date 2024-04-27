@@ -1,4 +1,4 @@
-import {Box} from '@mantine/core'
+import {Box, Center} from '@mantine/core'
 import Editor from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useRef} from 'react'
@@ -36,7 +36,7 @@ export const ValueEditor = ({
   const inputRef = useRef<HTMLInputElement>(null)
   return (
     <Box className={classes.valueContainer}>
-      <Box className={classes.valueTitle}>Value #{index}</Box>
+      <Box className={classes.valueTitle}><Center>#{index}</Center></Box>
       <div className={classes.valueEditor}>
         <Editor
           onChange={(value) => {
