@@ -22,13 +22,17 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   scrollbar: {
     // Subtle shadows to the left & top. Defaults to true.
     useShadows: false,
+    vertical: 'auto',
 
     verticalScrollbarSize: 10,
     horizontalScrollbarSize: 10,
   },
+  overviewRulerBorder: false,
+  hideCursorInOverviewRuler: true,
   automaticLayout: true,
   formatOnType: true,
   formatOnPaste: true,
+  renderLineHighlight: 'none',
 }
 
 const libUri = 'file:///node_modules/zod/lib/index.d.ts'

@@ -16,12 +16,17 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
     // Subtle shadows to the left & top. Defaults to true.
     useShadows: false,
 
+    vertical: 'auto',
+
     verticalScrollbarSize: 10,
     horizontalScrollbarSize: 10,
   },
+  overviewRulerBorder: false,
+  hideCursorInOverviewRuler: true,
   automaticLayout: true,
   formatOnType: true,
   formatOnPaste: true,
+  renderLineHighlight: 'none',
 }
 
 export const ValueEditor = ({
@@ -36,7 +41,9 @@ export const ValueEditor = ({
   const inputRef = useRef<HTMLInputElement>(null)
   return (
     <Box className={classes.valueContainer}>
-      <Box className={classes.valueTitle}><Center>#{index}</Center></Box>
+      <Box className={classes.valueTitle}>
+        <Center>#{index}</Center>
+      </Box>
       <div className={classes.valueEditor}>
         <Editor
           onChange={(value) => {
