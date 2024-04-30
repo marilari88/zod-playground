@@ -1,4 +1,4 @@
-import {Badge, Box, Button, Flex, Tooltip, useMantineTheme} from '@mantine/core'
+import {Badge, Box, Flex, Tooltip, useMantineTheme} from '@mantine/core'
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useEffect, useRef, useState} from 'react'
@@ -107,9 +107,7 @@ const defaultZodScheme = `z.object({
 const defaultTestValue = '{name: "John"}'
 
 function App() {
-  const [values, setValues] = useState<Value[]>([
-    {defaultValue: defaultTestValue},
-  ])
+  const [values, setValues] = useState<Value[]>([{value: defaultTestValue}])
   const [schemaText, setSchemaText] = useState<string>(defaultZodScheme)
   const [schemaError, setSchemaError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -213,24 +211,6 @@ function App() {
         </div>
 
         <div className={classes.rightPanel}>
-          <Flex
-            className={classes.sectionTitle}
-            align="center"
-            justify="space-between"
-          >
-            Values to be parsed
-            <Button
-              size="compact-xs"
-              onClick={() => {
-                setValues((values) => {
-                  return [...values, {}]
-                })
-              }}
-            >
-              Add a value
-            </Button>
-          </Flex>
-
           <div className={classes.valuesStack}>
             {values.map((value, index) => {
               return (
@@ -238,6 +218,22 @@ function App() {
                   key={`val${index}`}
                   value={value}
                   index={index + 1}
+                  onAdd={() => {
+                    setValues((values) => {
+                      const _values = [...values]
+                      _values.splice(index + 1, 0, {value: ''})
+                      return _values
+                    })
+                  }}
+                  onRemove={
+                    values.length > 1
+                      ? () => {
+                          setValues((values) => {
+                            return values.filter((_, i) => i !== index)
+                          })
+                        }
+                      : undefined
+                  }
                   onChange={() => {
                     formRef.current?.requestSubmit()
                   }}

@@ -13,11 +13,18 @@
   border-bottom: 1px solid var(--mantine-color-gray-2);
 }
 
+.valueEditorContainer {
+  display: flex;
+  overflow: auto;
+  height: 100%;
+}
+
 
 .valueEditor {
   height: 100%;
   overflow: auto;
   display: flex;
+  flex: 1;
 
   &>* {
     flex-grow: 1;
@@ -25,7 +32,8 @@
 }
 
 .valueResult {
-  color: var(--mantine-color-gray-8);
-  font-size: var(--mantine-font-size-sm);
-  font-weight: 500;
+  padding-inline: var(--mantine-spacing-sm);
+  border-left: 1px solid var(--mantine-color-gray-2);
+  display: block;
+  flex: 1;
 }
