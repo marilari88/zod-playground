@@ -5,12 +5,12 @@
 }
 
 .valueTitle {
-  padding-block: 2px;
+  height: 40px;
   padding-inline: var(--mantine-spacing-lg);
   font-weight: 500;
   color: var(--mantine-color-gray-7);
   background-color: var(--mantine-color-gray-0);
-  border-bottom: 1px solid var(--mantine-color-gray-2);
+  flex-shrink: 0;
 }
 
 .valueEditorContainer {

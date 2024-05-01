@@ -85,7 +85,12 @@ export const ValueEditor = ({
           {valueState.validationResult?.success && (
             <Popover opened={opened}>
               <Popover.Target>
-                <Badge variant="dot" onMouseEnter={open} onMouseLeave={close}>
+                <Badge
+                  variant="dot"
+                  onMouseEnter={open}
+                  onMouseLeave={close}
+                  style={{cursor: 'default'}}
+                >
                   Valid
                 </Badge>
               </Popover.Target>
@@ -106,13 +111,14 @@ export const ValueEditor = ({
             </Popover>
           )}
           {!valueState.validationResult?.success && (
-            <Popover opened={opened}>
+            <Popover opened={opened} withArrow>
               <Popover.Target>
                 <Badge
                   variant="dot"
                   color="red"
                   onMouseEnter={open}
                   onMouseLeave={close}
+                  style={{cursor: 'default'}}
                 >
                   Invalid
                 </Badge>

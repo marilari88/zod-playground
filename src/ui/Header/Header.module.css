@@ -1,6 +1,6 @@
 .header {
   border-bottom: 1px solid var(--mantine-color-gray-3);
-  padding: var(--mantine-spacing-md) var(--mantine-spacing-lg);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-lg);
   display: flex;
   align-items: center;
   gap: var(--mantine-spacing-md);

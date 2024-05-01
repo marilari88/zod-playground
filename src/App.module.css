@@ -24,11 +24,11 @@
 }
 
 .sectionTitle {
-  padding-block: var(--mantine-spacing-sm);
+  height: 40px;
   padding-inline: var(--mantine-spacing-lg);
   font-weight: 500;
   color: var(--mantine-color-gray-7);
-  border-bottom: 1px solid var(--mantine-color-gray-2);
+  flex-shrink: 0;
 }
 
 .editor {

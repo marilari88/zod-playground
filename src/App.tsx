@@ -181,7 +181,7 @@ function App() {
             className={classes.sectionTitle}
             align="center"
             justify="space-between"
-            bg={schemaError ? theme.colors.red[0] : 'transparent'}
+            bg={schemaError ? theme.colors.red[0] : theme.colors.gray[0]}
           >
             <Flex gap="sm">
               Zod schema
@@ -192,7 +192,7 @@ function App() {
             {schemaError && (
               <Tooltip label={schemaError}>
                 <Flex align="center">
-                  <FiAlertCircle color="red" size="1.5rem" />
+                  <FiAlertCircle color="red" size="1.125rem" />
                 </Flex>
               </Tooltip>
             )}
