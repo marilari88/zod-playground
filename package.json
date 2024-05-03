@@ -10,14 +10,14 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
-    "@mantine/core": "^7.8.1",
-    "@mantine/hooks": "^7.8.1",
+    "@mantine/core": "^7.9.0",
+    "@mantine/hooks": "^7.9.0",
     "@monaco-editor/react": "^4.6.0",
     "monaco-editor": "^0.48.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.2.0",
-    "zod": "^3.23.5",
+    "zod": "^3.23.6",
     "zod-error": "^1.5.0"
   },
   "devDependencies": {
@@ -26,6 +26,6 @@
     "@vitejs/plugin-react": "^4.2.1",
     "prettier": "3.2.5",
     "typescript": "^5.4.5",
-    "vite": "^5.2.10"
+    "vite": "^5.2.11"
   }
 }
