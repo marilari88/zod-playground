@@ -5,8 +5,8 @@ Zod Playground is a web app that allows users to play with the Zod API. Users ca
 To get started with Zod Playground, you will need to have Node.js and npm installed on your machine. Once you have these installed, you can clone the repository and run the following commands:
 
 ```
-yarn
-yarn dev
+npm i
+npm run dev
 ```
 This will start the development server and open the app in your default browser.
 
