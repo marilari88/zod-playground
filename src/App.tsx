@@ -6,7 +6,7 @@ import {FiAlertCircle} from 'react-icons/fi'
 import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
 
-import str2 from '../node_modules/zod/lib/types.d.ts?raw'
+import zodTypes from '../node_modules/zod/lib/types.d.ts?raw'
 import {dependencies} from '../package.json'
 import classes from './App.module.css'
 import {ValueEditor} from './features/ValueEditor/ValueEditor'
@@ -35,13 +35,8 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   renderLineHighlight: 'none',
 }
 
-const libUri = 'file:///node_modules/zod/lib/index.d.ts'
-
 loader.init().then((monaco) => {
-  monaco.languages.typescript.typescriptDefaults.addExtraLib(
-    `declare namespace z{${str2}}`,
-    libUri,
-  )
+  monaco.languages.typescript.typescriptDefaults.addExtraLib(`declare namespace z{${zodTypes}}`)
   monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
     noSemanticValidation: true,
     noSyntaxValidation: true,
