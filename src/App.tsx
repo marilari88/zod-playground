@@ -5,6 +5,7 @@ import {
   Flex,
   Tooltip,
   useMantineTheme,
+  Button,
 } from '@mantine/core'
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
@@ -192,11 +193,21 @@ function App() {
             gap="sm"
             bg={schemaError ? theme.colors.red[0] : theme.colors.gray[0]}
           >
-            <Flex gap="sm" flex={1}>
+            <Flex gap="sm" align="center" flex={1}>
               Zod schema
               <Badge variant="default" size="lg" tt="none">
                 v{ZOD_VERSION}
               </Badge>
+              <Button
+                rel="noopener noreferrer"
+                target="_blank"
+                size="compact-xs"
+                variant="transparent"
+                component="a"
+                href="https://zod.dev/"
+              >
+                Docs
+              </Button>
             </Flex>
             <Tooltip label="Copy schema">
               <ActionIcon
