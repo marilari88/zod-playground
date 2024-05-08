@@ -36,7 +36,9 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
 }
 
 loader.init().then((monaco) => {
-  monaco.languages.typescript.typescriptDefaults.addExtraLib(`declare namespace z{${zodTypes}}`)
+  monaco.languages.typescript.typescriptDefaults.addExtraLib(
+    `declare namespace z{${zodTypes}}`,
+  )
   monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
     noSemanticValidation: true,
     noSyntaxValidation: true,
@@ -226,7 +228,6 @@ function App() {
                       : undefined
                   }
                   onClear={(clearedIndex) => {
-                    console.log(clearedIndex)
                     setValues((values) => {
                       return values.map((value) => {
                         if (index === clearedIndex) {
