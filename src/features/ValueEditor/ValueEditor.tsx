@@ -20,6 +20,7 @@ import {
   FiColumns,
   FiMinus,
   FiPlus,
+  FiTrash,
 } from 'react-icons/fi'
 import {Value} from '../../models/value'
 import classes from './ValueEditor.module.css'
@@ -33,9 +34,7 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   scrollbar: {
     // Subtle shadows to the left & top. Defaults to true.
     useShadows: false,
-
     vertical: 'auto',
-
     verticalScrollbarSize: 10,
     horizontalScrollbarSize: 10,
   },
@@ -47,19 +46,23 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   renderLineHighlight: 'none',
 }
 
+interface Props {
+  value: Value
+  index: number
+  onAdd: () => void
+  onRemove?: () => void
+  onChange?: (value: string) => void
+  onClear: (clearedIndex: number) => void
+}
+
 export const ValueEditor = ({
   value: valueState,
   index,
   onChange,
   onAdd,
   onRemove,
-}: {
-  value: Value
-  index: number
-  onAdd?: () => void
-  onRemove?: () => void
-  onChange?: (value: string) => void
-}) => {
+  onClear,
+}: Props) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const [opened, {close, open}] = useDisclosure(false)
   const [openedResult, {toggle: toggleResult}] = useDisclosure(false)
@@ -81,7 +84,7 @@ export const ValueEditor = ({
         justify="space-between"
       >
         <Flex gap="sm" align="center">
-          Value #{index}
+          Value #{index + 1}
           {valueState.validationResult?.success && (
             <Popover opened={opened}>
               <Popover.Target>
@@ -141,13 +144,17 @@ export const ValueEditor = ({
           )}
         </Flex>
         <Flex gap="sm">
-          <Tooltip label="Add value">
+          <Tooltip label="Clear value">
             <ActionIcon
-              disabled={onAdd == undefined}
               variant="light"
-              aria-label="Add value"
-              onClick={() => onAdd?.()}
+              aria-label="Clear value"
+              onClick={() => onClear(index)}
             >
+              <FiTrash />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Add value">
+            <ActionIcon variant="light" aria-label="Add value" onClick={onAdd}>
               <FiPlus />
             </ActionIcon>
           </Tooltip>

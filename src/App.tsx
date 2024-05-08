@@ -212,13 +212,9 @@ function App() {
                 <ValueEditor
                   key={`val${index}`}
                   value={value}
-                  index={index + 1}
+                  index={index}
                   onAdd={() => {
-                    setValues((values) => {
-                      const _values = [...values]
-                      _values.splice(index + 1, 0, {value: ''})
-                      return _values
-                    })
+                    setValues((values) => [...values, {value: ''}])
                   }}
                   onRemove={
                     values.length > 1
@@ -229,6 +225,17 @@ function App() {
                         }
                       : undefined
                   }
+                  onClear={(clearedIndex) => {
+                    console.log(clearedIndex)
+                    setValues((values) => {
+                      return values.map((value) => {
+                        if (index === clearedIndex) {
+                          return {value: ''}
+                        }
+                        return value
+                      })
+                    })
+                  }}
                   onChange={() => {
                     formRef.current?.requestSubmit()
                   }}
