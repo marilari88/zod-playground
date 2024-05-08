@@ -1,12 +1,4 @@
-import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  NavLink,
-  Tooltip,
-  useMantineTheme,
-} from '@mantine/core'
+import {Badge, Box, Button, Flex, Tooltip, useMantineTheme} from '@mantine/core'
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useEffect, useRef, useState} from 'react'
