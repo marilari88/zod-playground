@@ -1,4 +1,12 @@
-import {Badge, Box, Flex, Tooltip, useMantineTheme} from '@mantine/core'
+import {
+  Badge,
+  Box,
+  Button,
+  Flex,
+  NavLink,
+  Tooltip,
+  useMantineTheme,
+} from '@mantine/core'
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useEffect, useRef, useState} from 'react'
@@ -36,7 +44,9 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
 }
 
 loader.init().then((monaco) => {
-  monaco.languages.typescript.typescriptDefaults.addExtraLib(`declare namespace z{${zodTypes}}`)
+  monaco.languages.typescript.typescriptDefaults.addExtraLib(
+    `declare namespace z{${zodTypes}}`,
+  )
   monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
     noSemanticValidation: true,
     noSyntaxValidation: true,
@@ -178,11 +188,21 @@ function App() {
             justify="space-between"
             bg={schemaError ? theme.colors.red[0] : theme.colors.gray[0]}
           >
-            <Flex gap="sm">
+            <Flex gap="sm" align="center">
               Zod schema
               <Badge variant="default" size="lg" tt="none">
                 v{ZOD_VERSION}
               </Badge>
+              <Button
+                rel="noopener noreferrer"
+                target="_blank"
+                size="compact-xs"
+                variant="transparent"
+                component="a"
+                href="https://zod.dev/"
+              >
+                Docs
+              </Button>
             </Flex>
             {schemaError && (
               <Tooltip label={schemaError}>
