@@ -11,6 +11,13 @@
   overflow: auto;
 }
 
+@media (max-width: 768px) {
+  .form {
+    grid-template-columns: none;
+    grid-template-rows: 1fr 1fr;
+  }
+}
+
 .leftPanel {
   border-right: 1px solid var(--mantine-color-gray-2);
   display: flex;
@@ -41,7 +48,7 @@
   height: 100%;
   overflow: auto;
 
-  &>* {
+  & > * {
     flex-basis: 200px;
     flex-shrink: 0;
     flex-grow: 1;
