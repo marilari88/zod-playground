@@ -1,8 +1,15 @@
-import {Badge, Box, Flex, Tooltip, useMantineTheme} from '@mantine/core'
+import {
+  ActionIcon,
+  Badge,
+  Box,
+  Flex,
+  Tooltip,
+  useMantineTheme,
+} from '@mantine/core'
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useEffect, useRef, useState} from 'react'
-import {FiAlertCircle} from 'react-icons/fi'
+import {FiAlertCircle, FiCopy} from 'react-icons/fi'
 import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
 
@@ -36,7 +43,9 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
 }
 
 loader.init().then((monaco) => {
-  monaco.languages.typescript.typescriptDefaults.addExtraLib(`declare namespace z{${zodTypes}}`)
+  monaco.languages.typescript.typescriptDefaults.addExtraLib(
+    `declare namespace z{${zodTypes}}`,
+  )
   monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
     noSemanticValidation: true,
     noSyntaxValidation: true,
@@ -114,6 +123,10 @@ function App() {
     formRef.current?.requestSubmit()
   }, [schemaText])
 
+  const onCopy = () => {
+    navigator.clipboard.writeText(schemaText)
+  }
+
   return (
     <Box className={classes.layout}>
       <Header />
@@ -176,14 +189,24 @@ function App() {
             className={classes.sectionTitle}
             align="center"
             justify="space-between"
+            gap="sm"
             bg={schemaError ? theme.colors.red[0] : theme.colors.gray[0]}
           >
-            <Flex gap="sm">
+            <Flex gap="sm" flex={1}>
               Zod schema
               <Badge variant="default" size="lg" tt="none">
                 v{ZOD_VERSION}
               </Badge>
             </Flex>
+            <Tooltip label="Copy schema">
+              <ActionIcon
+                variant="light"
+                aria-label="Copy schema"
+                onClick={onCopy}
+              >
+                <FiCopy />
+              </ActionIcon>
+            </Tooltip>
             {schemaError && (
               <Tooltip label={schemaError}>
                 <Flex align="center">
