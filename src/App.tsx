@@ -1,8 +1,16 @@
-import {Badge, Box, Button, Flex, Tooltip, useMantineTheme} from '@mantine/core'
+import {
+  ActionIcon,
+  Badge,
+  Box,
+  Flex,
+  Tooltip,
+  useMantineTheme,
+  Button,
+} from '@mantine/core'
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useEffect, useRef, useState} from 'react'
-import {FiAlertCircle} from 'react-icons/fi'
+import {FiAlertCircle, FiCopy} from 'react-icons/fi'
 import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
 
@@ -116,6 +124,10 @@ function App() {
     formRef.current?.requestSubmit()
   }, [schemaText])
 
+  const onCopy = () => {
+    navigator.clipboard.writeText(schemaText)
+  }
+
   return (
     <Box className={classes.layout}>
       <Header />
@@ -178,9 +190,10 @@ function App() {
             className={classes.sectionTitle}
             align="center"
             justify="space-between"
+            gap="sm"
             bg={schemaError ? theme.colors.red[0] : theme.colors.gray[0]}
           >
-            <Flex gap="sm" align="center">
+            <Flex gap="sm" align="center" flex={1}>
               Zod schema
               <Badge variant="default" size="lg" tt="none">
                 v{ZOD_VERSION}
@@ -196,6 +209,15 @@ function App() {
                 Docs
               </Button>
             </Flex>
+            <Tooltip label="Copy schema">
+              <ActionIcon
+                variant="light"
+                aria-label="Copy schema"
+                onClick={onCopy}
+              >
+                <FiCopy />
+              </ActionIcon>
+            </Tooltip>
             {schemaError && (
               <Tooltip label={schemaError}>
                 <Flex align="center">
