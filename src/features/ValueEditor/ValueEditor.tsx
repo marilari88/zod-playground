@@ -24,6 +24,7 @@ import {
 } from 'react-icons/fi'
 import {Value} from '../../models/value'
 import classes from './ValueEditor.module.css'
+import {CopyButton} from '../CopyButton'
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -144,6 +145,7 @@ export const ValueEditor = ({
           )}
         </Flex>
         <Flex gap="sm">
+          <CopyButton value={valueState.value || ''} />
           <Tooltip label="Clear value" withArrow>
             <ActionIcon
               variant="light"

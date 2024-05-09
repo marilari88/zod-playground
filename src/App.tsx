@@ -1,5 +1,4 @@
 import {
-  ActionIcon,
   Badge,
   Box,
   Flex,
@@ -10,7 +9,7 @@ import {
 import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useEffect, useRef, useState} from 'react'
-import {FiAlertCircle, FiCopy} from 'react-icons/fi'
+import {FiAlertCircle} from 'react-icons/fi'
 import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
 
@@ -18,6 +17,7 @@ import zodTypes from '../node_modules/zod/lib/types.d.ts?raw'
 import {dependencies} from '../package.json'
 import classes from './App.module.css'
 import {ValueEditor} from './features/ValueEditor/ValueEditor'
+import {CopyButton} from './features/CopyButton'
 import {Value} from './models/value'
 import {Header} from './ui/Header/Header'
 
@@ -124,10 +124,6 @@ function App() {
     formRef.current?.requestSubmit()
   }, [schemaText])
 
-  const onCopy = () => {
-    navigator.clipboard.writeText(schemaText)
-  }
-
   return (
     <Box className={classes.layout}>
       <Header />
@@ -209,15 +205,7 @@ function App() {
                 Docs
               </Button>
             </Flex>
-            <Tooltip label="Copy schema" withArrow>
-              <ActionIcon
-                variant="light"
-                aria-label="Copy schema"
-                onClick={onCopy}
-              >
-                <FiCopy />
-              </ActionIcon>
-            </Tooltip>
+            <CopyButton value={schemaText} />
             {schemaError && (
               <Tooltip label={schemaError}>
                 <Flex align="center">
