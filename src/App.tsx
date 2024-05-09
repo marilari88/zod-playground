@@ -1,4 +1,5 @@
 import {
+  ActionIcon,
   Badge,
   Box,
   Flex,
@@ -10,6 +11,7 @@ import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useEffect, useRef, useState} from 'react'
 import {FiAlertCircle} from 'react-icons/fi'
+import {LuEraser} from 'react-icons/lu'
 import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
 
@@ -206,6 +208,15 @@ function App() {
               </Button>
             </Flex>
             <CopyButton value={schemaText} />
+            <Tooltip label="Clear schema" withArrow>
+              <ActionIcon
+                variant="light"
+                aria-label="Clear schema"
+                onClick={() => setSchemaText('')}
+              >
+                <LuEraser />
+              </ActionIcon>
+            </Tooltip>
             {schemaError && (
               <Tooltip label={schemaError}>
                 <Flex align="center">
