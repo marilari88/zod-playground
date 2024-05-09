@@ -11,7 +11,7 @@ import Editor, {loader} from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
 import {useEffect, useRef, useState} from 'react'
 import {FiAlertCircle, FiCopy} from 'react-icons/fi'
-import {FaEraser} from 'react-icons/fa'
+import {LuEraser} from 'react-icons/lu'
 import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
 
@@ -225,7 +225,7 @@ function App() {
                 aria-label="Clear schema"
                 onClick={() => setSchemaText('')}
               >
-                <FaEraser />
+                <LuEraser />
               </ActionIcon>
             </Tooltip>
             {schemaError && (
