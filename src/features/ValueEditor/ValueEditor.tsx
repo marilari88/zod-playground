@@ -20,8 +20,8 @@ import {
   FiColumns,
   FiMinus,
   FiPlus,
-  FiTrash,
 } from 'react-icons/fi'
+import {LuEraser} from 'react-icons/lu'
 import {Value} from '../../models/value'
 import classes from './ValueEditor.module.css'
 
@@ -150,7 +150,7 @@ export const ValueEditor = ({
               aria-label="Clear value"
               onClick={() => onClear(index)}
             >
-              <FiTrash />
+              <LuEraser />
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Add value" withArrow>
