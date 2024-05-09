@@ -209,7 +209,7 @@ function App() {
                 Docs
               </Button>
             </Flex>
-            <Tooltip label="Copy schema">
+            <Tooltip label="Copy schema" withArrow>
               <ActionIcon
                 variant="light"
                 aria-label="Copy schema"

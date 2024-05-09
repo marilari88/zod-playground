@@ -144,7 +144,7 @@ export const ValueEditor = ({
           )}
         </Flex>
         <Flex gap="sm">
-          <Tooltip label="Clear value">
+          <Tooltip label="Clear value" withArrow>
             <ActionIcon
               variant="light"
               aria-label="Clear value"
@@ -153,12 +153,12 @@ export const ValueEditor = ({
               <FiTrash />
             </ActionIcon>
           </Tooltip>
-          <Tooltip label="Add value">
+          <Tooltip label="Add value" withArrow>
             <ActionIcon variant="light" aria-label="Add value" onClick={onAdd}>
               <FiPlus />
             </ActionIcon>
           </Tooltip>
-          <Tooltip label="Remove value">
+          <Tooltip label="Remove value" withArrow>
             <ActionIcon
               variant="light"
               disabled={onRemove == undefined}
@@ -168,7 +168,7 @@ export const ValueEditor = ({
               <FiMinus />
             </ActionIcon>
           </Tooltip>
-          <Tooltip label="Toggle results column">
+          <Tooltip label="Toggle results column" withArrow>
             <ActionIcon
               variant="light"
               aria-label="Toggle results column"
