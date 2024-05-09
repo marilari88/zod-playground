@@ -154,7 +154,6 @@ export function Header() {
         >
           <FaGithub
             className={classes.githubLink}
-            title="Go to zod playground github repo"
           />
         </Anchor>
       </Box>
