@@ -12,7 +12,12 @@ export const CopyButton = (
             withArrow
             position="top"
           >
-            <ActionIcon disabled={!value} variant="light" onClick={copy}>
+            <ActionIcon 
+              disabled={!value}
+              variant='light'
+              onClick={copy}
+              aria-label={copied ? 'Copied' : 'Copy schema'}
+            >
               {copied ? <FiCheck /> : <FiCopy />}
             </ActionIcon>
           </Tooltip>

@@ -146,7 +146,7 @@ export const ValueEditor = ({
         </Flex>
         <Flex gap="sm">
           <CopyButton value={valueState.value || ''} />
-          <Tooltip label="Clear value">
+          <Tooltip label="Clear value" withArrow>
             <ActionIcon
               variant="light"
               aria-label="Clear value"
