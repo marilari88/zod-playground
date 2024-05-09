@@ -20,10 +20,11 @@ import {
   FiColumns,
   FiMinus,
   FiPlus,
-  FiTrash,
 } from 'react-icons/fi'
+import {LuEraser} from 'react-icons/lu'
 import {Value} from '../../models/value'
 import classes from './ValueEditor.module.css'
+import {CopyButton} from '../CopyButton'
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -144,13 +145,14 @@ export const ValueEditor = ({
           )}
         </Flex>
         <Flex gap="sm">
+          <CopyButton value={valueState.value || ''} />
           <Tooltip label="Clear value" withArrow>
             <ActionIcon
               variant="light"
               aria-label="Clear value"
               onClick={() => onClear(index)}
             >
-              <FiTrash />
+              <LuEraser />
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Add value" withArrow>
