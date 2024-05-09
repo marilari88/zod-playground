@@ -135,18 +135,19 @@ const sampleZodSchema = `z.object({
 const sampleValue = '{name: "John"}'
 
 function App() {
-  const {defaultValues, defaultSchema} = getStateFromSearchParams()
-
   const [validations, setValidations] = useState<Validation[]>(() => {
+    const {defaultValues} = getStateFromSearchParams()
     return defaultValues.length
       ? defaultValues.map((v) => ({
           value: v,
         }))
       : [{value: sampleValue}]
   })
-  const [schemaString, setSchemaString] = useState<string>(
-    defaultSchema ?? sampleZodSchema,
-  )
+  const [schemaString, setSchemaString] = useState<string>(() => {
+    const {defaultSchema} = getStateFromSearchParams()
+    return defaultSchema ?? sampleZodSchema
+  })
+
   const [schemaError, setSchemaError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
