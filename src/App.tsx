@@ -2,28 +2,28 @@ import {
   ActionIcon,
   Badge,
   Box,
+  Button,
   Flex,
   Tooltip,
   useMantineTheme,
-  Button,
 } from '@mantine/core'
+import {notifications} from '@mantine/notifications'
 import Editor, {loader} from '@monaco-editor/react'
+import LZString from 'lz-string'
 import {editor} from 'monaco-editor'
 import {useEffect, useRef, useState} from 'react'
-import {FiAlertCircle} from 'react-icons/fi'
+import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
-import LZString from 'lz-string'
 
 import zodTypes from '../node_modules/zod/lib/types.d.ts?raw'
 import {dependencies} from '../package.json'
 import classes from './App.module.css'
-import {ValueEditor} from './features/ValueEditor/ValueEditor'
 import {CopyButton} from './features/CopyButton'
-import {Value} from './models/value'
+import {ValueEditor} from './features/ValueEditor/ValueEditor'
 import {Validation} from './models/validation'
-import {AppData, Validation} from './types'
+import {AppData, appDataSchema} from './types'
 import {Header} from './ui/Header/Header'
 
 const ZOD_VERSION = dependencies.zod.split('^')[1]
@@ -58,7 +58,7 @@ loader.init().then((monaco) => {
   })
 })
 
-const getAppDataFromSearchParams = (): AppData => {
+const getAppDataFromSearchParams = () => {
   const urlParams = new URLSearchParams(window.location.search)
   const encAppData = urlParams.get('appData')
   if (!encAppData)
@@ -67,23 +67,18 @@ const getAppDataFromSearchParams = (): AppData => {
       values: [],
     }
 
-  // clear url after reading when there'll be a share button
-
-  return JSON.parse(LZString.decompressFromEncodedURIComponent(encAppData)) // wrap?
+  return appDataSchema.parse(
+    JSON.parse(LZString.decompressFromEncodedURIComponent(encAppData)),
+  )
 }
 
-const storeAppDataInSearchParams = (schema: string, values: string[]) => {
+const storeAppDataInSearchParams = (appData: AppData) => {
   const queryParams = new URLSearchParams()
-  const appData: AppData = {
-    schema,
-    values,
-  }
   const encAppData = LZString.compressToEncodedURIComponent(
     JSON.stringify(appData),
-  ) // wrap?
+  )
   queryParams.set('appData', encAppData)
 
-  // for testing only, remove this when there'll be a share button
   window.history.replaceState(
     {},
     '',
@@ -137,11 +132,6 @@ const schemaSchema = z
   })
   .pipe(z.custom<ZodSchema>())
 
-const dataSchema = z.object({
-  schema: schemaSchema,
-  values: z.array(z.string()),
-})
-
 const sampleZodSchema = `z.object({
   name: z.string(),
   birth_year: z.number().optional()
@@ -150,7 +140,6 @@ const sampleZodSchema = `z.object({
 const sampleValue = '{name: "John"}'
 
 const App = () => {
-  // we should call getAppDataFromSearchParams() only once
   const [validations, setValidations] = useState<Validation[]>(() => {
     const {values} = getAppDataFromSearchParams()
     return values.length
@@ -176,7 +165,31 @@ const App = () => {
 
   return (
     <Box className={classes.layout}>
-      <Header />
+      <Header>
+        <Tooltip label="Copy the current schema and values to the clipboard">
+          <Button
+            variant="light"
+            onClick={() => {
+              if (!formRef.current) return
+              storeAppDataInSearchParams({
+                schema: schemaString,
+                values: validations
+                  .map(({value}) => value)
+                  .filter((value): value is string => typeof value == 'string'),
+              })
+              navigator.clipboard.writeText(window.location.href)
+              notifications.show({
+                title: 'The link has been copied to the clipboard',
+                message: 'Share it with your friends!',
+                icon: <FiLink />,
+              })
+            }}
+            rightSection={<FiLink />}
+          >
+            Share
+          </Button>
+        </Tooltip>
+      </Header>
       <form
         className={classes.form}
         ref={formRef}
@@ -191,9 +204,9 @@ const App = () => {
               values: formData.getAll('value'),
             }
 
-            const {values, schema} = dataSchema.parse(data)
+            const {values, schema} = appDataSchema.parse(data)
+            const evauluatedSchema = schemaSchema.parse(schema)
 
-            storeAppDataInSearchParams(schemaString, values) // value add/removal does not trigger url update
             setSchemaError(null)
 
             const validations = values.map((v): Validation => {
@@ -206,7 +219,7 @@ const App = () => {
               }
 
               const validationResult = validateData(
-                schema,
+                evauluatedSchema,
                 evaluatedExpression.data,
               )
               return {

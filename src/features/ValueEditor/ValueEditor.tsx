@@ -23,9 +23,8 @@ import {
 } from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 import {Value} from '../../models/value'
-import {Validation} from '../../models/validation'
-import classes from './ValueEditor.module.css'
 import {CopyButton} from '../CopyButton'
+import classes from './ValueEditor.module.css'
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
