@@ -21,6 +21,7 @@ import classes from './App.module.css'
 import {ValueEditor} from './features/ValueEditor/ValueEditor'
 import {CopyButton} from './features/CopyButton'
 import {Value} from './models/value'
+import {Validation} from './models/validation'
 import {Header} from './ui/Header/Header'
 
 const ZOD_VERSION = dependencies.zod.split('^')[1]
@@ -54,6 +55,26 @@ loader.init().then((monaco) => {
     noSyntaxValidation: true,
   })
 })
+
+function getStateFromSearchParams() {
+  const urlParams = new URLSearchParams(window.location.search)
+  const defaultSchema = urlParams.get('schema')
+  const defaultValues = urlParams.getAll('value').map((v) => v)
+  return {defaultValues, defaultSchema}
+}
+
+function saveStateToSearchParams(schemaText: string, values: string[]) {
+  const queryParams = new URLSearchParams()
+  queryParams.set('schema', schemaText)
+  values.forEach((v) => {
+    queryParams.append('value', v)
+  })
+  window.history.replaceState(
+    null,
+    '',
+    `${window.location.pathname}?${queryParams.toString()}`,
+  )
+}
 
 const evaluateExpression = (expression: string) => {
   try {
@@ -106,25 +127,35 @@ const dataSchema = z.object({
   values: z.array(z.string()),
 })
 
-const defaultZodScheme = `z.object({
+const sampleZodSchema = `z.object({
   name: z.string(),
   birth_year: z.number().optional()
 })`
 
-const defaultTestValue = '{name: "John"}'
+const sampleValue = '{name: "John"}'
 
 function App() {
-  const [values, setValues] = useState<Value[]>([{value: defaultTestValue}])
-  const [schemaText, setSchemaText] = useState<string>(defaultZodScheme)
+  const {defaultValues, defaultSchema} = getStateFromSearchParams()
+
+  const [validations, setValidations] = useState<Validation[]>(() => {
+    return defaultValues.length
+      ? defaultValues.map((v) => ({
+          value: v,
+        }))
+      : [{value: sampleValue}]
+  })
+  const [schemaString, setSchemaString] = useState<string>(
+    defaultSchema ?? sampleZodSchema,
+  )
   const [schemaError, setSchemaError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
   const theme = useMantineTheme()
 
   useEffect(() => {
-    if (schemaText == '') return
+    if (schemaString == '') return
     formRef.current?.requestSubmit()
-  }, [schemaText])
+  }, [schemaString])
 
   return (
     <Box className={classes.layout}>
@@ -144,14 +175,16 @@ function App() {
             }
 
             const {values, schema} = dataSchema.parse(data)
+
+            saveStateToSearchParams(schemaString, values)
             setSchemaError(null)
 
-            const newValues = values.map((v): Value => {
+            const validations = values.map((v): Validation => {
               const evaluatedExpression = evaluateExpression(v)
               if (!evaluatedExpression.success) {
                 return {
                   value: v,
-                  validationResult: evaluatedExpression,
+                  result: evaluatedExpression,
                 }
               }
 
@@ -161,10 +194,10 @@ function App() {
               )
               return {
                 value: v,
-                validationResult,
+                result: validationResult,
               } as const
             })
-            setValues(newValues)
+            setValidations(validations)
           } catch (e) {
             if (e instanceof z.ZodError) {
               const schemaIssue = e.issues.find((issue) =>
@@ -177,10 +210,6 @@ function App() {
             }
             setSchemaError('Invalid schema')
           }
-        }}
-        onChange={(e) => {
-          const form = e.currentTarget
-          form.requestSubmit()
         }}
       >
         <div className={classes.leftPanel}>
@@ -229,30 +258,30 @@ function App() {
           <Editor
             className={classes.editor}
             onChange={(value) => {
-              setSchemaText(value ?? '')
+              setSchemaString(value ?? '')
             }}
             defaultLanguage="typescript"
             options={editorOptions}
-            value={schemaText}
+            value={schemaString}
           />
-          <input type="hidden" name="schema" value={schemaText} />
+          <input type="hidden" name="schema" value={schemaString} />
         </div>
 
         <div className={classes.rightPanel}>
           <div className={classes.valuesStack}>
-            {values.map((value, index) => {
+            {validations.map((value, index) => {
               return (
                 <ValueEditor
                   key={`val${index}`}
-                  value={value}
+                  validation={value}
                   index={index}
                   onAdd={() => {
-                    setValues((values) => [...values, {value: ''}])
+                    setValidations((values) => [...values, {value: ''}])
                   }}
                   onRemove={
-                    values.length > 1
+                    validations.length > 1
                       ? () => {
-                          setValues((values) => {
+                          setValidations((values) => {
                             return values.filter((_, i) => i !== index)
                           })
                         }
