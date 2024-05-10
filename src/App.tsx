@@ -147,7 +147,7 @@ const App = () => {
         }))
       : [{value: sampleValue}]
   })
-  const [schemaString, setSchemaString] = useState<string>(() => {
+  const [schema, setSchema] = useState<string>(() => {
     const {schema} = getAppDataFromSearchParams()
     return schema || sampleZodSchema
   })
@@ -158,9 +158,9 @@ const App = () => {
   const theme = useMantineTheme()
 
   useEffect(() => {
-    if (schemaString == '') return
+    if (schema == '') return
     formRef.current?.requestSubmit()
-  }, [schemaString])
+  }, [schema])
 
   return (
     <Box className={classes.layout}>
@@ -171,7 +171,7 @@ const App = () => {
             onClick={() => {
               if (!formRef.current) return
               storeAppDataInSearchParams({
-                schema: schemaString,
+                schema,
                 values: validations
                   .map(({value}) => value)
                   .filter((value): value is string => typeof value == 'string'),
@@ -265,12 +265,12 @@ const App = () => {
                 Docs
               </Button>
             </Flex>
-            <CopyButton value={schemaString} />
+            <CopyButton value={schema} />
             <Tooltip label="Clear schema" withArrow>
               <ActionIcon
                 variant="light"
                 aria-label="Clear schema"
-                onClick={() => setSchemaString('')}
+                onClick={() => setSchema('')}
               >
                 <LuEraser />
               </ActionIcon>
@@ -287,13 +287,13 @@ const App = () => {
           <Editor
             className={classes.editor}
             onChange={(value) => {
-              setSchemaString(value ?? '')
+              setSchema(value ?? '')
             }}
             defaultLanguage="typescript"
             options={editorOptions}
-            value={schemaString}
+            value={schema}
           />
-          <input type="hidden" name="schema" value={schemaString} />
+          <input type="hidden" name="schema" value={schema} />
         </div>
 
         <div className={classes.rightPanel}>
