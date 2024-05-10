@@ -14,6 +14,7 @@ import {FiAlertCircle} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
+import LZString from 'lz-string'
 
 import zodTypes from '../node_modules/zod/lib/types.d.ts?raw'
 import {dependencies} from '../package.json'
@@ -23,6 +24,7 @@ import {CopyButton} from './features/CopyButton'
 import {Value} from './models/value'
 import {Validation} from './models/validation'
 import {Header} from './ui/Header/Header'
+import {AppData} from './models/appData'
 
 const ZOD_VERSION = dependencies.zod.split('^')[1]
 
@@ -56,24 +58,31 @@ loader.init().then((monaco) => {
   })
 })
 
-function getStateFromSearchParams() {
+function getAppDataFromSearchParams(): AppData {
   const urlParams = new URLSearchParams(window.location.search)
-  const defaultSchema = urlParams.get('schema')
-  const defaultValues = urlParams.getAll('value').map((v) => v)
-  return {defaultValues, defaultSchema}
+  const encAppData = urlParams.get('appData')
+  if (!encAppData)
+    return {
+      schema: '',
+      values: [],
+    }
+
+  // clear url after reading when there'll be a share button
+  
+  return JSON.parse(LZString.decompressFromEncodedURIComponent(encAppData)) // wrap?
 }
 
-function saveStateToSearchParams(schemaText: string, values: string[]) {
+function storeAppDataInSearchParams(schema: string, values: string[]) {
   const queryParams = new URLSearchParams()
-  queryParams.set('schema', schemaText)
-  values.forEach((v) => {
-    queryParams.append('value', v)
-  })
-  window.history.replaceState(
-    null,
-    '',
-    `${window.location.pathname}?${queryParams.toString()}`,
-  )
+  const appData: AppData = {
+    schema,
+    values,
+  }
+  const encAppData = LZString.compressToEncodedURIComponent(JSON.stringify(appData))  // wrap?
+  queryParams.set('appData', encAppData)
+
+  // for testing only, remove this when there'll be a share button
+  window.history.replaceState({}, '', `${window.location.pathname}?${queryParams}`)
 }
 
 const evaluateExpression = (expression: string) => {
@@ -135,17 +144,18 @@ const sampleZodSchema = `z.object({
 const sampleValue = '{name: "John"}'
 
 function App() {
+  // we should call getAppDataFromSearchParams() only once
   const [validations, setValidations] = useState<Validation[]>(() => {
-    const {defaultValues} = getStateFromSearchParams()
-    return defaultValues.length
-      ? defaultValues.map((v) => ({
+    const {values} = getAppDataFromSearchParams()
+    return values.length
+      ? values.map((v) => ({
           value: v,
         }))
       : [{value: sampleValue}]
   })
   const [schemaString, setSchemaString] = useState<string>(() => {
-    const {defaultSchema} = getStateFromSearchParams()
-    return defaultSchema ?? sampleZodSchema
+    const {schema} = getAppDataFromSearchParams()
+    return schema || sampleZodSchema
   })
 
   const [schemaError, setSchemaError] = useState<string | null>(null)
@@ -177,7 +187,7 @@ function App() {
 
             const {values, schema} = dataSchema.parse(data)
 
-            saveStateToSearchParams(schemaString, values)
+            storeAppDataInSearchParams(schemaString, values)
             setSchemaError(null)
 
             const validations = values.map((v): Validation => {
