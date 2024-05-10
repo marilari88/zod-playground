@@ -23,8 +23,8 @@ import {ValueEditor} from './features/ValueEditor/ValueEditor'
 import {CopyButton} from './features/CopyButton'
 import {Value} from './models/value'
 import {Validation} from './models/validation'
+import {AppData, Validation} from './types'
 import {Header} from './ui/Header/Header'
-import {AppData} from './models/appData'
 
 const ZOD_VERSION = dependencies.zod.split('^')[1]
 
@@ -58,7 +58,7 @@ loader.init().then((monaco) => {
   })
 })
 
-function getAppDataFromSearchParams(): AppData {
+const getAppDataFromSearchParams = (): AppData => {
   const urlParams = new URLSearchParams(window.location.search)
   const encAppData = urlParams.get('appData')
   if (!encAppData)
@@ -68,21 +68,27 @@ function getAppDataFromSearchParams(): AppData {
     }
 
   // clear url after reading when there'll be a share button
-  
+
   return JSON.parse(LZString.decompressFromEncodedURIComponent(encAppData)) // wrap?
 }
 
-function storeAppDataInSearchParams(schema: string, values: string[]) {
+const storeAppDataInSearchParams = (schema: string, values: string[]) => {
   const queryParams = new URLSearchParams()
   const appData: AppData = {
     schema,
     values,
   }
-  const encAppData = LZString.compressToEncodedURIComponent(JSON.stringify(appData))  // wrap?
+  const encAppData = LZString.compressToEncodedURIComponent(
+    JSON.stringify(appData),
+  ) // wrap?
   queryParams.set('appData', encAppData)
 
   // for testing only, remove this when there'll be a share button
-  window.history.replaceState({}, '', `${window.location.pathname}?${queryParams}`)
+  window.history.replaceState(
+    {},
+    '',
+    `${window.location.pathname}?${queryParams}`,
+  )
 }
 
 const evaluateExpression = (expression: string) => {
@@ -143,7 +149,7 @@ const sampleZodSchema = `z.object({
 
 const sampleValue = '{name: "John"}'
 
-function App() {
+const App = () => {
   // we should call getAppDataFromSearchParams() only once
   const [validations, setValidations] = useState<Validation[]>(() => {
     const {values} = getAppDataFromSearchParams()
@@ -187,7 +193,7 @@ function App() {
 
             const {values, schema} = dataSchema.parse(data)
 
-            storeAppDataInSearchParams(schemaString, values)
+            storeAppDataInSearchParams(schemaString, values) // value add/removal does not trigger url update
             setSchemaError(null)
 
             const validations = values.map((v): Validation => {
