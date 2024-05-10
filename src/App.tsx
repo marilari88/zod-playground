@@ -260,12 +260,9 @@ function App() {
                   }
                   onClear={(clearedIndex) => {
                     setValues((values) => {
-                      return values.map((value) => {
-                        if (index === clearedIndex) {
-                          return {value: ''}
-                        }
-                        return value
-                      })
+                      const newValues = [...values]
+                      newValues[clearedIndex] = {value: ''}
+                      return newValues
                     })
                   }}
                   onChange={() => {
