@@ -57,7 +57,7 @@ loader.init().then((monaco) => {
   })
 })
 
-const getAppDataFromSearchParams = () => {
+const getAppDataFromSearchParams = (): AppData => {
   const urlParams = new URLSearchParams(window.location.search)
   const encAppData = urlParams.get('appData')
   if (!encAppData)
