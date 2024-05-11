@@ -16,6 +16,10 @@
     grid-template-columns: none;
     grid-template-rows: 1fr 1fr;
   }
+
+  .rightPanel {
+    border-top: 1px solid var(--mantine-color-gray-2);
+  }
 }
 
 .leftPanel {
@@ -48,7 +52,7 @@
   height: 100%;
   overflow: auto;
 
-  & > * {
+  &>* {
     flex-basis: 200px;
     flex-shrink: 0;
     flex-grow: 1;
