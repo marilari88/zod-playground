@@ -38,6 +38,7 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
     vertical: 'auto',
     verticalScrollbarSize: 10,
     horizontalScrollbarSize: 10,
+    alwaysConsumeMouseWheel: false,
   },
   overviewRulerBorder: false,
   hideCursorInOverviewRuler: true,
