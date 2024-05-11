@@ -206,8 +206,8 @@ const App = () => {
             values: formData.getAll('value'),
           }
 
+          const {values, schema} = appDataSchema.parse(data)
           try {
-            const {values, schema} = appDataSchema.parse(data)
             const evaluatedSchema = schemaSchema.parse(schema)
 
             setSchemaError(null)
@@ -238,6 +238,16 @@ const App = () => {
               )
               if (schemaIssue) {
                 setSchemaError(schemaIssue.message)
+
+                setValidations(
+                  values.map((v) => ({
+                    value: v,
+                    result: {
+                      success: false,
+                      error: 'Cannot validate. The schema is invalid',
+                    },
+                  })),
+                )
                 return
               }
             }
