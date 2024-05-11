@@ -22,7 +22,7 @@ import {
   FiPlus,
 } from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
-import {Value} from '../../models/value'
+import {Validation} from '../../types'
 import {CopyButton} from '../CopyButton'
 import classes from './ValueEditor.module.css'
 
@@ -49,7 +49,7 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
 }
 
 interface Props {
-  value: Value
+  validation: Validation
   index: number
   onAdd: () => void
   onRemove?: () => void
@@ -144,7 +144,7 @@ export const ValueEditor = ({
           )}
         </Flex>
         <Flex gap="sm">
-          <CopyButton value={valueState.value || ''} />
+          <CopyButton value={validation.value || ''} />
           <Tooltip label="Clear value" withArrow>
             <ActionIcon
               variant="light"

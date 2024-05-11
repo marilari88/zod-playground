@@ -22,8 +22,7 @@ import {dependencies} from '../package.json'
 import classes from './App.module.css'
 import {CopyButton} from './features/CopyButton'
 import {ValueEditor} from './features/ValueEditor/ValueEditor'
-import {Validation} from './models/validation'
-import {AppData, appDataSchema} from './types'
+import {AppData, Validation, appDataSchema} from './types'
 import {Header} from './ui/Header/Header'
 
 const ZOD_VERSION = dependencies.zod.split('^')[1]
@@ -266,12 +265,12 @@ const App = () => {
                 Docs
               </Button>
             </Flex>
-            <CopyButton value={schemaText} />
+            <CopyButton value={schemaString} />
             <Tooltip label="Clear schema" withArrow>
               <ActionIcon
                 variant="light"
                 aria-label="Clear schema"
-                onClick={() => setSchemaText('')}
+                onClick={() => setSchemaString('')}
               >
                 <LuEraser />
               </ActionIcon>
@@ -299,11 +298,11 @@ const App = () => {
 
         <div className={classes.rightPanel}>
           <div className={classes.valuesStack}>
-            {validations.map((value, index) => {
+            {validations.map((validation, index) => {
               return (
                 <ValueEditor
                   key={`val${index}`}
-                  validation={value}
+                  validation={validation}
                   index={index}
                   onAdd={() => {
                     setValidations((values) => [...values, {value: ''}])
@@ -318,7 +317,7 @@ const App = () => {
                       : undefined
                   }
                   onClear={(clearedIndex) => {
-                    setValues((values) => {
+                    setValidations((values) => {
                       const newValues = [...values]
                       newValues[clearedIndex] = {value: ''}
                       return newValues
