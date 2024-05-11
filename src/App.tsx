@@ -59,16 +59,17 @@ loader.init().then((monaco) => {
 
 const getAppDataFromSearchParams = (): AppData => {
   const urlParams = new URLSearchParams(window.location.search)
-  const encAppData = urlParams.get('appData')
-  if (!encAppData)
+  const encodedAppData = urlParams.get('appData')
+  if (!encodedAppData)
     return {
       schema: '',
       values: [],
     }
 
-  return appDataSchema.parse(
-    JSON.parse(LZString.decompressFromEncodedURIComponent(encAppData)),
-  )
+  const decompressedAppData =
+    LZString.decompressFromEncodedURIComponent(encodedAppData)
+  const parsedAppData = JSON.parse(decompressedAppData)
+  return appDataSchema.parse(parsedAppData)
 }
 
 const storeAppDataInSearchParams = (appData: AppData) => {
@@ -165,7 +166,10 @@ const App = () => {
   return (
     <Box className={classes.layout}>
       <Header>
-        <Tooltip label="Copy the current schema and values to the clipboard">
+        <Tooltip
+          withArrow
+          label="Copy the current schema and values to the clipboard"
+        >
           <Button
             variant="light"
             onClick={() => {
@@ -197,14 +201,14 @@ const App = () => {
 
           const formData = new FormData(e.currentTarget)
 
-          try {
-            const data = {
-              schema: formData.get('schema'),
-              values: formData.getAll('value'),
-            }
+          const data = {
+            schema: formData.get('schema'),
+            values: formData.getAll('value'),
+          }
 
+          try {
             const {values, schema} = appDataSchema.parse(data)
-            const evauluatedSchema = schemaSchema.parse(schema)
+            const evaluatedSchema = schemaSchema.parse(schema)
 
             setSchemaError(null)
 
@@ -218,7 +222,7 @@ const App = () => {
               }
 
               const validationResult = validateData(
-                evauluatedSchema,
+                evaluatedSchema,
                 evaluatedExpression.data,
               )
               return {
