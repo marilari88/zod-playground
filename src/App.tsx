@@ -11,7 +11,7 @@ import {notifications} from '@mantine/notifications'
 import Editor, {loader} from '@monaco-editor/react'
 import LZString from 'lz-string'
 import {editor} from 'monaco-editor'
-import {useEffect, useRef, useState} from 'react'
+import {useEffect, useMemo, useRef, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 import {ZodSchema, z} from 'zod'
@@ -138,16 +138,19 @@ const sampleZodSchema = `z.object({
 const sampleValue = '{name: "John"}'
 
 const App = () => {
+  const appData = useMemo(() => getAppDataFromSearchParams(), []);
+
   const [validations, setValidations] = useState<Validation[]>(() => {
-    const {values} = getAppDataFromSearchParams()
+    const {values} = appData
     return values.length
       ? values.map((v) => ({
           value: v,
         }))
       : [{value: sampleValue}]
   })
+
   const [schema, setSchema] = useState<string>(() => {
-    const {schema} = getAppDataFromSearchParams()
+    const {schema} = appData
     return schema || sampleZodSchema
   })
 
