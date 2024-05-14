@@ -59,7 +59,7 @@ loader.init().then((monaco) => {
 
 const getAppDataFromSearchParams = (): AppData => {
   const urlParams = new URLSearchParams(window.location.search)
-  const compressedAppData = urlParams.get('appData')
+  const compressedAppData = urlParams.get('app-data')
   if (!compressedAppData)
     return {
       schema: '',
@@ -68,8 +68,9 @@ const getAppDataFromSearchParams = (): AppData => {
 
   const decompressedAppData =
     LZString.decompressFromEncodedURIComponent(compressedAppData)
-  const AppData = JSON.parse(decompressedAppData)
-  return appDataSchema.parse(AppData)
+  const appData = JSON.parse(decompressedAppData)
+
+  return appDataSchema.parse(appData)
 }
 
 const storeAppDataInSearchParams = (appData: AppData) => {
@@ -77,7 +78,7 @@ const storeAppDataInSearchParams = (appData: AppData) => {
   const compressedAppData = LZString.compressToEncodedURIComponent(
     JSON.stringify(appData),
   )
-  queryParams.set('appData', compressedAppData)
+  queryParams.set('app-data', compressedAppData)
 
   window.history.replaceState(
     {},
@@ -168,7 +169,7 @@ const App = () => {
       <Header>
         <Tooltip
           withArrow
-          label="Copy the current schema and values to the clipboard"
+          label="Create a link to share the current schema and values"
         >
           <Button
             variant="light"

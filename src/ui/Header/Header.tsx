@@ -147,15 +147,13 @@ export function Header({children}: {children?: React.ReactNode}) {
     <header className={classes.header}>
       <ZodLogo />
       <div className={classes.header__title}>Zod Playground</div>
+      {children}
       <Flex gap="md" ml="auto">
-        {children}
         <Anchor
           href="https://github.com/marilari88/zod-playground"
           target="_blank"
         >
-          <FaGithub
-            className={classes.githubLink}
-          />
+          <FaGithub className={classes.githubLink} />
         </Anchor>
       </Flex>
     </header>
