@@ -59,7 +59,7 @@ loader.init().then((monaco) => {
 
 const getAppDataFromSearchParams = (): AppData => {
   const urlParams = new URLSearchParams(window.location.search)
-  const compressedAppData = urlParams.get('app-data')
+  const compressedAppData = urlParams.get('appdata')
   if (!compressedAppData)
     return {
       schema: '',
@@ -78,7 +78,7 @@ const storeAppDataInSearchParams = (appData: AppData) => {
   const compressedAppData = LZString.compressToEncodedURIComponent(
     JSON.stringify(appData),
   )
-  queryParams.set('app-data', compressedAppData)
+  queryParams.set('appdata', compressedAppData)
 
   window.history.replaceState(
     {},
