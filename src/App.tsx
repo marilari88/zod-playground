@@ -2,15 +2,17 @@ import {
   ActionIcon,
   Badge,
   Box,
+  Button,
   Flex,
   Tooltip,
   useMantineTheme,
-  Button,
 } from '@mantine/core'
+import {notifications} from '@mantine/notifications'
 import Editor, {loader} from '@monaco-editor/react'
+import LZString from 'lz-string'
 import {editor} from 'monaco-editor'
 import {useEffect, useRef, useState} from 'react'
-import {FiAlertCircle} from 'react-icons/fi'
+import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 import {ZodSchema, z} from 'zod'
 import {generateErrorMessage} from 'zod-error'
@@ -18,9 +20,9 @@ import {generateErrorMessage} from 'zod-error'
 import zodTypes from '../node_modules/zod/lib/types.d.ts?raw'
 import {dependencies} from '../package.json'
 import classes from './App.module.css'
-import {ValueEditor} from './features/ValueEditor/ValueEditor'
 import {CopyButton} from './features/CopyButton'
-import {Value} from './models/value'
+import {ValueEditor} from './features/ValueEditor/ValueEditor'
+import {AppData, Validation, appDataSchema} from './types'
 import {Header} from './ui/Header/Header'
 
 const ZOD_VERSION = dependencies.zod.split('^')[1]
@@ -54,6 +56,33 @@ loader.init().then((monaco) => {
     noSyntaxValidation: true,
   })
 })
+
+const getAppDataFromSearchParams = (): AppData => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const compressedAppData = urlParams.get('appdata')
+
+  if (!compressedAppData)
+    return {
+      schema: '',
+      values: [],
+    }
+
+  const decompressedAppData =
+    LZString.decompressFromEncodedURIComponent(compressedAppData)
+  const appData = JSON.parse(decompressedAppData)
+
+  return appDataSchema.parse(appData)
+}
+
+const getURLwithAppData = (appData: AppData): string => {
+  const queryParams = new URLSearchParams()
+  const compressedAppData = LZString.compressToEncodedURIComponent(
+    JSON.stringify(appData),
+  )
+  queryParams.set('appdata', compressedAppData)
+
+  return `${window.location.protocol}//${window.location.host}?${queryParams}`
+}
 
 const evaluateExpression = (expression: string) => {
   try {
@@ -101,34 +130,67 @@ const schemaSchema = z
   })
   .pipe(z.custom<ZodSchema>())
 
-const dataSchema = z.object({
-  schema: schemaSchema,
-  values: z.array(z.string()),
-})
-
-const defaultZodScheme = `z.object({
+const sampleZodSchema = `z.object({
   name: z.string(),
   birth_year: z.number().optional()
 })`
 
-const defaultTestValue = '{name: "John"}'
+const sampleValue = '{name: "John"}'
 
-function App() {
-  const [values, setValues] = useState<Value[]>([{value: defaultTestValue}])
-  const [schemaText, setSchemaText] = useState<string>(defaultZodScheme)
+const App = () => {
+  const [validations, setValidations] = useState<Validation[]>(() => {
+    const {values} = getAppDataFromSearchParams()
+    return values.length
+      ? values.map((v) => ({
+          value: v,
+        }))
+      : [{value: sampleValue}]
+  })
+  const [schema, setSchema] = useState<string>(() => {
+    const {schema} = getAppDataFromSearchParams()
+    return schema || sampleZodSchema
+  })
+
   const [schemaError, setSchemaError] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
 
   const theme = useMantineTheme()
 
   useEffect(() => {
-    if (schemaText == '') return
+    if (schema == '') return
     formRef.current?.requestSubmit()
-  }, [schemaText])
+  }, [schema])
 
   return (
     <Box className={classes.layout}>
-      <Header />
+      <Header>
+        <Tooltip
+          withArrow
+          label="Create a link to share the current schema and values"
+        >
+          <Button
+            variant="light"
+            onClick={() => {
+              if (!formRef.current) return
+              const urlWithAppData = getURLwithAppData({
+                schema,
+                values: validations
+                  .map(({value}) => value)
+                  .filter((value): value is string => typeof value == 'string'),
+              })
+              navigator.clipboard.writeText(urlWithAppData)
+              notifications.show({
+                title: 'The link has been copied to the clipboard',
+                message: 'Share it with your friends!',
+                icon: <FiLink />,
+              })
+            }}
+            rightSection={<FiLink />}
+          >
+            Share
+          </Button>
+        </Tooltip>
+      </Header>
       <form
         className={classes.form}
         ref={formRef}
@@ -137,34 +199,36 @@ function App() {
 
           const formData = new FormData(e.currentTarget)
 
-          try {
-            const data = {
-              schema: formData.get('schema'),
-              values: formData.getAll('value'),
-            }
+          const data = {
+            schema: formData.get('schema'),
+            values: formData.getAll('value'),
+          }
 
-            const {values, schema} = dataSchema.parse(data)
+          const {values, schema} = appDataSchema.parse(data)
+          try {
+            const evaluatedSchema = schemaSchema.parse(schema)
+
             setSchemaError(null)
 
-            const newValues = values.map((v): Value => {
+            const validations = values.map((v): Validation => {
               const evaluatedExpression = evaluateExpression(v)
               if (!evaluatedExpression.success) {
                 return {
                   value: v,
-                  validationResult: evaluatedExpression,
+                  result: evaluatedExpression,
                 }
               }
 
               const validationResult = validateData(
-                schema,
+                evaluatedSchema,
                 evaluatedExpression.data,
               )
               return {
                 value: v,
-                validationResult,
+                result: validationResult,
               } as const
             })
-            setValues(newValues)
+            setValidations(validations)
           } catch (e) {
             if (e instanceof z.ZodError) {
               const schemaIssue = e.issues.find((issue) =>
@@ -172,15 +236,21 @@ function App() {
               )
               if (schemaIssue) {
                 setSchemaError(schemaIssue.message)
+
+                setValidations(
+                  values.map((v) => ({
+                    value: v,
+                    result: {
+                      success: false,
+                      error: 'Cannot validate. The schema is invalid',
+                    },
+                  })),
+                )
                 return
               }
             }
             setSchemaError('Invalid schema')
           }
-        }}
-        onChange={(e) => {
-          const form = e.currentTarget
-          form.requestSubmit()
         }}
       >
         <div className={classes.leftPanel}>
@@ -207,12 +277,12 @@ function App() {
                 Docs
               </Button>
             </Flex>
-            <CopyButton value={schemaText} />
+            <CopyButton value={schema} />
             <Tooltip label="Clear schema" withArrow>
               <ActionIcon
                 variant="light"
                 aria-label="Clear schema"
-                onClick={() => setSchemaText('')}
+                onClick={() => setSchema('')}
               >
                 <LuEraser />
               </ActionIcon>
@@ -229,37 +299,37 @@ function App() {
           <Editor
             className={classes.editor}
             onChange={(value) => {
-              setSchemaText(value ?? '')
+              setSchema(value ?? '')
             }}
             defaultLanguage="typescript"
             options={editorOptions}
-            value={schemaText}
+            value={schema}
           />
-          <input type="hidden" name="schema" value={schemaText} />
+          <input type="hidden" name="schema" value={schema} />
         </div>
 
         <div className={classes.rightPanel}>
           <div className={classes.valuesStack}>
-            {values.map((value, index) => {
+            {validations.map((validation, index) => {
               return (
                 <ValueEditor
                   key={`val${index}`}
-                  value={value}
+                  validation={validation}
                   index={index}
                   onAdd={() => {
-                    setValues((values) => [...values, {value: ''}])
+                    setValidations((values) => [...values, {value: ''}])
                   }}
                   onRemove={
-                    values.length > 1
+                    validations.length > 1
                       ? () => {
-                          setValues((values) => {
+                          setValidations((values) => {
                             return values.filter((_, i) => i !== index)
                           })
                         }
                       : undefined
                   }
                   onClear={(clearedIndex) => {
-                    setValues((values) => {
+                    setValidations((values) => {
                       const newValues = [...values]
                       newValues[clearedIndex] = {value: ''}
                       return newValues

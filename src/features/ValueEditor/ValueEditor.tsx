@@ -22,9 +22,9 @@ import {
   FiPlus,
 } from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
-import {Value} from '../../models/value'
-import classes from './ValueEditor.module.css'
+import {Validation} from '../../types'
 import {CopyButton} from '../CopyButton'
+import classes from './ValueEditor.module.css'
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -49,7 +49,7 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
 }
 
 interface Props {
-  value: Value
+  validation: Validation
   index: number
   onAdd: () => void
   onRemove?: () => void
@@ -58,7 +58,7 @@ interface Props {
 }
 
 export const ValueEditor = ({
-  value: valueState,
+  validation,
   index,
   onChange,
   onAdd,
@@ -70,12 +70,10 @@ export const ValueEditor = ({
   const [openedResult, {toggle: toggleResult}] = useDisclosure(false)
 
   const parsedData =
-    valueState.validationResult?.success &&
-    JSON.stringify(valueState.validationResult?.data)
+    validation.result?.success && JSON.stringify(validation.result?.data)
 
   const errors =
-    !valueState.validationResult?.success &&
-    JSON.stringify(valueState.validationResult?.error)
+    !validation.result?.success && JSON.stringify(validation.result?.error)
 
   return (
     <Box className={classes.valueContainer}>
@@ -87,7 +85,7 @@ export const ValueEditor = ({
       >
         <Flex gap="sm" align="center">
           Value #{index + 1}
-          {valueState.validationResult?.success && (
+          {validation.result?.success && (
             <Popover opened={opened}>
               <Popover.Target>
                 <Badge
@@ -115,7 +113,7 @@ export const ValueEditor = ({
               </Popover.Dropdown>
             </Popover>
           )}
-          {!valueState.validationResult?.success && (
+          {!validation.result?.success && (
             <Popover opened={opened} withArrow>
               <Popover.Target>
                 <Badge
@@ -146,7 +144,7 @@ export const ValueEditor = ({
           )}
         </Flex>
         <Flex gap="sm">
-          <CopyButton value={valueState.value || ''} />
+          <CopyButton value={validation.value || ''} />
           <Tooltip label="Clear value" withArrow>
             <ActionIcon
               variant="light"
@@ -191,8 +189,8 @@ export const ValueEditor = ({
             }}
             defaultLanguage="typescript"
             options={editorOptions}
-            value={valueState.value}
-            defaultValue={valueState.value}
+            value={validation.value}
+            defaultValue={validation.value}
           />
         </div>
         <div
@@ -211,7 +209,7 @@ export const ValueEditor = ({
       <input
         type="hidden"
         name="value"
-        value={valueState.value}
+        value={validation.value}
         ref={inputRef}
       />
     </Box>
