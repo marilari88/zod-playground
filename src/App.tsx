@@ -60,6 +60,7 @@ loader.init().then((monaco) => {
 const getAppDataFromSearchParams = (): AppData => {
   const urlParams = new URLSearchParams(window.location.search)
   const compressedAppData = urlParams.get('appdata')
+
   if (!compressedAppData)
     return {
       schema: '',
@@ -73,18 +74,14 @@ const getAppDataFromSearchParams = (): AppData => {
   return appDataSchema.parse(appData)
 }
 
-const storeAppDataInSearchParams = (appData: AppData) => {
+const getURLwithAppData = (appData: AppData): string => {
   const queryParams = new URLSearchParams()
   const compressedAppData = LZString.compressToEncodedURIComponent(
     JSON.stringify(appData),
   )
   queryParams.set('appdata', compressedAppData)
 
-  window.history.replaceState(
-    {},
-    '',
-    `${window.location.pathname}?${queryParams}`,
-  )
+  return `${window.location.protocol}//${window.location.host}?${queryParams}`
 }
 
 const evaluateExpression = (expression: string) => {
@@ -175,13 +172,13 @@ const App = () => {
             variant="light"
             onClick={() => {
               if (!formRef.current) return
-              storeAppDataInSearchParams({
+              const urlWithAppData = getURLwithAppData({
                 schema,
                 values: validations
                   .map(({value}) => value)
                   .filter((value): value is string => typeof value == 'string'),
               })
-              navigator.clipboard.writeText(window.location.href)
+              navigator.clipboard.writeText(urlWithAppData)
               notifications.show({
                 title: 'The link has been copied to the clipboard',
                 message: 'Share it with your friends!',
