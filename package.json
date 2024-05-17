@@ -10,9 +10,9 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
-    "@mantine/core": "^7.9.1",
-    "@mantine/hooks": "^7.9.1",
-    "@mantine/notifications": "^7.9.1",
+    "@mantine/core": "^7.9.2",
+    "@mantine/hooks": "^7.9.2",
+    "@mantine/notifications": "^7.9.2",
     "@monaco-editor/react": "^4.6.0",
     "lz-string": "^1.5.0",
     "monaco-editor": "^0.48.0",
