@@ -4,7 +4,7 @@
   height: 100dvh;
 }
 
-.form {
+.main {
   display: grid;
   grid-template-columns: 1fr 1fr;
   max-height: 100%;
@@ -12,7 +12,7 @@
 }
 
 @media (max-width: 768px) {
-  .form {
+  .main {
     grid-template-columns: none;
     grid-template-rows: 1fr 1fr;
   }
