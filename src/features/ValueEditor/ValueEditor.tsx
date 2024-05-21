@@ -26,6 +26,18 @@ import {generateErrorMessage} from 'zod-error'
 import {CopyButton} from '../CopyButton'
 import classes from './ValueEditor.module.css'
 
+const getErrorMessage = (e: unknown) => {
+  if (e instanceof SyntaxError) {
+    return 'Invalid syntax'
+  }
+
+  if (e instanceof ReferenceError) {
+    return 'Invalid reference'
+  }
+
+  return 'Invalid value'
+}
+
 const evaluateExpression = (expression: string) => {
   try {
     const evaluatedExpression = new Function(`return ${expression}`)()
@@ -33,12 +45,7 @@ const evaluateExpression = (expression: string) => {
   } catch (e) {
     return {
       success: false,
-      error:
-        e instanceof SyntaxError
-          ? 'Invalid syntax'
-          : e instanceof ReferenceError
-            ? 'Invalid reference'
-            : 'Invalid value',
+      error: getErrorMessage(e),
     } as const
   }
 }
@@ -107,7 +114,7 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
 }
 
 interface Props {
-  schema?: ZodSchema<any, z.ZodTypeDef, any> | undefined
+  schema: ZodSchema<any, z.ZodTypeDef, any> | undefined
   value: string
   index: number
   onAdd: () => void

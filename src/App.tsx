@@ -146,9 +146,7 @@ const App = () => {
             onClick={() => {
               const urlWithAppData = getURLwithAppData({
                 schema,
-                values: values.filter(
-                  (value): value is string => typeof value == 'string',
-                ),
+                values: values.filter((value) => typeof value == 'string'),
               })
               navigator.clipboard.writeText(urlWithAppData)
               notifications.show({
