@@ -11,18 +11,17 @@ import {notifications} from '@mantine/notifications'
 import Editor, {loader} from '@monaco-editor/react'
 import LZString from 'lz-string'
 import {editor} from 'monaco-editor'
-import {useEffect, useMemo, useRef, useState} from 'react'
+import {useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 import {ZodSchema, z} from 'zod'
-import {generateErrorMessage} from 'zod-error'
 
 import zodTypes from '../node_modules/zod/lib/types.d.ts?raw'
 import {dependencies} from '../package.json'
 import classes from './App.module.css'
 import {CopyButton} from './features/CopyButton'
-import {ValueEditor} from './features/ValueEditor/ValueEditor'
-import {AppData, Validation, appDataSchema} from './types'
+import {Validation} from './features/ValueEditor/ValueEditor'
+import {AppData, appDataSchema} from './types'
 import {Header} from './ui/Header/Header'
 
 const ZOD_VERSION = dependencies.zod.split('^')[1]
@@ -84,33 +83,6 @@ const getURLwithAppData = (appData: AppData): string => {
   return `${window.location.protocol}//${window.location.host}?${queryParams}`
 }
 
-const evaluateExpression = (expression: string) => {
-  try {
-    const evaluatedExpression = new Function(`return ${expression}`)()
-    return {success: true, data: evaluatedExpression} as const
-  } catch (e) {
-    return {
-      success: false,
-      error:
-        e instanceof SyntaxError
-          ? 'Invalid syntax'
-          : e instanceof ReferenceError
-            ? 'Invalid reference'
-            : 'Invalid value',
-    } as const
-  }
-}
-
-const validateData = (schema: ZodSchema, data: unknown) => {
-  const validationRes = schema.safeParse(data)
-  return validationRes.success
-    ? ({success: true, data: validationRes.data} as const)
-    : ({
-        success: false,
-        error: generateErrorMessage(validationRes.error.issues),
-      } as const)
-}
-
 const schemaSchema = z
   .string()
   .min(2)
@@ -123,7 +95,6 @@ const schemaSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: errorMessage,
-        path: ['schema'],
       })
       return z.NEVER
     }
@@ -137,32 +108,31 @@ const sampleZodSchema = `z.object({
 
 const sampleValue = '{name: "John"}'
 
+const appData = getAppDataFromSearchParams()
+
+const evaluateSchema = (schema: string) => {
+  try {
+    const evaluatedSchema = schemaSchema.parse(schema)
+    return {evaluatedSchema}
+  } catch (e) {
+    if (e instanceof z.ZodError) return {error: e.message}
+
+    return {error: 'Invalid schema'}
+  }
+}
+
 const App = () => {
-  const appData = useMemo(() => getAppDataFromSearchParams(), []);
-
-  const [validations, setValidations] = useState<Validation[]>(() => {
-    const {values} = appData
-    return values.length
-      ? values.map((v) => ({
-          value: v,
-        }))
-      : [{value: sampleValue}]
-  })
-
   const [schema, setSchema] = useState<string>(() => {
-    const {schema} = appData
-    return schema || sampleZodSchema
+    return appData.schema || sampleZodSchema
   })
 
-  const [schemaError, setSchemaError] = useState<string | null>(null)
-  const formRef = useRef<HTMLFormElement>(null)
+  const [values, setValues] = useState<Array<string>>(() => {
+    return appData.values.length ? appData.values : [sampleValue]
+  })
+
+  const {evaluatedSchema, error: schemaError} = evaluateSchema(schema)
 
   const theme = useMantineTheme()
-
-  useEffect(() => {
-    if (schema == '') return
-    formRef.current?.requestSubmit()
-  }, [schema])
 
   return (
     <Box className={classes.layout}>
@@ -174,12 +144,9 @@ const App = () => {
           <Button
             variant="light"
             onClick={() => {
-              if (!formRef.current) return
               const urlWithAppData = getURLwithAppData({
                 schema,
-                values: validations
-                  .map(({value}) => value)
-                  .filter((value): value is string => typeof value == 'string'),
+                values: values.filter((value) => typeof value == 'string'),
               })
               navigator.clipboard.writeText(urlWithAppData)
               notifications.show({
@@ -194,68 +161,7 @@ const App = () => {
           </Button>
         </Tooltip>
       </Header>
-      <form
-        className={classes.form}
-        ref={formRef}
-        onSubmit={(e) => {
-          e.preventDefault()
-
-          const formData = new FormData(e.currentTarget)
-
-          const data = {
-            schema: formData.get('schema'),
-            values: formData.getAll('value'),
-          }
-
-          const {values, schema} = appDataSchema.parse(data)
-          try {
-            const evaluatedSchema = schemaSchema.parse(schema)
-
-            setSchemaError(null)
-
-            const validations = values.map((v): Validation => {
-              const evaluatedExpression = evaluateExpression(v)
-              if (!evaluatedExpression.success) {
-                return {
-                  value: v,
-                  result: evaluatedExpression,
-                }
-              }
-
-              const validationResult = validateData(
-                evaluatedSchema,
-                evaluatedExpression.data,
-              )
-              return {
-                value: v,
-                result: validationResult,
-              } as const
-            })
-            setValidations(validations)
-          } catch (e) {
-            if (e instanceof z.ZodError) {
-              const schemaIssue = e.issues.find((issue) =>
-                issue.path.some((p) => p === 'schema'),
-              )
-              if (schemaIssue) {
-                setSchemaError(schemaIssue.message)
-
-                setValidations(
-                  values.map((v) => ({
-                    value: v,
-                    result: {
-                      success: false,
-                      error: 'Cannot validate. The schema is invalid',
-                    },
-                  })),
-                )
-                return
-              }
-            }
-            setSchemaError('Invalid schema')
-          }
-        }}
-      >
+      <main className={classes.main}>
         <div className={classes.leftPanel}>
           <Flex
             className={classes.sectionTitle}
@@ -308,45 +214,49 @@ const App = () => {
             options={editorOptions}
             value={schema}
           />
-          <input type="hidden" name="schema" value={schema} />
         </div>
 
         <div className={classes.rightPanel}>
           <div className={classes.valuesStack}>
-            {validations.map((validation, index) => {
+            {values.map((value, index) => {
               return (
-                <ValueEditor
+                <Validation
                   key={`val${index}`}
-                  validation={validation}
+                  schema={evaluatedSchema}
+                  value={value}
                   index={index}
                   onAdd={() => {
-                    setValidations((values) => [...values, {value: ''}])
+                    setValues((values) => [...values, ''])
                   }}
                   onRemove={
-                    validations.length > 1
+                    values.length > 1
                       ? () => {
-                          setValidations((values) => {
+                          setValues((values) => {
                             return values.filter((_, i) => i !== index)
                           })
                         }
                       : undefined
                   }
                   onClear={(clearedIndex) => {
-                    setValidations((values) => {
+                    setValues((values) => {
                       const newValues = [...values]
-                      newValues[clearedIndex] = {value: ''}
+                      newValues[clearedIndex] = ''
                       return newValues
                     })
                   }}
-                  onChange={() => {
-                    formRef.current?.requestSubmit()
+                  onChange={(newValue) => {
+                    setValues((values) => {
+                      const newValues = [...values]
+                      newValues[index] = newValue
+                      return newValues
+                    })
                   }}
                 />
               )
             })}
           </div>
         </div>
-      </form>
+      </main>
     </Box>
   )
 }

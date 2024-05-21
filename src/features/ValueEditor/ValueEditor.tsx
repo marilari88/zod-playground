@@ -11,7 +11,6 @@ import {
 } from '@mantine/core'
 import Editor from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
-import {useRef} from 'react'
 
 import {useDisclosure} from '@mantine/hooks'
 import {
@@ -22,9 +21,75 @@ import {
   FiPlus,
 } from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
-import {Validation} from '../../types'
+import {ZodSchema, z} from 'zod'
+import {generateErrorMessage} from 'zod-error'
 import {CopyButton} from '../CopyButton'
 import classes from './ValueEditor.module.css'
+
+const getErrorMessage = (e: unknown) => {
+  if (e instanceof SyntaxError) {
+    return 'Invalid syntax'
+  }
+
+  if (e instanceof ReferenceError) {
+    return 'Invalid reference'
+  }
+
+  return 'Invalid value'
+}
+
+const evaluateExpression = (expression: string) => {
+  try {
+    const evaluatedExpression = new Function(`return ${expression}`)()
+    return {success: true, data: evaluatedExpression} as const
+  } catch (e) {
+    return {
+      success: false,
+      error: getErrorMessage(e),
+    } as const
+  }
+}
+
+type ValidationResult =
+  | {
+      success: false
+      error: string
+    }
+  | {
+      success: true
+      parsedData: any
+    }
+
+const validateValue = (
+  schema: ZodSchema<any, z.ZodTypeDef, any> | undefined,
+  value: string,
+): ValidationResult => {
+  if (!schema) {
+    return {
+      success: false,
+      error: 'Invalid Schema',
+    }
+  }
+
+  const evaluatedValue = evaluateExpression(value)
+  if (!evaluatedValue.success) return evaluatedValue
+
+  try {
+    const validationRes = schema.safeParse(evaluatedValue.data)
+
+    return validationRes.success
+      ? ({success: true, parsedData: validationRes.data} as const)
+      : ({
+          success: false,
+          error: generateErrorMessage(validationRes.error.issues),
+        } as const)
+  } catch (e) {
+    return {
+      success: false,
+      error: 'Cannot validate value. Please check the schema',
+    }
+  }
+}
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -49,7 +114,8 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
 }
 
 interface Props {
-  validation: Validation
+  schema: ZodSchema<any, z.ZodTypeDef, any> | undefined
+  value: string
   index: number
   onAdd: () => void
   onRemove?: () => void
@@ -57,23 +123,22 @@ interface Props {
   onClear: (clearedIndex: number) => void
 }
 
-export const ValueEditor = ({
-  validation,
+export const Validation = ({
+  schema,
+  value,
   index,
   onChange,
   onAdd,
   onRemove,
   onClear,
 }: Props) => {
-  const inputRef = useRef<HTMLInputElement>(null)
   const [opened, {close, open}] = useDisclosure(false)
   const [openedResult, {toggle: toggleResult}] = useDisclosure(false)
 
-  const parsedData =
-    validation.result?.success && JSON.stringify(validation.result?.data)
+  const validation = validateValue(schema, value)
+  const parsedData = validation.success && JSON.stringify(validation.parsedData)
 
-  const errors =
-    !validation.result?.success && JSON.stringify(validation.result?.error)
+  const errors = !validation.success && JSON.stringify(validation.error)
 
   return (
     <Box className={classes.valueContainer}>
@@ -85,7 +150,7 @@ export const ValueEditor = ({
       >
         <Flex gap="sm" align="center">
           Value #{index + 1}
-          {validation.result?.success && (
+          {validation.success && (
             <Popover opened={opened}>
               <Popover.Target>
                 <Badge
@@ -113,7 +178,7 @@ export const ValueEditor = ({
               </Popover.Dropdown>
             </Popover>
           )}
-          {!validation.result?.success && (
+          {!validation.success && (
             <Popover opened={opened} withArrow>
               <Popover.Target>
                 <Badge
@@ -144,7 +209,7 @@ export const ValueEditor = ({
           )}
         </Flex>
         <Flex gap="sm">
-          <CopyButton value={validation.value || ''} />
+          <CopyButton value={value || ''} />
           <Tooltip label="Clear value" withArrow>
             <ActionIcon
               variant="light"
@@ -184,13 +249,11 @@ export const ValueEditor = ({
         <div className={classes.valueEditor}>
           <Editor
             onChange={(value) => {
-              inputRef.current!.value = value ?? ''
               onChange?.(value ?? '')
             }}
             defaultLanguage="typescript"
             options={editorOptions}
-            value={validation.value}
-            defaultValue={validation.value}
+            value={value}
           />
         </div>
         <div
@@ -206,12 +269,6 @@ export const ValueEditor = ({
           )}
         </div>
       </div>
-      <input
-        type="hidden"
-        name="value"
-        value={validation.value}
-        ref={inputRef}
-      />
     </Box>
   )
 }
