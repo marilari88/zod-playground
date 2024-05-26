@@ -14,17 +14,20 @@ import {editor} from 'monaco-editor'
 import {useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
-import {ZodSchema, z} from 'zod'
 
-import zodTypes from '../node_modules/zod/lib/types.d.ts?raw'
-import {dependencies} from '../package.json'
 import classes from './App.module.css'
 import {CopyButton} from './features/CopyButton'
 import {Validation} from './features/ValueEditor/ValueEditor'
-import {AppData, appDataSchema} from './types'
+import {AppData} from './types'
 import {Header} from './ui/Header/Header'
+import {Zod} from './zod'
 
-const ZOD_VERSION = dependencies.zod.split('^')[1]
+const ZOD_VERSION = '3.23.8'
+
+// no types.d.ts in 1.x
+const zodTypes = await (await fetch(`https://cdn.jsdelivr.net/npm/zod@${ZOD_VERSION}/lib/types.d.ts`)).text()
+
+await Zod.setVersion(ZOD_VERSION)
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -70,7 +73,7 @@ const getAppDataFromSearchParams = (): AppData => {
     LZString.decompressFromEncodedURIComponent(compressedAppData)
   const appData = JSON.parse(decompressedAppData)
 
-  return appDataSchema.parse(appData)
+  return appData
 }
 
 const getURLwithAppData = (appData: AppData): string => {
@@ -83,24 +86,6 @@ const getURLwithAppData = (appData: AppData): string => {
   return `${window.location.protocol}//${window.location.host}?${queryParams}`
 }
 
-const schemaSchema = z
-  .string()
-  .min(2)
-  .transform((s, ctx) => {
-    try {
-      return eval(s)
-    } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : 'Invalid schema'
-
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: errorMessage,
-      })
-      return z.NEVER
-    }
-  })
-  .pipe(z.custom<ZodSchema>())
-
 const sampleZodSchema = `z.object({
   name: z.string(),
   birth_year: z.number().optional()
@@ -109,17 +94,6 @@ const sampleZodSchema = `z.object({
 const sampleValue = '{name: "John"}'
 
 const appData = getAppDataFromSearchParams()
-
-const evaluateSchema = (schema: string) => {
-  try {
-    const evaluatedSchema = schemaSchema.parse(schema)
-    return {evaluatedSchema}
-  } catch (e) {
-    if (e instanceof z.ZodError) return {error: e.message}
-
-    return {error: 'Invalid schema'}
-  }
-}
 
 const App = () => {
   const [schema, setSchema] = useState<string>(() => {
@@ -130,7 +104,10 @@ const App = () => {
     return appData.values.length ? appData.values : [sampleValue]
   })
 
-  const {evaluatedSchema, error: schemaError} = evaluateSchema(schema)
+  const {
+    data: evaluatedSchema,
+    error: schemaError
+  } = Zod.validateSchema(schema)
 
   const theme = useMantineTheme()
 
