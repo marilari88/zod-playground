@@ -36,8 +36,7 @@ class _Zod {
       if (schema.length < 3)
         throw new Error('Schema is too short')
 
-      const z = this.z
-      const data = eval(schema)
+      const data = eval(`const z = this.z;${schema}`)
 
       return {
         success: true,
