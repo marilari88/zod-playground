@@ -21,9 +21,9 @@ import {
   FiPlus,
 } from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
+import {ValidationResult} from '../../types'
 import {CopyButton} from '../CopyButton'
 import classes from './ValueEditor.module.css'
-import {Zod} from '../../zod'
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -48,7 +48,7 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
 }
 
 interface Props {
-  schema: any
+  validationResult: ValidationResult
   value: string
   index: number
   onAdd: () => void
@@ -58,7 +58,7 @@ interface Props {
 }
 
 export const Validation = ({
-  schema,
+  validationResult,
   value,
   index,
   onChange,
@@ -69,10 +69,11 @@ export const Validation = ({
   const [opened, {close, open}] = useDisclosure(false)
   const [openedResult, {toggle: toggleResult}] = useDisclosure(false)
 
-  const validation = Zod.validateValue(schema, value)
-  const parsedData = validation.success && JSON.stringify(validation.data)
+  const parsedData =
+    validationResult.success && JSON.stringify(validationResult.data)
 
-  const errors = !validation.success && JSON.stringify(validation.error)
+  const errors =
+    !validationResult.success && JSON.stringify(validationResult.error)
 
   return (
     <Box className={classes.valueContainer}>
@@ -84,7 +85,7 @@ export const Validation = ({
       >
         <Flex gap="sm" align="center">
           Value #{index + 1}
-          {validation.success && (
+          {validationResult.success && (
             <Popover opened={opened}>
               <Popover.Target>
                 <Badge
@@ -112,7 +113,7 @@ export const Validation = ({
               </Popover.Dropdown>
             </Popover>
           )}
-          {!validation.success && (
+          {!validationResult.success && (
             <Popover opened={opened} withArrow>
               <Popover.Target>
                 <Badge

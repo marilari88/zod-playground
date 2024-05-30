@@ -20,14 +20,14 @@ import {CopyButton} from './features/CopyButton'
 import {Validation} from './features/ValueEditor/ValueEditor'
 import {AppData} from './types'
 import {Header} from './ui/Header/Header'
-import {Zod} from './zod'
+import {useZod} from './useZod'
 
 const ZOD_VERSION = '3.23.8'
 
 // no types.d.ts in 1.x
-const zodTypes = await (await fetch(`https://cdn.jsdelivr.net/npm/zod@${ZOD_VERSION}/lib/types.d.ts`)).text()
-
-await Zod.setVersion(ZOD_VERSION)
+const zodTypes = await (
+  await fetch(`https://cdn.jsdelivr.net/npm/zod@${ZOD_VERSION}/lib/types.d.ts`)
+).text()
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -104,10 +104,9 @@ const App = () => {
     return appData.values.length ? appData.values : [sampleValue]
   })
 
-  const {
-    data: evaluatedSchema,
-    error: schemaError
-  } = Zod.validateSchema(schema)
+  const {version, updateVersion, validate, isLoading} = useZod(ZOD_VERSION)
+
+  const {schemaResult, valuesResult} = validate(schema, values)
 
   const theme = useMantineTheme()
 
@@ -137,6 +136,17 @@ const App = () => {
             Share
           </Button>
         </Tooltip>
+        <select
+          onChange={(e) => {
+            const value = e.target.value
+            updateVersion(value)
+          }}
+          value={version}
+        >
+          <option value="3.23.8">3.23.8</option>
+          <option value="3.0.1">3.0.1</option>
+        </select>
+        {isLoading && 'Loading...'}
       </Header>
       <main className={classes.main}>
         <div className={classes.leftPanel}>
@@ -145,12 +155,14 @@ const App = () => {
             align="center"
             justify="space-between"
             gap="sm"
-            bg={schemaError ? theme.colors.red[0] : theme.colors.gray[0]}
+            bg={
+              !schemaResult.success ? theme.colors.red[0] : theme.colors.gray[0]
+            }
           >
             <Flex gap="sm" align="center" flex={1}>
               Zod schema
               <Badge variant="default" size="lg" tt="none">
-                v{ZOD_VERSION}
+                v{version}
               </Badge>
               <Button
                 rel="noopener noreferrer"
@@ -173,8 +185,8 @@ const App = () => {
                 <LuEraser />
               </ActionIcon>
             </Tooltip>
-            {schemaError && (
-              <Tooltip label={schemaError}>
+            {!schemaResult.success && (
+              <Tooltip label={schemaResult.error}>
                 <Flex align="center">
                   <FiAlertCircle color="red" size="1.125rem" />
                 </Flex>
@@ -195,12 +207,12 @@ const App = () => {
 
         <div className={classes.rightPanel}>
           <div className={classes.valuesStack}>
-            {values.map((value, index) => {
+            {valuesResult.map((valueResult, index) => {
               return (
                 <Validation
                   key={`val${index}`}
-                  schema={evaluatedSchema}
-                  value={value}
+                  validationResult={valueResult}
+                  value={values[index]}
                   index={index}
                   onAdd={() => {
                     setValues((values) => [...values, ''])
