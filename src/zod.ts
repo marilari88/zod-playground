@@ -2,28 +2,36 @@ import {ValidationResult} from './types'
 import {generateErrorMessage} from 'zod-error'
 
 class _Zod {
-  public readonly metadata: any
+  private versions: string[] | undefined
   private z: any
 
-  private constructor(metadata: any) {
-    this.metadata = metadata
-  }
+  async getVersions(): Promise<string[]> {
+    if (!this.versions) {
+      const res = await fetch('https://data.jsdelivr.com/v1/packages/npm/zod')
+      const metadata = await res.json()
+      const versions = []
 
-  static async init(): Promise<_Zod> {
-    const res = await fetch('https://data.jsdelivr.com/v1/packages/npm/zod')
-    const metadata = await res.json()
+      for (const el of metadata.versions) {
+        if (!['alpha', 'beta', 'canary'].some((v) => el.version.includes(v))) {
+          versions.push(el.version)
+        }
+      }
 
-    // metadata.tags
+      versions.push(metadata.tags.canary)
 
-    // alpha: "3.21.5-alpha.0"
-    // beta: "3.23.0-beta.2"
-    // canary: "3.24.0-canary.20240523T174819"
-    // latest: "3.23.8"
-    // next: "3.8.2-alpha.6"
+      // const tags = metadata.tags
+      // for (const k in tags) {
+      //   const ver = tags[k]
+      //   if (!versions.includes(ver))
+      //     versions.push(ver)
+      // }
 
-    // 4.0.0-beta.1 in metadata.versions
+      this.versions = versions.sort((a, b) => {
+        return b.localeCompare(a, undefined, {numeric: true})
+      })
+    }
 
-    return new _Zod(metadata)
+    return this.versions
   }
 
   async setVersion(ver: string) {
@@ -87,4 +95,4 @@ class _Zod {
   }
 }
 
-export const Zod = await _Zod.init()
+export const Zod = new _Zod()

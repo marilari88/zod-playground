@@ -1,22 +1,7 @@
 import {Badge, Combobox, Loader, useCombobox} from '@mantine/core'
-import {matchSorter} from 'match-sorter'
 import {useEffect, useState} from 'react'
 import {FiChevronDown} from 'react-icons/fi'
-
-type Metadata = {
-  versions: Array<{version: string}>
-  tags: Record<string, string>
-}
-
-async function getMetadata() {
-  const res = await fetch('https://data.jsdelivr.com/v1/packages/npm/zod')
-  const metadata = (await res.json()) as Metadata
-  return metadata.versions
-    .filter((v) => {
-      return !v.version.includes('alpha') && !v.version.includes('canary')
-    })
-    .map(({version}) => version)
-}
+import {Zod} from '../../zod'
 
 export function VersionPicker({
   value,
@@ -40,27 +25,22 @@ export function VersionPicker({
   })
 
   const [loading, setLoading] = useState(false)
-  const [versionList, setVersionList] = useState<string[] | null>(null)
+  const [versions, setVersions] = useState<string[] | null>(null)
   const [searchValue, setSearchValue] = useState('')
-  const empty = versionList && versionList.length === 0
 
   useEffect(() => {
     setLoading(true)
-    getMetadata()
-      .then((result) => {
-        setVersionList(result)
-        setLoading(false)
+
+    Zod.getVersions()
+      .then((versions) => {
+        setVersions(versions)
       })
-      .catch(() => {
+      .finally(() => {
         setLoading(false)
       })
   }, [])
 
-  const matchedVersions = matchSorter(versionList || [], searchValue, {
-    baseSort: (a, b) => (a > b ? -1 : 1),
-  })
-
-  const options = (matchedVersions || []).map((item) => (
+  const options = (versions || []).map((item) => (
     <Combobox.Option value={item} key={item}>
       {item}
     </Combobox.Option>
@@ -96,7 +76,7 @@ export function VersionPicker({
         </Badge>
       </Combobox.Target>
 
-      <Combobox.Dropdown hidden={versionList === null}>
+      <Combobox.Dropdown hidden={versions === null}>
         <Combobox.Search
           placeholder="Search a version"
           value={searchValue}
@@ -107,7 +87,7 @@ export function VersionPicker({
         />
         <Combobox.Options mah={400} style={{overflowY: 'auto'}}>
           {options}
-          {empty && <Combobox.Empty>No results found</Combobox.Empty>}
+          {versions?.length === 0 && <Combobox.Empty>No results found</Combobox.Empty>}
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>
