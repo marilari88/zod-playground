@@ -2,36 +2,53 @@ import {ValidationResult} from './types'
 import {generateErrorMessage} from 'zod-error'
 
 class _Zod {
-  private versions: string[] | undefined
+  private metadata: any
   private z: any
 
-  async getVersions(): Promise<string[]> {
-    if (!this.versions) {
+  async getTypes(ver: string): Promise<string> {
+    if (ver.startsWith('1'))
+      return ''
+
+    const res = await fetch(`https://cdn.jsdelivr.net/npm/zod@${ver}/lib/types.d.ts`)
+    return await res.text()
+  }
+
+  async getVersions(tag?: string): Promise<string[]> {
+    if (!this.metadata) {
       const res = await fetch('https://data.jsdelivr.com/v1/packages/npm/zod')
-      const metadata = await res.json()
-      const versions = []
-
-      for (const el of metadata.versions) {
-        if (!['alpha', 'beta', 'canary'].some((v) => el.version.includes(v))) {
-          versions.push(el.version)
-        }
-      }
-
-      versions.push(metadata.tags.canary)
-
-      // const tags = metadata.tags
-      // for (const k in tags) {
-      //   const ver = tags[k]
-      //   if (!versions.includes(ver))
-      //     versions.push(ver)
-      // }
-
-      this.versions = versions.sort((a, b) => {
-        return b.localeCompare(a, undefined, {numeric: true})
-      })
+      this.metadata = await res.json()
     }
 
-    return this.versions
+    const metadata = this.metadata
+    const versions = []
+
+    for (const el of metadata.versions) {
+      const ver = el.version
+
+      if (tag && ver.includes(tag)) {
+        versions.push(ver)
+      }
+      else if (!['alpha', 'beta', 'canary'].some((v) => ver.includes(v))) {
+        versions.push(ver)
+      }
+    }
+
+    if (tag) {
+      const ver = metadata.tags[tag]
+      if (ver) versions.push(ver)
+    }
+    else {
+      versions.push(metadata.tags.canary)
+    }
+
+    // const tags = metadata.tags
+    // for (const k in tags) {
+    //   const ver = tags[k]
+    //   if (!versions.includes(ver))
+    //     versions.push(ver)
+    // }
+
+    return versions.toSorted((a, b) => b.localeCompare(a, undefined, {numeric: true}))
   }
 
   async setVersion(ver: string) {

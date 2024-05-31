@@ -22,14 +22,10 @@ import {AppData} from './types'
 import {Header} from './ui/Header/Header'
 import {Zod} from './zod'
 
-const ZOD_VERSION = '3.23.8'
+const ZOD_DEFAULT_VERSION = (await Zod.getVersions('latest'))[0]
+const zodTypes = await Zod.getTypes(ZOD_DEFAULT_VERSION)
 
-// no types.d.ts in 1.x
-const zodTypes = await (
-  await fetch(`https://cdn.jsdelivr.net/npm/zod@${ZOD_VERSION}/lib/types.d.ts`)
-).text()
-
-await Zod.setVersion(ZOD_VERSION)
+await Zod.setVersion(ZOD_DEFAULT_VERSION)
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -69,7 +65,7 @@ const getAppDataFromSearchParams = (): AppData => {
     return {
       schema: '',
       values: [],
-      version: ZOD_VERSION,
+      version: ZOD_DEFAULT_VERSION,
     }
 
   const decompressedAppData =
@@ -109,7 +105,7 @@ const App = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const [version, setVersion] = useState(appData.version || ZOD_VERSION)
+  const [version, setVersion] = useState(appData.version || ZOD_DEFAULT_VERSION)
 
   const {data: evaluatedSchema, error: schemaError} = Zod.validateSchema(schema)
 
