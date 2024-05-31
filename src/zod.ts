@@ -20,26 +20,20 @@ class _Zod {
     }
 
     const metadata = this.metadata
-    const versions = []
-
-    for (const el of metadata.versions) {
-      const ver = el.version
-
-      if (tag && ver.includes(tag)) {
-        versions.push(ver)
-      }
-      else if (!['alpha', 'beta', 'canary'].some((v) => ver.includes(v))) {
-        versions.push(ver)
-      }
-    }
-
     if (tag) {
       const ver = metadata.tags[tag]
-      if (ver) versions.push(ver)
+      if (ver) return [ver]
+      else throw new Error('Invalid tag')
     }
-    else {
-      versions.push(metadata.tags.canary)
+
+    const versions = []
+    for (const el of metadata.versions) {
+      const ver = el.version
+      if (!['alpha', 'beta', 'canary'].some((v) => ver.includes(v)))
+        versions.push(ver)
     }
+
+    versions.push(metadata.tags.canary)
 
     // const tags = metadata.tags
     // for (const k in tags) {
