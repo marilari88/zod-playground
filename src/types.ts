@@ -1,7 +1,7 @@
-
 export type AppData = {
   schema: string
   values: string[]
+  version: string
 }
 
 export type ValidationResult = {

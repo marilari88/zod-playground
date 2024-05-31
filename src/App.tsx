@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Badge,
   Box,
   Button,
   Flex,
@@ -18,10 +17,10 @@ import {LuEraser} from 'react-icons/lu'
 import classes from './App.module.css'
 import {CopyButton} from './features/CopyButton'
 import {Validation} from './features/ValueEditor/ValueEditor'
+import {VersionPicker} from './features/VersionPicker/VersionPicker'
 import {AppData} from './types'
 import {Header} from './ui/Header/Header'
 import {Zod} from './zod'
-import {VersionPicker} from './features/VersionPicker/VersionPicker'
 
 const ZOD_VERSION = '3.23.8'
 
@@ -70,6 +69,7 @@ const getAppDataFromSearchParams = (): AppData => {
     return {
       schema: '',
       values: [],
+      version: ZOD_VERSION,
     }
 
   const decompressedAppData =
@@ -109,7 +109,7 @@ const App = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const [version, setVersion] = useState(ZOD_VERSION)
+  const [version, setVersion] = useState(appData.version || ZOD_VERSION)
 
   const {data: evaluatedSchema, error: schemaError} = Zod.validateSchema(schema)
 
@@ -128,6 +128,7 @@ const App = () => {
               const urlWithAppData = getURLwithAppData({
                 schema,
                 values: values.filter((value) => typeof value == 'string'),
+                version,
               })
               navigator.clipboard.writeText(urlWithAppData)
               notifications.show({
