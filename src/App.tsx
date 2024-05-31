@@ -21,11 +21,14 @@ import {Validation} from './features/ValueEditor/ValueEditor'
 import {AppData} from './types'
 import {Header} from './ui/Header/Header'
 import {Zod} from './zod'
+import {VersionPicker} from './features/VersionPicker/VersionPicker'
 
 const ZOD_VERSION = '3.23.8'
 
 // no types.d.ts in 1.x
-const zodTypes = await (await fetch(`https://cdn.jsdelivr.net/npm/zod@${ZOD_VERSION}/lib/types.d.ts`)).text()
+const zodTypes = await (
+  await fetch(`https://cdn.jsdelivr.net/npm/zod@${ZOD_VERSION}/lib/types.d.ts`)
+).text()
 
 await Zod.setVersion(ZOD_VERSION)
 
@@ -104,10 +107,11 @@ const App = () => {
     return appData.values.length ? appData.values : [sampleValue]
   })
 
-  const {
-    data: evaluatedSchema,
-    error: schemaError
-  } = Zod.validateSchema(schema)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const [version, setVersion] = useState(ZOD_VERSION)
+
+  const {data: evaluatedSchema, error: schemaError} = Zod.validateSchema(schema)
 
   const theme = useMantineTheme()
 
@@ -149,9 +153,16 @@ const App = () => {
           >
             <Flex gap="sm" align="center" flex={1}>
               Zod schema
-              <Badge variant="default" size="lg" tt="none">
-                v{ZOD_VERSION}
-              </Badge>
+              <VersionPicker
+                value={version}
+                onChange={async (value) => {
+                  setIsLoading(true)
+                  await Zod.setVersion(value)
+                  setVersion(value)
+                  setIsLoading(false)
+                }}
+                disabled={isLoading}
+              />
               <Button
                 rel="noopener noreferrer"
                 target="_blank"

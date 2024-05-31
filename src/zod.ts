@@ -1,8 +1,7 @@
-import {ValidationResult} from "./types"
+import {ValidationResult} from './types'
 import {generateErrorMessage} from 'zod-error'
 
 class _Zod {
-
   public readonly metadata: any
   private z: any
 
@@ -28,25 +27,25 @@ class _Zod {
   }
 
   async setVersion(ver: string) {
-    this.z = await import(/* @vite-ignore */ `https://cdn.jsdelivr.net/npm/zod@${ver}/+esm`)
+    this.z = await import(
+      /* @vite-ignore */ `https://cdn.jsdelivr.net/npm/zod@${ver}/+esm`
+    )
   }
 
   validateSchema(schema: string): ValidationResult {
     try {
-      if (schema.length < 3)
-        throw new Error('Schema is too short')
+      if (schema.length < 3) throw new Error('Schema is too short')
 
       const data = eval(`const z = this.z;${schema}`)
 
       return {
         success: true,
-        data
+        data,
       }
-    }
-    catch (e: any) {
+    } catch (e: any) {
       return {
         success: false,
-        error: e.message
+        error: e.message,
       }
     }
   }
@@ -57,10 +56,9 @@ class _Zod {
         const evaluatedExpression = new Function(`return ${expression}`)()
         return {
           success: true,
-          data: evaluatedExpression
+          data: evaluatedExpression,
         }
-      }
-      catch (e: any) {
+      } catch (e: any) {
         return {
           success: false,
           error: e.message,
@@ -75,20 +73,18 @@ class _Zod {
       const validationRes = schema.safeParse(evaluatedValue.data)
 
       return validationRes.success
-        ? { success: true, data: validationRes.data }
+        ? {success: true, data: validationRes.data}
         : {
-          success: false,
-          error: generateErrorMessage(validationRes.error.issues),
-        }
-    }
-    catch (e) {
+            success: false,
+            error: generateErrorMessage(validationRes.error.issues),
+          }
+    } catch (e) {
       return {
         success: false,
         error: 'Cannot validate value. Please check the schema',
       }
     }
   }
-
 }
 
 export const Zod = await _Zod.init()
