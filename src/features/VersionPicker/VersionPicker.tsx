@@ -1,6 +1,6 @@
-import {useEffect, useRef, useState} from 'react'
-import {Badge, Combobox, Loader, TextInput, useCombobox} from '@mantine/core'
+import {Badge, Combobox, Loader, useCombobox} from '@mantine/core'
 import {matchSorter} from 'match-sorter'
+import {useEffect, useState} from 'react'
 import {FiChevronDown} from 'react-icons/fi'
 
 type Metadata = {
