@@ -1,5 +1,10 @@
-import {ValidationResult} from './types'
 import {generateErrorMessage} from 'zod-error'
+
+export type ZodValidation = {
+  success: boolean
+  data?: any
+  error?: string
+}
 
 class _Zod {
   private metadata: any
@@ -51,7 +56,7 @@ class _Zod {
     )
   }
 
-  validateSchema(schema: string): ValidationResult {
+  validateSchema(schema: string): ZodValidation {
     try {
       if (schema.length < 3) throw new Error('Schema is too short')
 
@@ -69,7 +74,7 @@ class _Zod {
     }
   }
 
-  validateValue(schema: any, value: string): ValidationResult {
+  validateValue(schema: any, value: string): ZodValidation {
     const _evalExp = (expression: string) => {
       try {
         const evaluatedExpression = new Function(`return ${expression}`)()

@@ -18,9 +18,14 @@ import classes from './App.module.css'
 import {CopyButton} from './features/CopyButton'
 import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
-import {AppData} from './types'
 import {Header} from './ui/Header/Header'
 import {Zod} from './zod'
+
+type AppData = {
+  schema: string
+  values: string[]
+  version: string
+}
 
 const ZOD_DEFAULT_VERSION = (await Zod.getVersions('latest'))[0]
 const zodTypes = await Zod.getTypes(ZOD_DEFAULT_VERSION)
