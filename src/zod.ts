@@ -1,9 +1,15 @@
-import {generateErrorMessage} from 'zod-error'
-
 export type ZodValidation = {
   success: boolean
   data?: any
   error?: string
+}
+
+const generateErrorMessage = (issues: any[]) => {
+  const messages = []
+  for (const issue of issues)
+    messages.push(`${issue.path}: ${issue.code} - ${issue.message}`)
+
+  return messages.join(' | ')
 }
 
 class _Zod {
