@@ -15,7 +15,6 @@ export async function getDeclarationTypes(ver: string): Promise<string> {
   return await res.text()
 }
 
-
 export async function getVersions(tag?: string): Promise<string[]> {
   if (!METADATA) {
     const res = await fetch('https://data.jsdelivr.com/v1/packages/npm/zod')
@@ -39,7 +38,6 @@ export async function getVersions(tag?: string): Promise<string[]> {
 
   return versions.toSorted((a, b) => b.localeCompare(a, undefined, {numeric: true}))
 }
-
 
 export async function setVersion(ver: string) {
   Z = await import(
