@@ -23,7 +23,7 @@ import {
 import {LuEraser} from 'react-icons/lu'
 import {CopyButton} from '../CopyButton'
 import classes from './ValueEditor.module.css'
-import {Zod} from '../../zod'
+import * as zod from '../../zod'
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -69,7 +69,7 @@ export const Validation = ({
   const [opened, {close, open}] = useDisclosure(false)
   const [openedResult, {toggle: toggleResult}] = useDisclosure(false)
 
-  const validation = Zod.validateValue(schema, value)
+  const validation = zod.validateValue(schema, value)
   const parsedData = validation.success && JSON.stringify(validation.data)
 
   const errors = !validation.success && JSON.stringify(validation.error)

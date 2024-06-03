@@ -1,7 +1,7 @@
 import {Badge, Combobox, Loader, useCombobox} from '@mantine/core'
 import {useEffect, useState} from 'react'
 import {FiChevronDown} from 'react-icons/fi'
-import {Zod} from '../../zod'
+import * as zod from '../../zod'
 
 export function VersionPicker({
   value,
@@ -31,7 +31,7 @@ export function VersionPicker({
   useEffect(() => {
     setLoading(true)
 
-    Zod.getVersions()
+    zod.getVersions()
       .then((versions) => {
         setVersions(versions)
       })

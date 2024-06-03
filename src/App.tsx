@@ -19,7 +19,7 @@ import {CopyButton} from './features/CopyButton'
 import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
 import {Header} from './ui/Header/Header'
-import {Zod} from './zod'
+import * as zod from './zod'
 
 type AppData = {
   schema: string
@@ -27,10 +27,10 @@ type AppData = {
   version: string
 }
 
-const ZOD_DEFAULT_VERSION = (await Zod.getVersions('latest'))[0]
-const zodTypes = await Zod.getTypes(ZOD_DEFAULT_VERSION)
+const ZOD_DEFAULT_VERSION = (await zod.getVersions('latest'))[0]
+const zodTypes = await zod.getDeclarationTypes(ZOD_DEFAULT_VERSION)
 
-await Zod.setVersion(ZOD_DEFAULT_VERSION)
+await zod.setVersion(ZOD_DEFAULT_VERSION)
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -112,7 +112,7 @@ const App = () => {
 
   const [version, setVersion] = useState(appData.version || ZOD_DEFAULT_VERSION)
 
-  const {data: evaluatedSchema, error: schemaError} = Zod.validateSchema(schema)
+  const {data: evaluatedSchema, error: schemaError} = zod.validateSchema(schema)
 
   const theme = useMantineTheme()
 
@@ -159,7 +159,7 @@ const App = () => {
                 value={version}
                 onChange={async (value) => {
                   setIsLoading(true)
-                  await Zod.setVersion(value)
+                  await zod.setVersion(value)
                   setVersion(value)
                   setIsLoading(false)
                 }}
