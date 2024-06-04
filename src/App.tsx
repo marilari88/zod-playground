@@ -7,7 +7,7 @@ import {
   useMantineTheme,
 } from '@mantine/core'
 import {notifications} from '@mantine/notifications'
-import Editor, {loader} from '@monaco-editor/react'
+import Editor, {Monaco, loader} from '@monaco-editor/react'
 import LZString from 'lz-string'
 import {editor} from 'monaco-editor'
 import {useState} from 'react'
@@ -28,7 +28,7 @@ type AppData = {
 }
 
 const ZOD_DEFAULT_VERSION = (await zod.getVersions('latest'))[0]
-const zodTypes = await zod.getDeclarationTypes(ZOD_DEFAULT_VERSION)
+const ZOD_DEFAULT_TYPES = await zod.getDeclarationTypes(ZOD_DEFAULT_VERSION)
 
 await zod.setVersion(ZOD_DEFAULT_VERSION)
 
@@ -52,14 +52,17 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   renderLineHighlight: 'none',
 }
 
-loader.init().then((monaco) => {
-  monaco.languages.typescript.typescriptDefaults.addExtraLib(
-    `declare namespace z{${zodTypes}}`,
+let monaco: Monaco
+
+loader.init().then((_monaco) => {
+  _monaco.languages.typescript.typescriptDefaults.addExtraLib(
+    `declare namespace z{${ZOD_DEFAULT_TYPES}}`,
   )
-  monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+  _monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
     noSemanticValidation: true,
     noSyntaxValidation: true,
   })
+  monaco = _monaco
 })
 
 const getAppDataFromSearchParams = (): AppData => {
@@ -99,6 +102,16 @@ const sampleValue = '{name: "John"}'
 
 const appData = getAppDataFromSearchParams()
 
+const setDeclarationTypes = async (ver: string) => {
+  const declarationTypes = await zod.getDeclarationTypes(ver)
+  
+  monaco.languages.typescript.typescriptDefaults.setExtraLibs([
+    {
+      content: `declare namespace z{${declarationTypes}}`,
+    },
+  ])
+}
+
 const App = () => {
   const [schema, setSchema] = useState<string>(() => {
     return appData.schema || sampleZodSchema
@@ -115,6 +128,12 @@ const App = () => {
   const {data: evaluatedSchema, error: schemaError} = zod.validateSchema(schema)
 
   const theme = useMantineTheme()
+
+  const changeVersion = async (ver: string) => {
+    await zod.setVersion(ver)
+    await setDeclarationTypes(ver)
+    setVersion(ver)
+  }
 
   return (
     <Box className={classes.layout}>
@@ -157,10 +176,9 @@ const App = () => {
               Zod schema
               <VersionPicker
                 value={version}
-                onChange={async (value) => {
+                onChange={async (ver) => {
                   setIsLoading(true)
-                  await zod.setVersion(value)
-                  setVersion(value)
+                  await changeVersion(ver)
                   setIsLoading(false)
                 }}
                 disabled={isLoading}
