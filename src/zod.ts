@@ -8,9 +8,6 @@ let METADATA: any
 let Z: any
 
 export async function getDeclarationTypes(ver: string): Promise<string> {
-  if (ver.startsWith('1'))
-    return ''
-
   const res = await fetch(`https://cdn.jsdelivr.net/npm/zod@${ver}/lib/types.d.ts`)
   return await res.text()
 }
@@ -30,8 +27,14 @@ export async function getVersions(tag?: string): Promise<string[]> {
   const versions = []
   for (const el of METADATA.versions) {
     const ver = el.version
-    if (!['alpha', 'beta', 'canary'].some((v) => ver.includes(v)))
-      versions.push(ver)
+
+    if (ver.startsWith('1'))
+      continue
+
+    if (['alpha', 'beta', 'canary'].some((v) => ver.includes(v)))
+      continue
+    
+    versions.push(ver)
   }
 
   versions.push(METADATA.tags.canary)
