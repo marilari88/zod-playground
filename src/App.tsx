@@ -28,7 +28,6 @@ type AppData = {
 }
 
 const ZOD_DEFAULT_VERSION = (await zod.getVersions('latest'))[0]
-const ZOD_DEFAULT_TYPES = await zod.getDeclarationTypes(ZOD_DEFAULT_VERSION)
 
 await zod.setVersion(ZOD_DEFAULT_VERSION)
 
@@ -54,15 +53,13 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
 
 let monaco: Monaco
 
-loader.init().then((_monaco) => {
-  _monaco.languages.typescript.typescriptDefaults.addExtraLib(
-    `declare namespace z{${ZOD_DEFAULT_TYPES}}`,
-  )
+loader.init().then(async (_monaco) => {
   _monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
     noSemanticValidation: true,
     noSyntaxValidation: true,
   })
   monaco = _monaco
+  await setMonacoDeclarationTypes(ZOD_DEFAULT_VERSION)
 })
 
 const getAppDataFromSearchParams = (): AppData => {
@@ -102,7 +99,7 @@ const sampleValue = '{name: "John"}'
 
 const appData = getAppDataFromSearchParams()
 
-const setDeclarationTypes = async (ver: string) => {
+const setMonacoDeclarationTypes = async (ver: string) => {
   const declarationTypes = await zod.getDeclarationTypes(ver)
   
   monaco.languages.typescript.typescriptDefaults.setExtraLibs([
@@ -131,7 +128,7 @@ const App = () => {
 
   const changeVersion = async (ver: string) => {
     await zod.setVersion(ver)
-    await setDeclarationTypes(ver)
+    await setMonacoDeclarationTypes(ver)
     setVersion(ver)
   }
 
