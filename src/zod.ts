@@ -4,8 +4,8 @@ export type ZodValidation = {
   error?: string
 }
 
-let METADATA: any
-let Z: any
+let _metadata: any
+let _z: any
 
 export async function getDeclarationTypes(ver: string): Promise<string> {
   const res = await fetch(`https://cdn.jsdelivr.net/npm/zod@${ver}/lib/types.d.ts`)
@@ -13,19 +13,19 @@ export async function getDeclarationTypes(ver: string): Promise<string> {
 }
 
 export async function getVersions(tag?: string): Promise<string[]> {
-  if (!METADATA) {
+  if (!_metadata) {
     const res = await fetch('https://data.jsdelivr.com/v1/packages/npm/zod')
-    METADATA = await res.json()
+    _metadata = await res.json()
   }
 
   if (tag) {
-    const ver = METADATA.tags[tag]
+    const ver = _metadata.tags[tag]
     if (ver) return [ver]
     else throw new Error('Invalid tag')
   }
 
   const versions = []
-  for (const el of METADATA.versions) {
+  for (const el of _metadata.versions) {
     const ver = el.version
 
     if (ver.startsWith('1'))
@@ -37,13 +37,13 @@ export async function getVersions(tag?: string): Promise<string[]> {
     versions.push(ver)
   }
 
-  versions.push(METADATA.tags.canary)
+  versions.push(_metadata.tags.canary)
 
   return versions.toSorted((a, b) => b.localeCompare(a, undefined, {numeric: true}))
 }
 
 export async function setVersion(ver: string) {
-  Z = await import(
+  _z = await import(
     /* @vite-ignore */ `https://cdn.jsdelivr.net/npm/zod@${ver}/+esm`
   )
 }
@@ -52,7 +52,7 @@ export function validateSchema(schema: string): ZodValidation {
   try {
     if (schema.length < 3) throw new Error('Schema is too short')
 
-    const data = new Function('z', `return ${schema}`)(Z)
+    const data = new Function('z', `return ${schema}`)(_z)
 
     return {
       success: true,
