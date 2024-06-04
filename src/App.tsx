@@ -51,14 +51,14 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   renderLineHighlight: 'none',
 }
 
-let monaco: Monaco
+let monacoInstance: Monaco
 
-loader.init().then(async (_monaco) => {
-  _monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+loader.init().then(async (monaco) => {
+  monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
     noSemanticValidation: true,
     noSyntaxValidation: true,
   })
-  monaco = _monaco
+  monacoInstance = monaco
   await setMonacoDeclarationTypes(ZOD_DEFAULT_VERSION)
 })
 
@@ -102,7 +102,7 @@ const appData = getAppDataFromSearchParams()
 const setMonacoDeclarationTypes = async (ver: string) => {
   const declarationTypes = await zod.getDeclarationTypes(ver)
   
-  monaco.languages.typescript.typescriptDefaults.setExtraLibs([
+  monacoInstance.languages.typescript.typescriptDefaults.setExtraLibs([
     {
       content: `declare namespace z{${declarationTypes}}`,
     },
