@@ -7,10 +7,10 @@ import {
   useMantineTheme,
 } from '@mantine/core'
 import {notifications} from '@mantine/notifications'
-import Editor, {Monaco, loader} from '@monaco-editor/react'
+import Editor, {Monaco, loader, useMonaco} from '@monaco-editor/react'
 import LZString from 'lz-string'
 import {editor} from 'monaco-editor'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 
@@ -28,8 +28,6 @@ type AppData = {
 }
 
 const ZOD_DEFAULT_VERSION = (await zod.getVersions('latest'))[0]
-
-await zod.setVersion(ZOD_DEFAULT_VERSION)
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -51,15 +49,11 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   renderLineHighlight: 'none',
 }
 
-let monacoInstance: Monaco
-
-loader.init().then(async (monaco) => {
+await loader.init().then(async (monaco) => {
   monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
     noSemanticValidation: true,
     noSyntaxValidation: true,
   })
-  monacoInstance = monaco
-  await setMonacoDeclarationTypes(ZOD_DEFAULT_VERSION)
 })
 
 const getAppDataFromSearchParams = (): AppData => {
@@ -99,10 +93,10 @@ const sampleValue = '{name: "John"}'
 
 const appData = getAppDataFromSearchParams()
 
-const setMonacoDeclarationTypes = async (ver: string) => {
+const setMonacoDeclarationTypes = async (ver: string, monaco: Monaco) => {
   const declarationTypes = await zod.getDeclarationTypes(ver)
-  
-  monacoInstance.languages.typescript.typescriptDefaults.setExtraLibs([
+
+  monaco.languages.typescript.typescriptDefaults.setExtraLibs([
     {
       content: `declare namespace z{${declarationTypes}}`,
     },
@@ -122,15 +116,23 @@ const App = () => {
 
   const [version, setVersion] = useState(appData.version || ZOD_DEFAULT_VERSION)
 
+  const monaco = useMonaco()
+
   const {data: evaluatedSchema, error: schemaError} = zod.validateSchema(schema)
 
   const theme = useMantineTheme()
 
-  const changeVersion = async (ver: string) => {
-    await zod.setVersion(ver)
-    await setMonacoDeclarationTypes(ver)
-    setVersion(ver)
-  }
+  useEffect(() => {
+    if (isLoading || !monaco) return
+    updateVersion()
+
+    async function updateVersion() {
+      setIsLoading(true)
+      await zod.setVersion(version)
+      if (monaco) await setMonacoDeclarationTypes(version, monaco)
+      setIsLoading(false)
+    }
+  }, [version, monaco])
 
   return (
     <Box className={classes.layout}>
@@ -174,9 +176,7 @@ const App = () => {
               <VersionPicker
                 value={version}
                 onChange={async (ver) => {
-                  setIsLoading(true)
-                  await changeVersion(ver)
-                  setIsLoading(false)
+                  setVersion(ver)
                 }}
                 disabled={isLoading}
               />
