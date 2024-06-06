@@ -21,75 +21,9 @@ import {
   FiPlus,
 } from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
-import {ZodSchema, z} from 'zod'
-import {generateErrorMessage} from 'zod-error'
 import {CopyButton} from '../CopyButton'
 import classes from './ValueEditor.module.css'
-
-const getErrorMessage = (e: unknown) => {
-  if (e instanceof SyntaxError) {
-    return 'Invalid syntax'
-  }
-
-  if (e instanceof ReferenceError) {
-    return 'Invalid reference'
-  }
-
-  return 'Invalid value'
-}
-
-const evaluateExpression = (expression: string) => {
-  try {
-    const evaluatedExpression = new Function(`return ${expression}`)()
-    return {success: true, data: evaluatedExpression} as const
-  } catch (e) {
-    return {
-      success: false,
-      error: getErrorMessage(e),
-    } as const
-  }
-}
-
-type ValidationResult =
-  | {
-      success: false
-      error: string
-    }
-  | {
-      success: true
-      parsedData: any
-    }
-
-const validateValue = (
-  schema: ZodSchema<any, z.ZodTypeDef, any> | undefined,
-  value: string,
-): ValidationResult => {
-  if (!schema) {
-    return {
-      success: false,
-      error: 'Invalid Schema',
-    }
-  }
-
-  const evaluatedValue = evaluateExpression(value)
-  if (!evaluatedValue.success) return evaluatedValue
-
-  try {
-    const validationRes = schema.safeParse(evaluatedValue.data)
-
-    return validationRes.success
-      ? ({success: true, parsedData: validationRes.data} as const)
-      : ({
-          success: false,
-          error: generateErrorMessage(validationRes.error.issues),
-        } as const)
-  } catch (e) {
-    return {
-      success: false,
-      error: 'Cannot validate value. Please check the schema',
-    }
-  }
-}
+import * as zod from '../../zod'
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -114,7 +48,7 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
 }
 
 interface Props {
-  schema: ZodSchema<any, z.ZodTypeDef, any> | undefined
+  schema: any
   value: string
   index: number
   onAdd: () => void
@@ -135,8 +69,8 @@ export const Validation = ({
   const [opened, {close, open}] = useDisclosure(false)
   const [openedResult, {toggle: toggleResult}] = useDisclosure(false)
 
-  const validation = validateValue(schema, value)
-  const parsedData = validation.success && JSON.stringify(validation.parsedData)
+  const validation = zod.validateValue(schema, value)
+  const parsedData = validation.success && JSON.stringify(validation.data)
 
   const errors = !validation.success && JSON.stringify(validation.error)
 

@@ -1,6 +1,5 @@
 import {
   ActionIcon,
-  Badge,
   Box,
   Button,
   Flex,
@@ -8,23 +7,27 @@ import {
   useMantineTheme,
 } from '@mantine/core'
 import {notifications} from '@mantine/notifications'
-import Editor, {loader} from '@monaco-editor/react'
+import Editor, {Monaco, loader, useMonaco} from '@monaco-editor/react'
 import LZString from 'lz-string'
 import {editor} from 'monaco-editor'
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
-import {ZodSchema, z} from 'zod'
 
-import zodTypes from '../node_modules/zod/lib/types.d.ts?raw'
-import {dependencies} from '../package.json'
 import classes from './App.module.css'
 import {CopyButton} from './features/CopyButton'
 import {Validation} from './features/ValueEditor/ValueEditor'
-import {AppData, appDataSchema} from './types'
+import {VersionPicker} from './features/VersionPicker/VersionPicker'
 import {Header} from './ui/Header/Header'
+import * as zod from './zod'
 
-const ZOD_VERSION = dependencies.zod.split('^')[1]
+type AppData = {
+  schema: string
+  values: string[]
+  version: string
+}
+
+const ZOD_DEFAULT_VERSION = (await zod.getVersions('latest'))[0]
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
@@ -46,14 +49,10 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   renderLineHighlight: 'none',
 }
 
-loader.init().then((monaco) => {
-  monaco.languages.typescript.typescriptDefaults.addExtraLib(
-    `declare namespace z{${zodTypes}}`,
-  )
-  monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-    noSemanticValidation: true,
-    noSyntaxValidation: true,
-  })
+const monaco = await loader.init()
+monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+  noSemanticValidation: true,
+  noSyntaxValidation: true,
 })
 
 const getAppDataFromSearchParams = (): AppData => {
@@ -64,13 +63,14 @@ const getAppDataFromSearchParams = (): AppData => {
     return {
       schema: '',
       values: [],
+      version: ZOD_DEFAULT_VERSION,
     }
 
   const decompressedAppData =
     LZString.decompressFromEncodedURIComponent(compressedAppData)
   const appData = JSON.parse(decompressedAppData)
 
-  return appDataSchema.parse(appData)
+  return appData
 }
 
 const getURLwithAppData = (appData: AppData): string => {
@@ -83,24 +83,6 @@ const getURLwithAppData = (appData: AppData): string => {
   return `${window.location.protocol}//${window.location.host}?${queryParams}`
 }
 
-const schemaSchema = z
-  .string()
-  .min(2)
-  .transform((s, ctx) => {
-    try {
-      return eval(s)
-    } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : 'Invalid schema'
-
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: errorMessage,
-      })
-      return z.NEVER
-    }
-  })
-  .pipe(z.custom<ZodSchema>())
-
 const sampleZodSchema = `z.object({
   name: z.string(),
   birth_year: z.number().optional()
@@ -110,15 +92,14 @@ const sampleValue = '{name: "John"}'
 
 const appData = getAppDataFromSearchParams()
 
-const evaluateSchema = (schema: string) => {
-  try {
-    const evaluatedSchema = schemaSchema.parse(schema)
-    return {evaluatedSchema}
-  } catch (e) {
-    if (e instanceof z.ZodError) return {error: e.message}
+const setMonacoDeclarationTypes = async (monaco: Monaco, ver: string) => {
+  const declarationTypes = await zod.getDeclarationTypes(ver)
 
-    return {error: 'Invalid schema'}
-  }
+  monaco.languages.typescript.typescriptDefaults.setExtraLibs([
+    {
+      content: `declare namespace z{${declarationTypes}}`,
+    },
+  ])
 }
 
 const App = () => {
@@ -130,9 +111,28 @@ const App = () => {
     return appData.values.length ? appData.values : [sampleValue]
   })
 
-  const {evaluatedSchema, error: schemaError} = evaluateSchema(schema)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const [version, setVersion] = useState(appData.version || ZOD_DEFAULT_VERSION)
+
+  const monaco = useMonaco()
+
+  const {data: evaluatedSchema, error: schemaError} = zod.validateSchema(schema)
 
   const theme = useMantineTheme()
+
+  useEffect(() => {
+    if (isLoading || !monaco) return
+
+    async function updateVersion(monaco: Monaco, ver: string) {
+      setIsLoading(true)
+      await zod.setVersion(ver)
+      await setMonacoDeclarationTypes(monaco, ver)
+      setIsLoading(false)
+    }
+
+    updateVersion(monaco, version)
+  }, [version, monaco])
 
   return (
     <Box className={classes.layout}>
@@ -147,6 +147,7 @@ const App = () => {
               const urlWithAppData = getURLwithAppData({
                 schema,
                 values: values.filter((value) => typeof value == 'string'),
+                version,
               })
               navigator.clipboard.writeText(urlWithAppData)
               notifications.show({
@@ -172,9 +173,13 @@ const App = () => {
           >
             <Flex gap="sm" align="center" flex={1}>
               Zod schema
-              <Badge variant="default" size="lg" tt="none">
-                v{ZOD_VERSION}
-              </Badge>
+              <VersionPicker
+                value={version}
+                onChange={async (ver) => {
+                  setVersion(ver)
+                }}
+                disabled={isLoading}
+              />
               <Button
                 rel="noopener noreferrer"
                 target="_blank"
