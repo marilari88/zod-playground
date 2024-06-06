@@ -92,7 +92,7 @@ const sampleValue = '{name: "John"}'
 
 const appData = getAppDataFromSearchParams()
 
-const setMonacoDeclarationTypes = async (ver: string, monaco: Monaco) => {
+const setMonacoDeclarationTypes = async (monaco: Monaco, ver: string) => {
   const declarationTypes = await zod.getDeclarationTypes(ver)
 
   monaco.languages.typescript.typescriptDefaults.setExtraLibs([
@@ -123,14 +123,15 @@ const App = () => {
 
   useEffect(() => {
     if (isLoading || !monaco) return
-    updateVersion()
 
-    async function updateVersion() {
+    async function updateVersion(monaco: Monaco, ver: string) {
       setIsLoading(true)
-      await zod.setVersion(version)
-      if (monaco) await setMonacoDeclarationTypes(version, monaco)
+      await zod.setVersion(ver)
+      await setMonacoDeclarationTypes(monaco, ver)
       setIsLoading(false)
     }
+
+    updateVersion(monaco, version)
   }, [version, monaco])
 
   return (
