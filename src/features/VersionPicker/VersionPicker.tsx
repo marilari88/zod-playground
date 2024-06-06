@@ -40,7 +40,9 @@ export function VersionPicker({
       })
   }, [])
 
-  const options = (versions || []).map((item) => (
+  const filteredVersions = versions?.filter((el) => el.includes(searchValue)) || []
+
+  const options = (filteredVersions).map((item) => (
     <Combobox.Option value={item} key={item}>
       {item}
     </Combobox.Option>
