@@ -49,11 +49,10 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   renderLineHighlight: 'none',
 }
 
-await loader.init().then(async (monaco) => {
-  monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-    noSemanticValidation: true,
-    noSyntaxValidation: true,
-  })
+const monaco = await loader.init()
+monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+  noSemanticValidation: true,
+  noSyntaxValidation: true,
 })
 
 const getAppDataFromSearchParams = (): AppData => {
