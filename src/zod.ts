@@ -113,5 +113,5 @@ function generateErrorMessage(issues: any[]) {
       messages.push(`${issue.code} - ${issue.message}`)
   }
 
-  return messages.join(' | ')
-}
+  return messages.join('\n')
+} 

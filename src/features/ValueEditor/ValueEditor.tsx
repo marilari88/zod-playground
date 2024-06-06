@@ -72,7 +72,7 @@ export const Validation = ({
   const validation = zod.validateValue(schema, value)
   const parsedData = validation.success && JSON.stringify(validation.data)
 
-  const errors = !validation.success && JSON.stringify(validation.error)
+  const errors = !validation.success && validation.error
 
   return (
     <Box className={classes.valueContainer}>
@@ -135,7 +135,7 @@ export const Validation = ({
                   </Flex>
                   <Stack gap="xs">
                     <Text>Error list:</Text>
-                    <Code>{errors}</Code>
+                    <Code block>{errors}</Code>
                   </Stack>
                 </Stack>
               </Popover.Dropdown>
@@ -197,7 +197,7 @@ export const Validation = ({
         >
           {parsedData && <Code>{parsedData}</Code>}
           {errors && (
-            <Text c="red" size="sm">
+            <Text c="red" size="sm" style={{whiteSpace: 'pre-line'}}>
               {errors}
             </Text>
           )}
