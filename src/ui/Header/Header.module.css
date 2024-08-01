@@ -1,15 +1,12 @@
 .header {
-  border-bottom: 1px solid var(--mantine-color-gray-3);
+  color: var(--mantine-color-primary-7);
+  border-bottom: 1px solid var(--mantine-color-neutral-2);
   padding: var(--mantine-spacing-sm) var(--mantine-spacing-lg);
-  display: flex;
-  align-items: center;
-  gap: var(--mantine-spacing-md);
 }
 
 .header__title {
-  color: var(--mantine-color-primary-5);
   font-size: var(--mantine-font-size-xl);
-  font-weight: 800;
+  font-weight: 700;
   margin: 0;
 }
 
@@ -18,7 +15,5 @@
 }
 
 .githubLink {
-  color: var(--mantine-color-gray-9);
   font-size: 2rem;
-
 }

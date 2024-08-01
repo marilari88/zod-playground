@@ -8,8 +8,7 @@
   height: 40px;
   padding-inline: var(--mantine-spacing-lg);
   font-weight: 500;
-  color: var(--mantine-color-gray-7);
-  background-color: var(--mantine-color-gray-0);
+  color: var(--mantine-color-neutral-7);
   flex-shrink: 0;
 }
 
@@ -33,7 +32,7 @@
 
 .valueResult {
   padding-inline: var(--mantine-spacing-sm);
-  border-left: 1px solid var(--mantine-color-gray-2);
+  border-left: 1px solid var(--mantine-color-neutral-2);
   display: block;
   flex: 1;
 }

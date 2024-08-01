@@ -8,6 +8,7 @@ import {
   Stack,
   Text,
   Tooltip,
+  useComputedColorScheme,
 } from '@mantine/core'
 import Editor from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
@@ -21,31 +22,9 @@ import {
   FiPlus,
 } from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
+import * as zod from '../../zod'
 import {CopyButton} from '../CopyButton'
 import classes from './ValueEditor.module.css'
-import * as zod from '../../zod'
-
-const editorOptions: editor.IStandaloneEditorConstructionOptions = {
-  minimap: {enabled: false},
-  theme: 'vs',
-  scrollBeyondLastLine: false,
-  showUnused: false,
-  inlayHints: {enabled: 'off'},
-  scrollbar: {
-    // Subtle shadows to the left & top. Defaults to true.
-    useShadows: false,
-    vertical: 'auto',
-    verticalScrollbarSize: 10,
-    horizontalScrollbarSize: 10,
-    alwaysConsumeMouseWheel: false,
-  },
-  overviewRulerBorder: false,
-  hideCursorInOverviewRuler: true,
-  automaticLayout: true,
-  formatOnType: true,
-  formatOnPaste: true,
-  renderLineHighlight: 'none',
-}
 
 interface Props {
   schema: any
@@ -73,6 +52,30 @@ export const Validation = ({
   const parsedData = validation.success && JSON.stringify(validation.data)
 
   const errors = !validation.success && JSON.stringify(validation.error)
+
+  const computedColorScheme = useComputedColorScheme('light')
+
+  const editorOptions: editor.IStandaloneEditorConstructionOptions = {
+    minimap: {enabled: false},
+    theme: computedColorScheme == 'light' ? 'vs' : 'vs-dark',
+    scrollBeyondLastLine: false,
+    showUnused: false,
+    inlayHints: {enabled: 'off'},
+    scrollbar: {
+      // Subtle shadows to the left & top. Defaults to true.
+      useShadows: false,
+      vertical: 'auto',
+      verticalScrollbarSize: 10,
+      horizontalScrollbarSize: 10,
+      alwaysConsumeMouseWheel: false,
+    },
+    overviewRulerBorder: false,
+    hideCursorInOverviewRuler: true,
+    automaticLayout: true,
+    formatOnType: true,
+    formatOnPaste: true,
+    renderLineHighlight: 'none',
+  }
 
   return (
     <Box className={classes.valueContainer}>
