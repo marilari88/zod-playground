@@ -8,6 +8,7 @@ import {
   Stack,
   Text,
   Tooltip,
+  useComputedColorScheme,
 } from '@mantine/core'
 import Editor from '@monaco-editor/react'
 import {editor} from 'monaco-editor'
@@ -21,13 +22,22 @@ import {
   FiPlus,
 } from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
+import * as zod from '../../zod'
 import {CopyButton} from '../CopyButton'
 import classes from './ValueEditor.module.css'
-import * as zod from '../../zod'
+
+interface Props {
+  schema: any
+  value: string
+  index: number
+  onAdd: () => void
+  onRemove?: () => void
+  onChange?: (value: string) => void
+  onClear: (clearedIndex: number) => void
+}
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
-  theme: 'vs',
   scrollBeyondLastLine: false,
   showUnused: false,
   inlayHints: {enabled: 'off'},
@@ -47,16 +57,6 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   renderLineHighlight: 'none',
 }
 
-interface Props {
-  schema: any
-  value: string
-  index: number
-  onAdd: () => void
-  onRemove?: () => void
-  onChange?: (value: string) => void
-  onClear: (clearedIndex: number) => void
-}
-
 export const Validation = ({
   schema,
   value,
@@ -73,6 +73,8 @@ export const Validation = ({
   const parsedData = validation.success && JSON.stringify(validation.data)
 
   const errors = !validation.success && validation.error
+
+  const computedColorScheme = useComputedColorScheme('light')
 
   return (
     <Box className={classes.valueContainer}>
@@ -182,6 +184,7 @@ export const Validation = ({
       <div className={classes.valueEditorContainer}>
         <div className={classes.valueEditor}>
           <Editor
+            theme={computedColorScheme == 'light' ? 'vs' : 'vs-dark'}
             onChange={(value) => {
               onChange?.(value ?? '')
             }}

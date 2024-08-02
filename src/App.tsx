@@ -4,7 +4,7 @@ import {
   Button,
   Flex,
   Tooltip,
-  useMantineTheme,
+  useComputedColorScheme,
 } from '@mantine/core'
 import {notifications} from '@mantine/notifications'
 import Editor, {Monaco, loader, useMonaco} from '@monaco-editor/react'
@@ -15,6 +15,7 @@ import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 
 import classes from './App.module.css'
+import {ColorSchemeToggle} from './features/ColorSchemeToggle'
 import {CopyButton} from './features/CopyButton'
 import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
@@ -31,7 +32,6 @@ const ZOD_DEFAULT_VERSION = (await zod.getVersions('latest'))[0]
 
 const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
-  theme: 'vs',
   scrollBeyondLastLine: false,
   scrollbar: {
     // Subtle shadows to the left & top. Defaults to true.
@@ -116,10 +116,9 @@ const App = () => {
   const [version, setVersion] = useState(appData.version || ZOD_DEFAULT_VERSION)
 
   const monaco = useMonaco()
+  const computedColorScheme = useComputedColorScheme('light')
 
   const {data: evaluatedSchema, error: schemaError} = zod.validateSchema(schema)
-
-  const theme = useMantineTheme()
 
   useEffect(() => {
     if (isLoading || !monaco) return
@@ -157,10 +156,12 @@ const App = () => {
               })
             }}
             rightSection={<FiLink />}
+            color="primary"
           >
             Share
           </Button>
         </Tooltip>
+        <ColorSchemeToggle />
       </Header>
       <main className={classes.main}>
         <div className={classes.leftPanel}>
@@ -169,7 +170,6 @@ const App = () => {
             align="center"
             justify="space-between"
             gap="sm"
-            bg={schemaError ? theme.colors.red[0] : theme.colors.gray[0]}
           >
             <Flex gap="sm" align="center" flex={1}>
               Zod schema
@@ -217,6 +217,7 @@ const App = () => {
             }}
             defaultLanguage="typescript"
             options={editorOptions}
+            theme={computedColorScheme == 'light' ? 'vs' : 'vs-dark'}
             value={schema}
           />
         </div>

@@ -25,7 +25,7 @@ export const ZodLogo = () => (
         y="8972.31"
         width="3500.78"
         height="135.721"
-        style={{fill: 'rgb(39, 77, 130)'}}
+        style={{fill: 'currentcolor'}}
       />
     </g>
     <g transform="matrix(0.0900481,0,0,0.473619,101.204,-3534.08)">
@@ -34,7 +34,7 @@ export const ZodLogo = () => (
         y="8972.31"
         width="3500.78"
         height="135.721"
-        style={{fill: 'rgb(39,77,130)'}}
+        style={{fill: 'currentcolor'}}
       />
     </g>
     <g transform="matrix(0.0481846,0,0,0.133311,454.599,-550.685)">
@@ -43,7 +43,7 @@ export const ZodLogo = () => (
         y="8972.31"
         width="3500.78"
         height="135.721"
-        style={{fill: 'rgb(39,77,130)'}}
+        style={{fill: 'currentcolor'}}
       />
     </g>
     <g transform="matrix(0.17212,-0.0993737,0.446387,0.773164,-4264.21,-6040.13)">
@@ -52,7 +52,7 @@ export const ZodLogo = () => (
         y="8972.31"
         width="3500.78"
         height="135.721"
-        style={{fill: 'rgb(39,77,130)'}}
+        style={{fill: 'currentcolor'}}
       />
     </g>
     <g transform="matrix(0.110306,-0.0636855,0.0916929,0.158817,-1037.66,-798.056)">
@@ -61,7 +61,7 @@ export const ZodLogo = () => (
         y="8972.31"
         width="3500.78"
         height="135.721"
-        style={{fill: 'rgb(39,77,130)'}}
+        style={{fill: 'currentcolor'}}
       />
     </g>
     <g transform="matrix(0.110306,-0.0636855,0.0916929,0.158817,-1050.22,-812.682)">
@@ -70,7 +70,7 @@ export const ZodLogo = () => (
         y="8972.31"
         width="3500.78"
         height="135.721"
-        style={{fill: 'rgb(39,77,130)'}}
+        style={{fill: 'currentcolor'}}
       />
     </g>
     <g transform="matrix(0.110306,-0.0636855,0.0916929,0.158817,-1062.67,-824.113)">
@@ -79,7 +79,7 @@ export const ZodLogo = () => (
         y="8972.31"
         width="3500.78"
         height="135.721"
-        style={{fill: 'rgb(39,77,130)'}}
+        style={{fill: 'currentcolor'}}
       />
     </g>
     <g transform="matrix(0.116652,-0.067349,0.0722158,0.125081,-870.022,-471.251)">
@@ -88,7 +88,7 @@ export const ZodLogo = () => (
         y="8972.31"
         width="3500.78"
         height="135.721"
-        style={{fill: 'rgb(39,77,130)'}}
+        style={{fill: 'currentcolor'}}
       />
     </g>
     <g transform="matrix(0.12113,-0.0699344,0.0722158,0.125081,-874.027,-449.65)">
@@ -97,7 +97,7 @@ export const ZodLogo = () => (
         y="8972.31"
         width="3500.78"
         height="135.721"
-        style={{fill: 'rgb(39,77,130)'}}
+        style={{fill: 'currentcolor'}}
       />
     </g>
     <g transform="matrix(0.129529,-0.0747837,0.0916929,0.158817,-1067.52,-724.985)">
@@ -106,7 +106,7 @@ export const ZodLogo = () => (
         y="8972.31"
         width="3500.78"
         height="135.721"
-        style={{fill: 'rgb(39,77,130)'}}
+        style={{fill: 'currentcolor'}}
       />
     </g>
     <g transform="matrix(0.0389201,-0.0224705,0.296775,0.514029,-2065.36,-4228.86)">
@@ -115,14 +115,14 @@ export const ZodLogo = () => (
         y="8972.31"
         width="3500.78"
         height="135.721"
-        style={{fill: 'rgb(39,77,130)'}}
+        style={{fill: 'currentcolor'}}
       />
     </g>
     <use xlinkHref="#_Image2" x="30" y="160" width="1045px" height="842px" />
     <g transform="matrix(1.01688,0,-5.64483e-17,1.01688,-1013.22,-4627.54)">
       <path
         d="M1825.05,4726.89L1250.49,4726.89L1040.57,4935.73L1517.16,5509.64L1555.18,5466.98L2026.94,4937.69L1825.05,4726.89ZM1804.06,4776.06L1960,4938.89L1518.48,5434.26L1107.11,4938.89L1270.78,4776.06L1804.06,4776.06Z"
-        style={{fill: 'rgb(48,104,183)'}}
+        style={{fill: 'currentcolor'}}
       />
     </g>
     <defs>
@@ -144,18 +144,19 @@ export const ZodLogo = () => (
 
 export function Header({children}: {children?: React.ReactNode}) {
   return (
-    <header className={classes.header}>
+    <Flex component="header" className={classes.header} align="center" gap="md">
       <ZodLogo />
-      <div className={classes.header__title}>Zod Playground</div>
+      <Box className={classes.header__title}>Zod Playground</Box>
       {children}
-      <Flex gap="md" ml="auto">
+      <Flex gap="md" ml="auto" color="primary">
         <Anchor
           href="https://github.com/marilari88/zod-playground"
           target="_blank"
+          c="primary"
         >
           <FaGithub className={classes.githubLink} />
         </Anchor>
       </Flex>
-    </header>
+    </Flex>
   )
 }
