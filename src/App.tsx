@@ -8,9 +8,7 @@ import {
 } from '@mantine/core'
 import {notifications} from '@mantine/notifications'
 import Editor, {Monaco, loader, useMonaco} from '@monaco-editor/react'
-import LZString from 'lz-string'
-import {editor} from 'monaco-editor'
-import {useEffect, useState} from 'react'
+import {useEffect, useMemo, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 
@@ -21,32 +19,24 @@ import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
 import {Header} from './ui/Header/Header'
 import * as zod from './zod'
+import getAppDataFromSearchParams from './utils/getAppDataFromSearchParams'
+import {
+  defaultAppData,
+  editorOptions,
+  sampleValue,
+  sampleZodSchema,
+  STORAGE_KEY,
+  ZOD_DEFAULT_VERSION,
+} from './constants'
+import getURLwithAppData from './utils/getUrlWithAppData'
+import setMonacoDeclarationTypes from './utils/setMonacoDeclarationTypes'
+import {getAppDataFromLocalStorage} from './utils/getAppDataFromLocalStorage'
+import usePersistAppData from './hooks/usePersistAppData'
 
-type AppData = {
+export type AppData = {
   schema: string
   values: string[]
   version: string
-}
-
-const ZOD_DEFAULT_VERSION = (await zod.getVersions('latest'))[0]
-
-const editorOptions: editor.IStandaloneEditorConstructionOptions = {
-  minimap: {enabled: false},
-  scrollBeyondLastLine: false,
-  scrollbar: {
-    // Subtle shadows to the left & top. Defaults to true.
-    useShadows: false,
-    vertical: 'auto',
-
-    verticalScrollbarSize: 10,
-    horizontalScrollbarSize: 10,
-  },
-  overviewRulerBorder: false,
-  hideCursorInOverviewRuler: true,
-  automaticLayout: true,
-  formatOnType: true,
-  formatOnPaste: true,
-  renderLineHighlight: 'none',
 }
 
 const monaco = await loader.init()
@@ -55,65 +45,35 @@ monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
   noSyntaxValidation: true,
 })
 
-const getAppDataFromSearchParams = (): AppData => {
-  const urlParams = new URLSearchParams(window.location.search)
-  const compressedAppData = urlParams.get('appdata')
-
-  if (!compressedAppData)
-    return {
-      schema: '',
-      values: [],
-      version: ZOD_DEFAULT_VERSION,
-    }
-
-  const decompressedAppData =
-    LZString.decompressFromEncodedURIComponent(compressedAppData)
-  const appData = JSON.parse(decompressedAppData)
-
-  return appData
-}
-
-const getURLwithAppData = (appData: AppData): string => {
-  const queryParams = new URLSearchParams()
-  const compressedAppData = LZString.compressToEncodedURIComponent(
-    JSON.stringify(appData),
-  )
-  queryParams.set('appdata', compressedAppData)
-
-  return `${window.location.protocol}//${window.location.host}?${queryParams}`
-}
-
-const sampleZodSchema = `z.object({
-  name: z.string(),
-  birth_year: z.number().optional()
-})`
-
-const sampleValue = '{name: "John"}'
-
-const appData = getAppDataFromSearchParams()
-
-const setMonacoDeclarationTypes = async (monaco: Monaco, ver: string) => {
-  const declarationTypes = await zod.getDeclarationTypes(ver)
-
-  monaco.languages.typescript.typescriptDefaults.setExtraLibs([
-    {
-      content: `declare namespace z{${declarationTypes}}`,
-    },
-  ])
-}
+// Data in the url have precedence over localStorage.
+const initialAppData =
+  getAppDataFromSearchParams() ?? getAppDataFromLocalStorage() ?? defaultAppData
 
 const App = () => {
   const [schema, setSchema] = useState<string>(() => {
-    return appData.schema || sampleZodSchema
+    return initialAppData.schema || sampleZodSchema
   })
 
   const [values, setValues] = useState<Array<string>>(() => {
-    return appData.values.length ? appData.values : [sampleValue]
+    return initialAppData.values.length ? initialAppData.values : [sampleValue]
   })
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const [version, setVersion] = useState(appData.version || ZOD_DEFAULT_VERSION)
+  const [version, setVersion] = useState(
+    initialAppData.version || ZOD_DEFAULT_VERSION,
+  )
+
+  const appData = useMemo(
+    () => ({
+      schema,
+      values: values.filter((value) => typeof value === 'string'),
+      version,
+    }),
+    [schema, values, version],
+  )
+
+  usePersistAppData(appData)
 
   const monaco = useMonaco()
   const computedColorScheme = useComputedColorScheme('light')
@@ -143,11 +103,7 @@ const App = () => {
           <Button
             variant="light"
             onClick={() => {
-              const urlWithAppData = getURLwithAppData({
-                schema,
-                values: values.filter((value) => typeof value == 'string'),
-                version,
-              })
+              const urlWithAppData = getURLwithAppData(appData)
               navigator.clipboard.writeText(urlWithAppData)
               notifications.show({
                 title: 'The link has been copied to the clipboard',
