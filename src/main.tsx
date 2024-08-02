@@ -47,6 +47,18 @@ const theme = createTheme({
       '#424e88',
       '#364379',
     ],
+    ['primary-dark']: [
+      '#48400A',
+      '#6C5F0F',
+      '#907F14',
+      '#B49F18',
+      '#D7BF1D',
+      '#E4CD3A',
+      '#E9D65D',
+      '#EFDF6C',
+      '#F3E791',
+      '#F7EFB6',
+    ],
     neutral: virtualColor({
       name: 'neutral',
       dark: 'neutral-dark',
@@ -54,7 +66,7 @@ const theme = createTheme({
     }),
     primary: virtualColor({
       name: 'primary',
-      dark: 'cyan',
+      dark: 'primary-dark',
       light: 'primary-light',
     }),
   },

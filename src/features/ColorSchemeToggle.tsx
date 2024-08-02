@@ -3,7 +3,6 @@ import {
   useComputedColorScheme,
   useMantineColorScheme,
 } from '@mantine/core'
-import {useMonaco} from '@monaco-editor/react'
 import {FiMoon, FiSun} from 'react-icons/fi'
 
 export function ColorSchemeToggle({
