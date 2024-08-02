@@ -120,26 +120,6 @@ const App = () => {
 
   const {data: evaluatedSchema, error: schemaError} = zod.validateSchema(schema)
 
-  const editorOptions: editor.IStandaloneEditorConstructionOptions = {
-    minimap: {enabled: false},
-    scrollBeyondLastLine: false,
-    theme: computedColorScheme == 'light' ? 'vs' : 'vs-dark',
-    scrollbar: {
-      // Subtle shadows to the left & top. Defaults to true.
-      useShadows: false,
-      vertical: 'auto',
-
-      verticalScrollbarSize: 10,
-      horizontalScrollbarSize: 10,
-    },
-    overviewRulerBorder: false,
-    hideCursorInOverviewRuler: true,
-    automaticLayout: true,
-    formatOnType: true,
-    formatOnPaste: true,
-    renderLineHighlight: 'none',
-  }
-
   useEffect(() => {
     if (isLoading || !monaco) return
 
@@ -237,6 +217,7 @@ const App = () => {
             }}
             defaultLanguage="typescript"
             options={editorOptions}
+            theme={computedColorScheme == 'light' ? 'vs' : 'vs-dark'}
             value={schema}
           />
         </div>

@@ -15,8 +15,6 @@ export function ColorSchemeToggle({
 
   const computedColorScheme = useComputedColorScheme('light')
 
-  const monaco = useMonaco()
-
   return (
     <ActionIcon
       color="primary"
@@ -25,7 +23,6 @@ export function ColorSchemeToggle({
         const colorScheme = computedColorScheme === 'light' ? 'dark' : 'light'
         setColorScheme(colorScheme)
         onToggle?.(colorScheme)
-        monaco?.editor.setTheme(colorScheme == 'light' ? 'vs' : 'vs-dark')
       }}
       size="lg"
       aria-label="Toggle color scheme"

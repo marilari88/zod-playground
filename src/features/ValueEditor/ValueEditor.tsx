@@ -36,6 +36,27 @@ interface Props {
   onClear: (clearedIndex: number) => void
 }
 
+const editorOptions: editor.IStandaloneEditorConstructionOptions = {
+  minimap: {enabled: false},
+  scrollBeyondLastLine: false,
+  showUnused: false,
+  inlayHints: {enabled: 'off'},
+  scrollbar: {
+    // Subtle shadows to the left & top. Defaults to true.
+    useShadows: false,
+    vertical: 'auto',
+    verticalScrollbarSize: 10,
+    horizontalScrollbarSize: 10,
+    alwaysConsumeMouseWheel: false,
+  },
+  overviewRulerBorder: false,
+  hideCursorInOverviewRuler: true,
+  automaticLayout: true,
+  formatOnType: true,
+  formatOnPaste: true,
+  renderLineHighlight: 'none',
+}
+
 export const Validation = ({
   schema,
   value,
@@ -54,28 +75,6 @@ export const Validation = ({
   const errors = !validation.success && JSON.stringify(validation.error)
 
   const computedColorScheme = useComputedColorScheme('light')
-
-  const editorOptions: editor.IStandaloneEditorConstructionOptions = {
-    minimap: {enabled: false},
-    theme: computedColorScheme == 'light' ? 'vs' : 'vs-dark',
-    scrollBeyondLastLine: false,
-    showUnused: false,
-    inlayHints: {enabled: 'off'},
-    scrollbar: {
-      // Subtle shadows to the left & top. Defaults to true.
-      useShadows: false,
-      vertical: 'auto',
-      verticalScrollbarSize: 10,
-      horizontalScrollbarSize: 10,
-      alwaysConsumeMouseWheel: false,
-    },
-    overviewRulerBorder: false,
-    hideCursorInOverviewRuler: true,
-    automaticLayout: true,
-    formatOnType: true,
-    formatOnPaste: true,
-    renderLineHighlight: 'none',
-  }
 
   return (
     <Box className={classes.valueContainer}>
@@ -185,6 +184,7 @@ export const Validation = ({
       <div className={classes.valueEditorContainer}>
         <div className={classes.valueEditor}>
           <Editor
+            theme={computedColorScheme == 'light' ? 'vs' : 'vs-dark'}
             onChange={(value) => {
               onChange?.(value ?? '')
             }}
