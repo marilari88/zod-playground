@@ -105,8 +105,13 @@ function evalExp(expression: string): ZodValidation {
 
 function generateErrorMessage(issues: any[]) {
   const messages = []
-  for (const issue of issues)
-    messages.push(`${issue.path}: ${issue.code} - ${issue.message}`)
+  for (const issue of issues) {
+    const path = issue.path
+    if (path.length > 0)
+      messages.push(`${path}: ${issue.code} - ${issue.message}`)
+    else
+      messages.push(`${issue.code} - ${issue.message}`)
+  }
 
-  return messages.join(' | ')
-}
+  return messages.join('\n')
+} 
