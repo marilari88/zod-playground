@@ -1,0 +1,3 @@
+:root[data-mantine-color-scheme="dark"] {
+  --mantine-color-body: var(--mantine-color-neutral-1) !important;
+}

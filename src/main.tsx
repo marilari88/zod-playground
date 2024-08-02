@@ -6,6 +6,7 @@ import App from './App'
 
 import '@mantine/core/styles.css'
 import '@mantine/notifications/styles.css'
+import './main.css'
 
 const theme = createTheme({
   fontFamily: 'Roboto, sans-serif',
