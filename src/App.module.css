@@ -39,7 +39,8 @@
   padding-inline: var(--mantine-spacing-lg);
   font-weight: 500;
   flex-shrink: 0;
-  color: var(--mantine-color-neutral-7);
+  color: var(--mantine-color-primary-7);
+  background-color: var(--mantine-color-primary-0);
 }
 
 .editor {

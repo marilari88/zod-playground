@@ -8,8 +8,9 @@
   height: 40px;
   padding-inline: var(--mantine-spacing-lg);
   font-weight: 500;
-  color: var(--mantine-color-neutral-7);
   flex-shrink: 0;
+  color: var(--mantine-color-primary-7);
+  background-color: var(--mantine-color-primary-0);
 }
 
 .valueEditorContainer {

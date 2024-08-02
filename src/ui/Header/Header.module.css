@@ -1,6 +1,5 @@
 .header {
   color: var(--mantine-color-primary-7);
-  border-bottom: 1px solid var(--mantine-color-neutral-2);
   padding: var(--mantine-spacing-sm) var(--mantine-spacing-lg);
 }
 
