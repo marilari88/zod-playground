@@ -1,4 +1,5 @@
 import {test, expect} from '@playwright/test'
+import {writeInMonaco} from './fixtures'
 
 test('has title "Zod Playground', async ({page}) => {
   await page.goto('/')
@@ -30,8 +31,12 @@ test('zod version switch', async ({page}) => {
   await expect(page.getByRole('button', {name: 'v3.23.7'})).toBeVisible()
 })
 
-test('has default schema', async ({page}) => {
+test('has invalid marker when an invalid value is in the Value Editor', async ({
+  page,
+}) => {
   await page.goto('/')
 
-  await expect(page.getByText('z.object({ name: z.string(),')).toBeVisible()
+  await writeInMonaco(page, 'Invalid value')
+
+  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
 })
