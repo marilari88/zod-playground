@@ -4,13 +4,12 @@ import {editor} from 'monaco-editor'
 export const DEFAULT_ZOD_VERSION = (await zod.getVersions('latest'))[0]
 
 export const EDITOR_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
-  minimap: {enabled: false},
+  minimap: {
+      enabled: false
+  },
   scrollBeyondLastLine: false,
   scrollbar: {
     useShadows: false,
-    vertical: 'auto',
-    verticalScrollbarSize: 10,
-    horizontalScrollbarSize: 10,
   },
   overviewRulerBorder: false,
   hideCursorInOverviewRuler: true,
