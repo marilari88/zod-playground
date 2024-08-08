@@ -1,11 +1,4 @@
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Flex,
-  Tooltip,
-  useComputedColorScheme,
-} from '@mantine/core'
+import {ActionIcon, Box, Button, Flex, Tooltip, useComputedColorScheme} from '@mantine/core'
 import {notifications} from '@mantine/notifications'
 import Editor, {Monaco, loader, useMonaco} from '@monaco-editor/react'
 import {useEffect, useMemo, useState} from 'react'
@@ -19,24 +12,14 @@ import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
 import {Header} from './ui/Header/Header'
 import * as zod from './zod'
-import getAppDataFromSearchParams from './utils/getAppDataFromSearchParams'
-import {
-  defaultAppData,
-  editorOptions,
-  sampleValue,
-  sampleZodSchema,
-  ZOD_DEFAULT_VERSION,
-} from './constants'
-import getURLwithAppData from './utils/getUrlWithAppData'
+import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
 import setMonacoDeclarationTypes from './utils/setMonacoDeclarationTypes'
-import {getAppDataFromLocalStorage} from './utils/getAppDataFromLocalStorage'
-import usePersistAppData from './hooks/usePersistAppData'
-
-export type AppData = {
-  schema: string
-  values: string[]
-  version: string
-}
+import {usePersistAppData} from './hooks/usePersistAppData'
+import {
+  getAppDataFromSearchParams,
+  getAppDataFromLocalStorage,
+  getURLwithAppData,
+} from './utils/appData'
 
 const monaco = await loader.init()
 monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
@@ -46,22 +29,13 @@ monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
 
 // Data in the url have precedence over localStorage.
 const initialAppData =
-  getAppDataFromSearchParams() ?? getAppDataFromLocalStorage() ?? defaultAppData
+  getAppDataFromSearchParams() ?? getAppDataFromLocalStorage() ?? DEFAULT_APP_DATA
 
 const App = () => {
-  const [schema, setSchema] = useState<string>(() => {
-    return initialAppData.schema || sampleZodSchema
-  })
-
-  const [values, setValues] = useState<Array<string>>(() => {
-    return initialAppData.values.length ? initialAppData.values : [sampleValue]
-  })
-
   const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const [version, setVersion] = useState(
-    initialAppData.version || ZOD_DEFAULT_VERSION,
-  )
+  const [schema, setSchema] = useState<string>(() => initialAppData.schema)
+  const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
+  const [version, setVersion] = useState(initialAppData.version)
 
   const appData = useMemo(
     () => ({
@@ -95,10 +69,7 @@ const App = () => {
   return (
     <Box className={classes.layout}>
       <Header>
-        <Tooltip
-          withArrow
-          label="Create a link to share the current schema and values"
-        >
+        <Tooltip withArrow label="Create a link to share the current schema and values">
           <Button
             variant="light"
             onClick={() => {
@@ -120,12 +91,7 @@ const App = () => {
       </Header>
       <main className={classes.main}>
         <div className={classes.leftPanel}>
-          <Flex
-            className={classes.sectionTitle}
-            align="center"
-            justify="space-between"
-            gap="sm"
-          >
+          <Flex className={classes.sectionTitle} align="center" justify="space-between" gap="sm">
             <Flex gap="sm" align="center" flex={1}>
               Zod schema
               <VersionPicker
@@ -148,11 +114,7 @@ const App = () => {
             </Flex>
             <CopyButton value={schema} />
             <Tooltip label="Clear schema" withArrow>
-              <ActionIcon
-                variant="light"
-                aria-label="Clear schema"
-                onClick={() => setSchema('')}
-              >
+              <ActionIcon variant="light" aria-label="Clear schema" onClick={() => setSchema('')}>
                 <LuEraser />
               </ActionIcon>
             </Tooltip>
@@ -171,7 +133,7 @@ const App = () => {
               setSchema(value ?? '')
             }}
             defaultLanguage="typescript"
-            options={editorOptions}
+            options={EDITOR_OPTIONS}
             theme={computedColorScheme == 'light' ? 'vs' : 'vs-dark'}
             value={schema}
           />
