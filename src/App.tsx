@@ -19,21 +19,17 @@ import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
 import {Header} from './ui/Header/Header'
 import * as zod from './zod'
-import getAppDataFromSearchParams from './utils/getAppDataFromSearchParams'
 import {
   DEFAULT_APP_DATA,
   EDITOR_OPTIONS,
 } from './constants'
-import getURLwithAppData from './utils/getUrlWithAppData'
 import setMonacoDeclarationTypes from './utils/setMonacoDeclarationTypes'
-import {getAppDataFromLocalStorage} from './utils/getAppDataFromLocalStorage'
 import usePersistAppData from './hooks/usePersistAppData'
-
-export type AppData = {
-  schema: string
-  values: string[]
-  version: string
-}
+import {
+  getAppDataFromSearchParams,
+  getAppDataFromLocalStorage,
+  getURLwithAppData,
+} from './utils/appData'
 
 const monaco = await loader.init()
 monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
