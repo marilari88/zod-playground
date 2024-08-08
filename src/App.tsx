@@ -21,12 +21,12 @@ import {Header} from './ui/Header/Header'
 import * as zod from './zod'
 import getAppDataFromSearchParams from './utils/getAppDataFromSearchParams'
 import {
-  defaultAppData,
-  editorOptions,
-  sampleValue,
-  sampleZodSchema,
+  DEFAULT_APP_DATA,
+  EDITOR_OPTIONS,
+  DEFAULT_TEST_VALUE,
+  DEFAULT_ZOD_SCHEMA,
   STORAGE_KEY,
-  ZOD_DEFAULT_VERSION,
+  DEFAULT_ZOD_VERSION,
 } from './constants'
 import getURLwithAppData from './utils/getUrlWithAppData'
 import setMonacoDeclarationTypes from './utils/setMonacoDeclarationTypes'
@@ -47,21 +47,21 @@ monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
 
 // Data in the url have precedence over localStorage.
 const initialAppData =
-  getAppDataFromSearchParams() ?? getAppDataFromLocalStorage() ?? defaultAppData
+  getAppDataFromSearchParams() ?? getAppDataFromLocalStorage() ?? DEFAULT_APP_DATA
 
 const App = () => {
   const [schema, setSchema] = useState<string>(() => {
-    return initialAppData.schema || sampleZodSchema
+    return initialAppData.schema || DEFAULT_ZOD_SCHEMA
   })
 
   const [values, setValues] = useState<Array<string>>(() => {
-    return initialAppData.values.length ? initialAppData.values : [sampleValue]
+    return initialAppData.values.length ? initialAppData.values : [DEFAULT_TEST_VALUE]
   })
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const [version, setVersion] = useState(
-    initialAppData.version || ZOD_DEFAULT_VERSION,
+    initialAppData.version || DEFAULT_ZOD_VERSION,
   )
 
   const appData = useMemo(
@@ -172,7 +172,7 @@ const App = () => {
               setSchema(value ?? '')
             }}
             defaultLanguage="typescript"
-            options={editorOptions}
+            options={EDITOR_OPTIONS}
             theme={computedColorScheme == 'light' ? 'vs' : 'vs-dark'}
             value={schema}
           />

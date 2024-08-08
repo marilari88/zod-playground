@@ -1,16 +1,14 @@
 import * as zod from './zod'
 import {editor} from 'monaco-editor'
 
-export const ZOD_DEFAULT_VERSION = (await zod.getVersions('latest'))[0]
+export const DEFAULT_ZOD_VERSION = (await zod.getVersions('latest'))[0]
 
-export const editorOptions: editor.IStandaloneEditorConstructionOptions = {
+export const EDITOR_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   minimap: {enabled: false},
   scrollBeyondLastLine: false,
   scrollbar: {
-    // Subtle shadows to the left & top. Defaults to true.
     useShadows: false,
     vertical: 'auto',
-
     verticalScrollbarSize: 10,
     horizontalScrollbarSize: 10,
   },
@@ -22,17 +20,17 @@ export const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   renderLineHighlight: 'none',
 }
 
-export const sampleZodSchema = `z.object({
+export const DEFAULT_ZOD_SCHEMA = `z.object({
   name: z.string(),
   birth_year: z.number().optional()
 })`
 
-export const sampleValue = '{name: "John"}'
+export const DEFAULT_TEST_VALUE = '{name: "John"}'
 
-export const defaultAppData = {
+export const DEFAULT_APP_DATA = {
   schema: '',
   values: [],
-  version: ZOD_DEFAULT_VERSION,
+  version: DEFAULT_ZOD_VERSION,
 }
 
 export const STORAGE_KEY = 'zod-playground'
