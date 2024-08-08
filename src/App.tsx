@@ -1,11 +1,4 @@
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Flex,
-  Tooltip,
-  useComputedColorScheme,
-} from '@mantine/core'
+import {ActionIcon, Box, Button, Flex, Tooltip, useComputedColorScheme} from '@mantine/core'
 import {notifications} from '@mantine/notifications'
 import Editor, {Monaco, loader, useMonaco} from '@monaco-editor/react'
 import {useEffect, useMemo, useState} from 'react'
@@ -19,10 +12,7 @@ import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
 import {Header} from './ui/Header/Header'
 import * as zod from './zod'
-import {
-  DEFAULT_APP_DATA,
-  EDITOR_OPTIONS,
-} from './constants'
+import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
 import setMonacoDeclarationTypes from './utils/setMonacoDeclarationTypes'
 import usePersistAppData from './hooks/usePersistAppData'
 import {
@@ -79,10 +69,7 @@ const App = () => {
   return (
     <Box className={classes.layout}>
       <Header>
-        <Tooltip
-          withArrow
-          label="Create a link to share the current schema and values"
-        >
+        <Tooltip withArrow label="Create a link to share the current schema and values">
           <Button
             variant="light"
             onClick={() => {
@@ -104,12 +91,7 @@ const App = () => {
       </Header>
       <main className={classes.main}>
         <div className={classes.leftPanel}>
-          <Flex
-            className={classes.sectionTitle}
-            align="center"
-            justify="space-between"
-            gap="sm"
-          >
+          <Flex className={classes.sectionTitle} align="center" justify="space-between" gap="sm">
             <Flex gap="sm" align="center" flex={1}>
               Zod schema
               <VersionPicker
@@ -132,11 +114,7 @@ const App = () => {
             </Flex>
             <CopyButton value={schema} />
             <Tooltip label="Clear schema" withArrow>
-              <ActionIcon
-                variant="light"
-                aria-label="Clear schema"
-                onClick={() => setSchema('')}
-              >
+              <ActionIcon variant="light" aria-label="Clear schema" onClick={() => setSchema('')}>
                 <LuEraser />
               </ActionIcon>
             </Tooltip>
