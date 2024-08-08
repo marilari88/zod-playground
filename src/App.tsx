@@ -14,7 +14,7 @@ import {Header} from './ui/Header/Header'
 import * as zod from './zod'
 import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
 import setMonacoDeclarationTypes from './utils/setMonacoDeclarationTypes'
-import usePersistAppData from './hooks/usePersistAppData'
+import {usePersistAppData} from './hooks/usePersistAppData'
 import {
   getAppDataFromSearchParams,
   getAppDataFromLocalStorage,

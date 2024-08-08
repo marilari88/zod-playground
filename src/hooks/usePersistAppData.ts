@@ -2,7 +2,7 @@ import {useEffect, useRef} from 'react'
 import {STORAGE_KEY} from '../constants'
 import {AppData} from '../utils/appData'
 
-const usePersistAppData = (data: AppData) => {
+export function usePersistAppData(data: AppData) {
   const timeoutRef = useRef<number | null>(null)
 
   useEffect(() => {
@@ -24,5 +24,3 @@ const usePersistAppData = (data: AppData) => {
     }
   }, [data])
 }
-
-export default usePersistAppData
