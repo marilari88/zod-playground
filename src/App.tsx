@@ -23,9 +23,6 @@ import getAppDataFromSearchParams from './utils/getAppDataFromSearchParams'
 import {
   DEFAULT_APP_DATA,
   EDITOR_OPTIONS,
-  DEFAULT_TEST_VALUE,
-  DEFAULT_ZOD_SCHEMA,
-  DEFAULT_ZOD_VERSION,
 } from './constants'
 import getURLwithAppData from './utils/getUrlWithAppData'
 import setMonacoDeclarationTypes from './utils/setMonacoDeclarationTypes'
@@ -49,19 +46,10 @@ const initialAppData =
   getAppDataFromSearchParams() ?? getAppDataFromLocalStorage() ?? DEFAULT_APP_DATA
 
 const App = () => {
-  const [schema, setSchema] = useState<string>(() => {
-    return initialAppData.schema || DEFAULT_ZOD_SCHEMA
-  })
-
-  const [values, setValues] = useState<Array<string>>(() => {
-    return initialAppData.values.length ? initialAppData.values : [DEFAULT_TEST_VALUE]
-  })
-
   const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const [version, setVersion] = useState(
-    initialAppData.version || DEFAULT_ZOD_VERSION,
-  )
+  const [schema, setSchema] = useState<string>(() => initialAppData.schema)
+  const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
+  const [version, setVersion] = useState(initialAppData.version)
 
   const appData = useMemo(
     () => ({
