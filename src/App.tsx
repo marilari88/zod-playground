@@ -25,7 +25,6 @@ import {
   EDITOR_OPTIONS,
   DEFAULT_TEST_VALUE,
   DEFAULT_ZOD_SCHEMA,
-  STORAGE_KEY,
   DEFAULT_ZOD_VERSION,
 } from './constants'
 import getURLwithAppData from './utils/getUrlWithAppData'
