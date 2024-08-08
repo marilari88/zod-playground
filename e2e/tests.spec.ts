@@ -1,15 +1,15 @@
 import {test, expect} from '@playwright/test'
 import {writeInMonaco} from './fixtures'
 
+import * as zod from '../src/zod'
+
 test('has title "Zod Playground', async ({page}) => {
   await page.goto('/')
 
   await expect(page).toHaveTitle(/Zod Playground/)
 })
 
-test('has header with title, share, theme toggler and github repo link', async ({
-  page,
-}) => {
+test('has header with title, share, theme toggler and github repo link', async ({page}) => {
   await page.goto('/')
 
   await expect(page.getByText('Zod Playground')).toBeVisible()
@@ -24,11 +24,16 @@ test('has header with title, share, theme toggler and github repo link', async (
 test('zod version switch', async ({page}) => {
   await page.goto('/')
 
-  await page.getByRole('button', {name: 'v3.23.8'}).click()
-  await page.getByRole('option', {name: '3.23.7'}).click()
+  const latestZodVersion = (await zod.getVersions('latest'))[0]
+  const anotherZodVersion = (await zod.getVersions()).find(
+    (zVersion) => zVersion !== latestZodVersion,
+  )
 
-  await expect(page.getByRole('button', {name: 'v3.23.8'})).not.toBeVisible()
-  await expect(page.getByRole('button', {name: 'v3.23.7'})).toBeVisible()
+  await page.getByRole('button', {name: `v${latestZodVersion}`}).click()
+  await page.getByRole('option', {name: anotherZodVersion}).click()
+
+  await expect(page.getByRole('button', {name: `v${latestZodVersion}`})).not.toBeVisible()
+  await expect(page.getByRole('button', {name: `v${anotherZodVersion}`})).toBeVisible()
 })
 
 test('has default schema', async ({page}) => {
@@ -42,9 +47,7 @@ test('has default schema', async ({page}) => {
 })`)
 })
 
-test('has invalid marker when an invalid value is in the Value Editor', async ({
-  page,
-}) => {
+test('has invalid marker when an invalid value is in the Value Editor', async ({page}) => {
   await page.goto('/')
 
   await writeInMonaco({page, text: 'Invalid value'})
