@@ -31,12 +31,23 @@ test('zod version switch', async ({page}) => {
   await expect(page.getByRole('button', {name: 'v3.23.7'})).toBeVisible()
 })
 
+test('has default schema', async ({page}) => {
+  await page.goto('/')
+
+  const editor = await page.getByRole('textbox').nth(0)
+  const editorValue = await editor.evaluate((e) => e.textContent)
+  await expect(editorValue).toContain(`z.object({
+  name: z.string(),
+  birth_year: z.number().optional()
+})`)
+})
+
 test('has invalid marker when an invalid value is in the Value Editor', async ({
   page,
 }) => {
   await page.goto('/')
 
-  await writeInMonaco(page, 'Invalid value')
+  await writeInMonaco({page, text: 'Invalid value'})
 
   await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
 })
