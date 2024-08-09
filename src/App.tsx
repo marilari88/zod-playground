@@ -1,13 +1,6 @@
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Flex,
-  Tooltip,
-  useComputedColorScheme,
-} from '@mantine/core'
+import {ActionIcon, Box, Button, Flex, Tooltip, useComputedColorScheme} from '@mantine/core'
 import {notifications} from '@mantine/notifications'
-import Editor, {Monaco, loader, useMonaco} from '@monaco-editor/react'
+import Editor, {Monaco, useMonaco} from '@monaco-editor/react'
 import {useEffect, useMemo, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
@@ -19,50 +12,25 @@ import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
 import {Header} from './ui/Header/Header'
 import * as zod from './zod'
-import getAppDataFromSearchParams from './utils/getAppDataFromSearchParams'
+import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
+import {initMonaco, setMonacoDeclarationTypes} from './utils/monaco'
+import {usePersistAppData} from './hooks/usePersistAppData'
 import {
-  defaultAppData,
-  editorOptions,
-  sampleValue,
-  sampleZodSchema,
-  STORAGE_KEY,
-  ZOD_DEFAULT_VERSION,
-} from './constants'
-import getURLwithAppData from './utils/getUrlWithAppData'
-import setMonacoDeclarationTypes from './utils/setMonacoDeclarationTypes'
-import {getAppDataFromLocalStorage} from './utils/getAppDataFromLocalStorage'
-import usePersistAppData from './hooks/usePersistAppData'
+  getAppDataFromSearchParams,
+  getAppDataFromLocalStorage,
+  getURLwithAppData,
+} from './utils/appData'
 
-export type AppData = {
-  schema: string
-  values: string[]
-  version: string
-}
+await initMonaco()
 
-const monaco = await loader.init()
-monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-  noSemanticValidation: true,
-  noSyntaxValidation: true,
-})
-
-// Data in the url have precedence over localStorage.
 const initialAppData =
-  getAppDataFromSearchParams() ?? getAppDataFromLocalStorage() ?? defaultAppData
+  getAppDataFromSearchParams() ?? getAppDataFromLocalStorage() ?? DEFAULT_APP_DATA
 
 const App = () => {
-  const [schema, setSchema] = useState<string>(() => {
-    return initialAppData.schema || sampleZodSchema
-  })
-
-  const [values, setValues] = useState<Array<string>>(() => {
-    return initialAppData.values.length ? initialAppData.values : [sampleValue]
-  })
-
   const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const [version, setVersion] = useState(
-    initialAppData.version || ZOD_DEFAULT_VERSION,
-  )
+  const [schema, setSchema] = useState<string>(() => initialAppData.schema)
+  const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
+  const [version, setVersion] = useState(initialAppData.version)
 
   const appData = useMemo(
     () => ({
@@ -96,10 +64,7 @@ const App = () => {
   return (
     <Box className={classes.layout}>
       <Header>
-        <Tooltip
-          withArrow
-          label="Create a link to share the current schema and values"
-        >
+        <Tooltip withArrow label="Create a link to share the current schema and values">
           <Button
             variant="light"
             onClick={() => {
@@ -121,12 +86,7 @@ const App = () => {
       </Header>
       <main className={classes.main}>
         <div className={classes.leftPanel}>
-          <Flex
-            className={classes.sectionTitle}
-            align="center"
-            justify="space-between"
-            gap="sm"
-          >
+          <Flex className={classes.sectionTitle} align="center" justify="space-between" gap="sm">
             <Flex gap="sm" align="center" flex={1}>
               Zod schema
               <VersionPicker
@@ -149,11 +109,7 @@ const App = () => {
             </Flex>
             <CopyButton value={schema} />
             <Tooltip label="Clear schema" withArrow>
-              <ActionIcon
-                variant="light"
-                aria-label="Clear schema"
-                onClick={() => setSchema('')}
-              >
+              <ActionIcon variant="light" aria-label="Clear schema" onClick={() => setSchema('')}>
                 <LuEraser />
               </ActionIcon>
             </Tooltip>
@@ -172,7 +128,7 @@ const App = () => {
               setSchema(value ?? '')
             }}
             defaultLanguage="typescript"
-            options={editorOptions}
+            options={EDITOR_OPTIONS}
             theme={computedColorScheme == 'light' ? 'vs' : 'vs-dark'}
             value={schema}
           />
