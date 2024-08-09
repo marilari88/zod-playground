@@ -140,7 +140,7 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
           <Tooltip label="Remove value" withArrow>
             <ActionIcon
               variant="light"
-              disabled={onRemove == undefined}
+              disabled={onRemove === undefined}
               aria-label="Remove value"
               onClick={() => onRemove?.()}
             >
@@ -157,7 +157,7 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
       <div className={classes.valueEditorContainer}>
         <div className={classes.valueEditor}>
           <Editor
-            theme={computedColorScheme == 'light' ? 'vs' : 'vs-dark'}
+            theme={computedColorScheme === 'light' ? 'vs' : 'vs-dark'}
             onChange={(value) => {
               onChange?.(value ?? '')
             }}

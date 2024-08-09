@@ -21,7 +21,7 @@ export async function getVersions(tag?: string): Promise<string[]> {
   if (tag) {
     const ver = _metadata.tags[tag]
     if (ver) return [ver]
-    else throw new Error('Invalid tag')
+    throw new Error('Invalid tag')
   }
 
   const versions = []

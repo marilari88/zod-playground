@@ -134,7 +134,7 @@ const App = () => {
             }}
             defaultLanguage="typescript"
             options={EDITOR_OPTIONS}
-            theme={computedColorScheme == 'light' ? 'vs' : 'vs-dark'}
+            theme={computedColorScheme === 'light' ? 'vs' : 'vs-dark'}
             value={schema}
           />
         </div>

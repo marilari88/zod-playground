@@ -22,7 +22,7 @@ export function ColorSchemeToggle({
       size="lg"
       aria-label="Toggle color scheme"
     >
-      {computedColorScheme == 'light' ? <FiSun /> : <FiMoon />}
+      {computedColorScheme === 'light' ? <FiSun /> : <FiMoon />}
     </ActionIcon>
   )
 }
