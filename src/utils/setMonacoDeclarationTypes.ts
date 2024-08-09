@@ -1,4 +1,4 @@
-import {Monaco} from '@monaco-editor/react'
+import type {Monaco} from '@monaco-editor/react'
 import * as zod from '../zod'
 
 const setMonacoDeclarationTypes = async (monaco: Monaco, ver: string) => {

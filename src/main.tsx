@@ -12,7 +12,7 @@ const theme = createTheme({
   fontFamily: 'Roboto, sans-serif',
   primaryColor: 'primary',
   colors: {
-    ['neutral-light']: [
+    'neutral-light': [
       '#FFFFFF',
       '#F5F5F5',
       '#EEEEEE',
@@ -24,7 +24,7 @@ const theme = createTheme({
       '#424242',
       '#212121',
     ],
-    ['neutral-dark']: [
+    'neutral-dark': [
       '#121212',
       '#1C1C1C',
       '#2C2C2C',
@@ -36,7 +36,7 @@ const theme = createTheme({
       '#D0D0D0',
       '#E0E0E0',
     ],
-    ['primary-light']: [
+    'primary-light': [
       '#eef3ff',
       '#dee2f2',
       '#bdc2de',
@@ -48,7 +48,7 @@ const theme = createTheme({
       '#424e88',
       '#364379',
     ],
-    ['primary-dark']: [
+    'primary-dark': [
       '#081F21',
       '#144D52',
       '#248994',

@@ -1,6 +1,6 @@
 import {useEffect, useRef} from 'react'
 import {STORAGE_KEY} from '../constants'
-import {AppData} from '../utils/appData'
+import type {AppData} from '../utils/appData'
 
 export function usePersistAppData(data: AppData) {
   const timeoutRef = useRef<number | null>(null)
