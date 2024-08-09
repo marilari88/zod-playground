@@ -11,16 +11,10 @@ import {
   useComputedColorScheme,
 } from '@mantine/core'
 import Editor from '@monaco-editor/react'
-import {editor} from 'monaco-editor'
+import type {editor} from 'monaco-editor'
 
 import {useDisclosure} from '@mantine/hooks'
-import {
-  FiAlertCircle,
-  FiCheckCircle,
-  FiColumns,
-  FiMinus,
-  FiPlus,
-} from 'react-icons/fi'
+import {FiAlertCircle, FiCheckCircle, FiColumns, FiMinus, FiPlus} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 import * as zod from '../../zod'
 import {CopyButton} from '../CopyButton'
@@ -57,15 +51,7 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   renderLineHighlight: 'none',
 }
 
-export const Validation = ({
-  schema,
-  value,
-  index,
-  onChange,
-  onAdd,
-  onRemove,
-  onClear,
-}: Props) => {
+export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onClear}: Props) => {
   const [opened, {close, open}] = useDisclosure(false)
   const [openedResult, {toggle: toggleResult}] = useDisclosure(false)
 
@@ -78,12 +64,7 @@ export const Validation = ({
 
   return (
     <Box className={classes.valueContainer}>
-      <Flex
-        align="center"
-        className={classes.valueTitle}
-        gap="sm"
-        justify="space-between"
-      >
+      <Flex align="center" className={classes.valueTitle} gap="sm" justify="space-between">
         <Flex gap="sm" align="center">
           Value #{index + 1}
           {validation.success && (
@@ -147,11 +128,7 @@ export const Validation = ({
         <Flex gap="sm">
           <CopyButton value={value || ''} />
           <Tooltip label="Clear value" withArrow>
-            <ActionIcon
-              variant="light"
-              aria-label="Clear value"
-              onClick={() => onClear(index)}
-            >
+            <ActionIcon variant="light" aria-label="Clear value" onClick={() => onClear(index)}>
               <LuEraser />
             </ActionIcon>
           </Tooltip>
@@ -171,11 +148,7 @@ export const Validation = ({
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Toggle results column" withArrow>
-            <ActionIcon
-              variant="light"
-              aria-label="Toggle results column"
-              onClick={toggleResult}
-            >
+            <ActionIcon variant="light" aria-label="Toggle results column" onClick={toggleResult}>
               <FiColumns />
             </ActionIcon>
           </Tooltip>

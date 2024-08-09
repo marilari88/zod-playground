@@ -1,25 +1,25 @@
 import {ActionIcon, Box, Button, Flex, Tooltip, useComputedColorScheme} from '@mantine/core'
 import {notifications} from '@mantine/notifications'
-import Editor, {Monaco, loader, useMonaco} from '@monaco-editor/react'
+import Editor, {type Monaco, loader, useMonaco} from '@monaco-editor/react'
 import {useEffect, useMemo, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 
 import classes from './App.module.css'
+import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
 import {ColorSchemeToggle} from './features/ColorSchemeToggle'
 import {CopyButton} from './features/CopyButton'
 import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
-import {Header} from './ui/Header/Header'
-import * as zod from './zod'
-import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
-import setMonacoDeclarationTypes from './utils/setMonacoDeclarationTypes'
 import {usePersistAppData} from './hooks/usePersistAppData'
+import {Header} from './ui/Header/Header'
 import {
-  getAppDataFromSearchParams,
   getAppDataFromLocalStorage,
+  getAppDataFromSearchParams,
   getURLwithAppData,
 } from './utils/appData'
+import setMonacoDeclarationTypes from './utils/setMonacoDeclarationTypes'
+import * as zod from './zod'
 
 const monaco = await loader.init()
 monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({

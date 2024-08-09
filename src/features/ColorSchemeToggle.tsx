@@ -1,8 +1,4 @@
-import {
-  ActionIcon,
-  useComputedColorScheme,
-  useMantineColorScheme,
-} from '@mantine/core'
+import {ActionIcon, useComputedColorScheme, useMantineColorScheme} from '@mantine/core'
 import {FiMoon, FiSun} from 'react-icons/fi'
 
 export function ColorSchemeToggle({

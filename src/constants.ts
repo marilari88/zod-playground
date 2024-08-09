@@ -1,9 +1,9 @@
+import type {editor} from 'monaco-editor'
 import * as zod from './zod'
-import {editor} from 'monaco-editor'
 
 export const EDITOR_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   minimap: {
-      enabled: false
+    enabled: false,
   },
   scrollBeyondLastLine: false,
   scrollbar: {
