@@ -47,7 +47,7 @@ test('has default schema', async ({page}) => {
 test('has invalid marker when an invalid value is in the Value Editor', async ({page}) => {
   await page.goto('/')
 
-  await writeInMonaco({page, text: 'Invalid value'})
+  await writeInMonaco({page, text: 'Invalid value', editorNth: 1})
 
   await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
 })

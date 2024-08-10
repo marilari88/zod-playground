@@ -22,8 +22,8 @@ export const writeInMonaco = async ({
   text: string
   deletePreviousContent?: boolean
 } & BaseMonacoFixturesProps) => {
-  const monacoEditor = page.locator('.monaco-editor').nth(editorNth)
-  await monacoEditor.click()
+  const editor = page.getByRole('code').nth(editorNth)
+  await editor.click()
   if (deletePreviousContent) {
     await page.keyboard.press('ControlOrMeta+KeyA')
   }
