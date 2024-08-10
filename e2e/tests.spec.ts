@@ -1,5 +1,5 @@
-import {test, expect} from '@playwright/test'
-import {writeInMonaco} from './fixtures'
+import {expect, test} from '@playwright/test'
+import {fetchMonacoContent, writeInMonaco} from './fixtures'
 
 import * as zod from '../src/zod'
 
@@ -39,12 +39,9 @@ test('zod version switch', async ({page}) => {
 test('has default schema', async ({page}) => {
   await page.goto('/')
 
-  const editor = await page.getByRole('textbox').nth(0)
-  const editorValue = await editor.evaluate((e) => e.textContent)
-  await expect(editorValue).toContain(`z.object({
-  name: z.string(),
-  birth_year: z.number().optional()
-})`)
+  const editorValue = await fetchMonacoContent({page})
+
+  expect(editorValue).toEqual('1234z.object({name:z.string(),birth_year:z.number().optional()})')
 })
 
 test('has invalid marker when an invalid value is in the Value Editor', async ({page}) => {
