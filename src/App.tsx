@@ -7,13 +7,11 @@ import {LuEraser} from 'react-icons/lu'
 
 import classes from './App.module.css'
 import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
-import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
 import {ColorSchemeToggle} from './features/ColorSchemeToggle'
 import {CopyButton} from './features/CopyButton'
 import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
 import {usePersistAppData} from './hooks/usePersistAppData'
-import {Header} from './ui/Header/Header'
 import {Header} from './ui/Header/Header'
 import {
   getAppDataFromLocalStorage,
@@ -21,8 +19,6 @@ import {
   getURLwithAppData,
 } from './utils/appData'
 import {initMonaco, setMonacoDeclarationTypes} from './utils/monaco'
-import setMonacoDeclarationTypes from './utils/setMonacoDeclarationTypes'
-import * as zod from './zod'
 import * as zod from './zod'
 
 await initMonaco()
