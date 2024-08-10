@@ -140,7 +140,7 @@ const App = () => {
               return (
                 <Validation
                   key={`val${index}`}
-                  schema={evaluatedSchema}
+                  schema={evaluatedSchema as zod.ZodSchema}
                   value={value}
                   index={index}
                   onAdd={() => {

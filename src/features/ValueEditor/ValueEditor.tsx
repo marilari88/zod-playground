@@ -21,7 +21,7 @@ import {CopyButton} from '../CopyButton'
 import classes from './ValueEditor.module.css'
 
 interface Props {
-  schema: any
+  schema: zod.ZodSchema
   value: string
   index: number
   onAdd: () => void
