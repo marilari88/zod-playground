@@ -21,19 +21,17 @@ export async function getVersions(tag?: string): Promise<string[]> {
   if (tag) {
     const ver = _metadata.tags[tag]
     if (ver) return [ver]
-    else throw new Error('Invalid tag')
+    throw new Error('Invalid tag')
   }
 
   const versions = []
   for (const el of _metadata.versions) {
     const ver = el.version
 
-    if (ver.startsWith('1'))
-      continue
+    if (ver.startsWith('1')) continue
 
-    if (['alpha', 'beta', 'canary'].some((v) => ver.includes(v)))
-      continue
-    
+    if (['alpha', 'beta', 'canary'].some((v) => ver.includes(v))) continue
+
     versions.push(ver)
   }
 
@@ -43,9 +41,7 @@ export async function getVersions(tag?: string): Promise<string[]> {
 }
 
 export async function setVersion(ver: string) {
-  _z = await import(
-    /* @vite-ignore */ `https://cdn.jsdelivr.net/npm/zod@${ver}/+esm`
-  )
+  _z = await import(/* @vite-ignore */ `https://cdn.jsdelivr.net/npm/zod@${ver}/+esm`)
 }
 
 export function validateSchema(schema: string): ZodValidation {
@@ -68,8 +64,7 @@ export function validateSchema(schema: string): ZodValidation {
 
 export function validateValue(schema: any, value: string): ZodValidation {
   const evaluatedValue = evalExp(value)
-  if (!evaluatedValue.success)
-    return evaluatedValue
+  if (!evaluatedValue.success) return evaluatedValue
 
   try {
     const validationRes = schema.safeParse(evaluatedValue.data)
@@ -107,11 +102,9 @@ function generateErrorMessage(issues: any[]) {
   const messages = []
   for (const issue of issues) {
     const path = issue.path
-    if (path.length > 0)
-      messages.push(`${path}: ${issue.code} - ${issue.message}`)
-    else
-      messages.push(`${issue.code} - ${issue.message}`)
+    if (path.length > 0) messages.push(`${path}: ${issue.code} - ${issue.message}`)
+    else messages.push(`${issue.code} - ${issue.message}`)
   }
 
   return messages.join('\n')
-} 
+}

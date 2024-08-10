@@ -149,11 +149,7 @@ export function Header({children}: {children?: React.ReactNode}) {
       <Box className={classes.header__title}>Zod Playground</Box>
       {children}
       <Flex gap="md" ml="auto" color="primary">
-        <Anchor
-          href="https://github.com/marilari88/zod-playground"
-          target="_blank"
-          c="primary"
-        >
+        <Anchor href="https://github.com/marilari88/zod-playground" target="_blank" c="primary">
           <FaGithub className={classes.githubLink} />
         </Anchor>
       </Flex>

@@ -31,7 +31,8 @@ export function VersionPicker({
   useEffect(() => {
     setLoading(true)
 
-    zod.getVersions()
+    zod
+      .getVersions()
       .then((versions) => {
         setVersions(versions)
       })
@@ -42,7 +43,7 @@ export function VersionPicker({
 
   const filteredVersions = versions?.filter((el) => el.includes(searchValue)) || []
 
-  const options = (filteredVersions).map((item) => (
+  const options = filteredVersions.map((item) => (
     <Combobox.Option value={item} key={item}>
       {item}
     </Combobox.Option>
@@ -68,9 +69,7 @@ export function VersionPicker({
           tt="none"
           onClick={() => combobox.toggleDropdown()}
           component="button"
-          rightSection={
-            loading ? <Loader size={18} /> : <FiChevronDown size={18} />
-          }
+          rightSection={loading ? <Loader size={18} /> : <FiChevronDown size={18} />}
           disabled={disabled}
           style={{opacity: disabled ? 0.5 : 1}}
         >
