@@ -59,7 +59,7 @@ const App = () => {
     }
 
     updateVersion(monaco, version)
-  }, [version, monaco])
+  }, [version, monaco, isLoading])
 
   return (
     <Box className={classes.layout}>
