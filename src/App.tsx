@@ -1,28 +1,28 @@
 import {ActionIcon, Box, Button, Flex, Tooltip, useComputedColorScheme} from '@mantine/core'
 import {notifications} from '@mantine/notifications'
-import Editor, {Monaco, useMonaco} from '@monaco-editor/react'
+import Editor, {type Monaco, useMonaco} from '@monaco-editor/react'
 import {useEffect, useMemo, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 
 import classes from './App.module.css'
 import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
+import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
 import {ColorSchemeToggle} from './features/ColorSchemeToggle'
 import {CopyButton} from './features/CopyButton'
 import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
-import {Header} from './ui/Header/Header'
-import * as zod from './zod'
-import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
-import {initMonaco, setMonacoDeclarationTypes} from './utils/monaco'
 import {usePersistAppData} from './hooks/usePersistAppData'
+import {Header} from './ui/Header/Header'
 import {Header} from './ui/Header/Header'
 import {
   getAppDataFromLocalStorage,
   getAppDataFromSearchParams,
   getURLwithAppData,
 } from './utils/appData'
+import {initMonaco, setMonacoDeclarationTypes} from './utils/monaco'
 import setMonacoDeclarationTypes from './utils/setMonacoDeclarationTypes'
+import * as zod from './zod'
 import * as zod from './zod'
 
 await initMonaco()

@@ -1,4 +1,4 @@
-import {Monaco, loader} from '@monaco-editor/react'
+import {type Monaco, loader} from '@monaco-editor/react'
 import * as zod from '../zod'
 
 export async function initMonaco() {
