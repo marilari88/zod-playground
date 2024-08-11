@@ -87,7 +87,7 @@ export function validateSchema(schema: string): ZodValidation {
       success: true,
       data,
     }
-  } catch (e: unknown) {
+  } catch (e) {
     const error = e instanceof Error ? e.message : 'Unknown error'
     return {
       success: false,
@@ -124,7 +124,7 @@ function evalExp(expression: string): ZodValidation {
       success: true,
       data: evaluatedExpression,
     }
-  } catch (e: unknown) {
+  } catch (e) {
     const error = e instanceof Error ? e.message : 'Unknown error'
     return {
       success: false,
