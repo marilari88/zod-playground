@@ -48,9 +48,8 @@ const App = () => {
 
   const {data: evaluatedSchema, error: schemaError} = zod.validateSchema(schema)
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: isLoading is not a dependency
   useEffect(() => {
-    if (isLoading || !monaco) return
+    if (!monaco) return
 
     async function updateVersion(monaco: Monaco, ver: string) {
       setIsLoading(true)
