@@ -11,6 +11,7 @@ export const ZodLogo = () => (
     style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeMiterlimit: 5}}
     className={classes.header__logo}
   >
+    <title>Zod Logo</title>
     <use
       xlinkHref="#_Image1"
       x="112.458"

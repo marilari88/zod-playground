@@ -46,10 +46,12 @@ const App = () => {
   const monaco = useMonaco()
   const computedColorScheme = useComputedColorScheme('light')
 
-  const {data: evaluatedSchema, error: schemaError} = zod.validateSchema(schema)
+  const schemaValidation = zod.validateSchema(schema)
+  const evaluatedSchema = schemaValidation.success ? schemaValidation.data : undefined
+  const schemaError = !schemaValidation.success ? schemaValidation.error : undefined
 
   useEffect(() => {
-    if (isLoading || !monaco) return
+    if (!monaco) return
 
     async function updateVersion(monaco: Monaco, ver: string) {
       setIsLoading(true)
@@ -139,6 +141,7 @@ const App = () => {
             {values.map((value, index) => {
               return (
                 <Validation
+                  // biome-ignore lint/suspicious/noArrayIndexKey: items order does not change
                   key={`val${index}`}
                   schema={evaluatedSchema}
                   value={value}

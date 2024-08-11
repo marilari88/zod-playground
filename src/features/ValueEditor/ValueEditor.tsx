@@ -21,7 +21,7 @@ import {CopyButton} from '../CopyButton'
 import classes from './ValueEditor.module.css'
 
 interface Props {
-  schema: any
+  schema?: zod.ZodSchema
   value: string
   index: number
   onAdd: () => void
@@ -55,7 +55,9 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
   const [opened, {close, open}] = useDisclosure(false)
   const [openedResult, {toggle: toggleResult}] = useDisclosure(false)
 
-  const validation = zod.validateValue(schema, value)
+  const validation = schema
+    ? zod.validateValue(schema, value)
+    : {success: false as const, error: 'Invalid schema'}
   const parsedData = validation.success && JSON.stringify(validation.data)
 
   const errors = !validation.success && validation.error
