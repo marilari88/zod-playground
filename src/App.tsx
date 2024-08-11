@@ -139,6 +139,7 @@ const App = () => {
             {values.map((value, index) => {
               return (
                 <Validation
+                  // biome-ignore lint/suspicious/noArrayIndexKey: items order does not change
                   key={`val${index}`}
                   schema={evaluatedSchema as zod.ZodSchema}
                   value={value}
