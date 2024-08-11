@@ -1,56 +1,3 @@
-export type ZodSchema = {
-  safeParse: (data: unknown) => {
-    success: boolean
-    data: unknown
-    error: {
-      issues: ZodIssue[]
-    }
-  }
-}
-
-type SchemaValidation =
-  | {
-      success: true
-      data: ZodSchema
-    }
-  | {
-      success: false
-      error: string
-    }
-
-type ValueValidation =
-  | {
-      success: true
-      data: unknown
-    }
-  | {
-      success: false
-      error: string
-    }
-
-type ZodIssue = {
-  code: string
-  path: (string | number)[]
-  message: string
-}
-
-type JsDelivrMetadata = {
-  type: string
-  name: string
-  tags: Record<string, string>
-  versions: {
-    version: string
-    links: {
-      self: string
-      entrypoints: string
-      stats: string
-    }
-  }[]
-  links: {
-    stats: string
-  }
-}
-
 let _metadata: JsDelivrMetadata
 let _z: unknown
 
@@ -156,4 +103,57 @@ function generateErrorMessage(issues: ZodIssue[]) {
   }
 
   return messages.join('\n')
+}
+
+export type ZodSchema = {
+  safeParse: (data: unknown) => {
+    success: boolean
+    data: unknown
+    error: {
+      issues: ZodIssue[]
+    }
+  }
+}
+
+type ZodIssue = {
+  code: string
+  path: (string | number)[]
+  message: string
+}
+
+type SchemaValidation =
+  | {
+      success: true
+      data: ZodSchema
+    }
+  | {
+      success: false
+      error: string
+    }
+
+type ValueValidation =
+  | {
+      success: true
+      data: unknown
+    }
+  | {
+      success: false
+      error: string
+    }
+
+type JsDelivrMetadata = {
+  type: string
+  name: string
+  tags: Record<string, string>
+  versions: {
+    version: string
+    links: {
+      self: string
+      entrypoints: string
+      stats: string
+    }
+  }[]
+  links: {
+    stats: string
+  }
 }
