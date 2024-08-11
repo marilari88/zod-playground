@@ -46,7 +46,9 @@ const App = () => {
   const monaco = useMonaco()
   const computedColorScheme = useComputedColorScheme('light')
 
-  const {data: evaluatedSchema, error: schemaError} = zod.validateSchema(schema)
+  const schemaValidation = zod.validateSchema(schema)
+  const evaluatedSchema = schemaValidation.success ? schemaValidation.data : undefined
+  const schemaError = !schemaValidation.success ? schemaValidation.error : undefined
 
   useEffect(() => {
     if (!monaco) return
@@ -141,7 +143,7 @@ const App = () => {
                 <Validation
                   // biome-ignore lint/suspicious/noArrayIndexKey: items order does not change
                   key={`val${index}`}
-                  schema={evaluatedSchema as zod.ZodSchema}
+                  schema={evaluatedSchema}
                   value={value}
                   index={index}
                   onAdd={() => {

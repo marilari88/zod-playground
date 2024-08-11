@@ -8,11 +8,25 @@ export type ZodSchema = {
   }
 }
 
-type ZodValidation = {
-  success: boolean
-  data?: unknown
-  error?: string
-}
+type SchemaValidation =
+  | {
+      success: true
+      data: ZodSchema
+    }
+  | {
+      success: false
+      error: string
+    }
+
+type ValueValidation =
+  | {
+      success: true
+      data: unknown
+    }
+  | {
+      success: false
+      error: string
+    }
 
 type ZodIssue = {
   code: string
@@ -77,11 +91,11 @@ export async function setVersion(ver: string) {
   _z = await import(/* @vite-ignore */ `https://cdn.jsdelivr.net/npm/zod@${ver}/+esm`)
 }
 
-export function validateSchema(schema: string): ZodValidation {
+export function validateSchema(schema: string): SchemaValidation {
   try {
     if (schema.length < 3) throw new Error('Schema is too short')
 
-    const data = new Function('z', `return ${schema}`)(_z)
+    const data = new Function('z', `return ${schema}`)(_z) as ZodSchema
 
     return {
       success: true,
@@ -96,7 +110,7 @@ export function validateSchema(schema: string): ZodValidation {
   }
 }
 
-export function validateValue(schema: ZodSchema, value: string): ZodValidation {
+export function validateValue(schema: ZodSchema, value: string): ValueValidation {
   const evaluatedValue = evalExp(value)
   if (!evaluatedValue.success) return evaluatedValue
 
@@ -117,7 +131,7 @@ export function validateValue(schema: ZodSchema, value: string): ZodValidation {
   }
 }
 
-function evalExp(expression: string): ZodValidation {
+function evalExp(expression: string): ValueValidation {
   try {
     const evaluatedExpression = new Function(`return ${expression}`)()
     return {
