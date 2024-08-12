@@ -13,7 +13,8 @@ import {
 import Editor from '@monaco-editor/react'
 import type {editor} from 'monaco-editor'
 
-import {useDisclosure} from '@mantine/hooks'
+import {useDisclosure, useMediaQuery} from '@mantine/hooks'
+import {useState} from 'react'
 import {FiAlertCircle, FiCheckCircle, FiColumns, FiMinus, FiPlus} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 import * as zod from '../../zod'
@@ -52,8 +53,11 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
 }
 
 export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onClear}: Props) => {
-  const [opened, {close, open}] = useDisclosure(false)
-  const [openedResult, {toggle: toggleResult}] = useDisclosure(false)
+  const [isPopoverOpen, {close, open}] = useDisclosure(false)
+
+  const matches = useMediaQuery('(min-width: 80em)')
+  const [isResultManuallyOpen, setResultManuallyOpen] = useState<boolean | null>(null)
+  const isResultOpen = isResultManuallyOpen ?? !!matches
 
   const validation = schema
     ? zod.validateValue(schema, value)
@@ -70,7 +74,7 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
         <Flex gap="sm" align="center">
           Value #{index + 1}
           {validation.success && (
-            <Popover opened={opened}>
+            <Popover opened={isPopoverOpen}>
               <Popover.Target>
                 <Badge
                   variant="dot"
@@ -98,7 +102,7 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
             </Popover>
           )}
           {!validation.success && (
-            <Popover opened={opened} withArrow>
+            <Popover opened={isPopoverOpen} withArrow>
               <Popover.Target>
                 <Badge
                   variant="dot"
@@ -150,7 +154,13 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Toggle results column" withArrow>
-            <ActionIcon variant="light" aria-label="Toggle results column" onClick={toggleResult}>
+            <ActionIcon
+              variant="light"
+              aria-label="Toggle results column"
+              onClick={() => {
+                isResultOpen ? setResultManuallyOpen(false) : setResultManuallyOpen(true)
+              }}
+            >
               <FiColumns />
             </ActionIcon>
           </Tooltip>
@@ -169,9 +179,9 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
           />
         </div>
         <div
-          style={{display: openedResult ? 'block' : 'none'}}
+          style={{display: isResultOpen ? 'block' : 'none'}}
           className={classes.valueResult}
-          data-open={openedResult}
+          data-open={isResultOpen}
         >
           {parsedData && <Code>{parsedData}</Code>}
           {errors && (
