@@ -157,4 +157,3 @@ type JsDelivrMetadata = {
     stats: string
   }
 }
-
