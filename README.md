@@ -1,8 +1,10 @@
 <div align="center">
+  
 ![Zod Playground logo](./public/logo.svg)
+
 </div>
 
-# Zod Playground
+## Play with zod
 
 Zod Playground is a web app that allows users to play with the Zod API. Users can define a schema and test the validation of given values. The app is designed to be user-friendly and easy to use. It is a great tool for developers who are working with the Zod API and want to test their code.
 
