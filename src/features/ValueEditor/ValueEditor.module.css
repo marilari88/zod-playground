@@ -36,4 +36,7 @@
   border-left: 1px solid var(--mantine-color-neutral-2);
   display: block;
   flex: 1;
+
+  white-space: pre-wrap;
+  font-size: var(--mantine-font-size-sm);
 }
