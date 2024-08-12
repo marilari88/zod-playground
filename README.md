@@ -1,5 +1,5 @@
 <div align="center">
-![Zod Playground logo](public/logo.svg)
+![Zod Playground logo]('public/logo.svg')
 </div>
 
 # Zod Playground
