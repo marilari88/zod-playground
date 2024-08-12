@@ -1,17 +1,13 @@
-import {expect, test} from '@playwright/test'
-import {fetchMonacoContent, writeInMonaco} from './fixtures'
+import {expect} from '@playwright/test'
 
 import * as zod from '../src/zod'
+import {test} from './fixtures'
 
 test('has title "Zod Playground', async ({page}) => {
-  await page.goto('/')
-
   await expect(page).toHaveTitle(/Zod Playground/)
 })
 
 test('has header with title, share, theme toggler and github repo link', async ({page}) => {
-  await page.goto('/')
-
   await expect(page.getByText('Zod Playground')).toBeVisible()
   await expect(page.getByRole('button', {name: 'Share'})).toBeVisible()
   await expect(page.getByLabel('Toggle color scheme')).toBeVisible()
@@ -22,8 +18,6 @@ test('has header with title, share, theme toggler and github repo link', async (
 })
 
 test('zod version switch', async ({page}) => {
-  await page.goto('/')
-
   const latestZodVersion = (await zod.getVersions('latest'))[0]
   const anotherZodVersion = (await zod.getVersions()).find(
     (zVersion) => zVersion !== latestZodVersion,
@@ -36,18 +30,19 @@ test('zod version switch', async ({page}) => {
   await expect(page.getByRole('button', {name: `v${anotherZodVersion}`})).toBeVisible()
 })
 
-test('has default schema', async ({page}) => {
-  await page.goto('/')
-
-  const editorValue = await fetchMonacoContent({page})
+test('has default schema', async ({codeEditors}) => {
+  const editorValue = await codeEditors.getSchemaEditorContent()
 
   expect(editorValue).toEqual('1234z.object({name:z.string(),birth_year:z.number().optional()})')
 })
 
-test('has invalid marker when an invalid value is in the Value Editor', async ({page}) => {
-  await page.goto('/')
-
-  await writeInMonaco({page, text: 'Invalid value', editorNth: 1})
+test('has invalid marker when an invalid value is in the Value Editor', async ({
+  page,
+  codeEditors,
+}) => {
+  await codeEditors.writeValue({
+    text: 'Invalid value',
+  })
 
   await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
 })
