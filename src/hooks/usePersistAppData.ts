@@ -3,7 +3,7 @@ import {STORAGE_KEY} from '../constants'
 import type {AppData} from '../utils/appData'
 
 export function usePersistAppData(data: AppData) {
-  const timeoutRef = useRef<number | null>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const saveData = () => {
