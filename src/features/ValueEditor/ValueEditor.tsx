@@ -15,7 +15,7 @@ import type {editor} from 'monaco-editor'
 
 import {useDisclosure, useMediaQuery} from '@mantine/hooks'
 import {useState} from 'react'
-import {FiAlertCircle, FiCheckCircle, FiColumns, FiMinus, FiPlus} from 'react-icons/fi'
+import {FiAlertCircle, FiCheckCircle, FiEye, FiEyeOff, FiMinus, FiPlus} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 import * as zod from '../../zod'
 import {CopyButton} from '../CopyButton'
@@ -55,8 +55,8 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
 export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onClear}: Props) => {
   const [isPopoverOpen, {close, open}] = useDisclosure(false)
 
-  const matches = useMediaQuery('(min-width: 80em)')
-  const [isResultManuallyOpen, setResultManuallyOpen] = useState<boolean | null>(null)
+  const matches = useMediaQuery('(min-width: 1200px)')
+  const [isResultManuallyOpen, setIsResultManuallyOpen] = useState<boolean | null>(null)
   const isResultOpen = isResultManuallyOpen ?? !!matches
 
   const validation = schema
@@ -153,15 +153,14 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
               <FiMinus />
             </ActionIcon>
           </Tooltip>
-          <Tooltip label="Toggle results column" withArrow>
+          <Tooltip label={isResultOpen ? 'Hide results' : 'Show results'} withArrow>
             <ActionIcon
               variant="light"
-              aria-label="Toggle results column"
               onClick={() => {
-                isResultOpen ? setResultManuallyOpen(false) : setResultManuallyOpen(true)
+                isResultOpen ? setIsResultManuallyOpen(false) : setIsResultManuallyOpen(true)
               }}
             >
-              <FiColumns />
+              {!isResultOpen ? <FiEye /> : <FiEyeOff />}
             </ActionIcon>
           </Tooltip>
         </Flex>
