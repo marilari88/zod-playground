@@ -30,7 +30,7 @@ export class CodeEditors {
     nth = 0,
     formatOutput = true,
   }: {nth?: number; formatOutput?: boolean} = {}) {
-    return await getMonacoContent({locator: this.codeEditors.nth(nth), formatOutput})
+    return await getMonacoContent({locator: this.codeEditors.nth(nth + 1), formatOutput})
   }
 
   async writeSchema({
@@ -51,7 +51,7 @@ export class CodeEditors {
     replacePreviousContent = true,
   }: {nth?: number; text: string; replacePreviousContent?: boolean}) {
     await writeInMonaco({
-      locator: this.codeEditors.nth(nth),
+      locator: this.codeEditors.nth(nth + 1),
       page: this.page,
       text,
       replacePreviousContent,
