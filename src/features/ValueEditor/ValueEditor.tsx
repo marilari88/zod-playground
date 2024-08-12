@@ -156,6 +156,7 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
           <Tooltip label={isResultOpen ? 'Hide results' : 'Show results'} withArrow>
             <ActionIcon
               variant="light"
+              aria-label={isResultOpen ? 'Hide results' : 'Show results'}
               onClick={() => {
                 isResultOpen ? setIsResultManuallyOpen(false) : setIsResultManuallyOpen(true)
               }}
