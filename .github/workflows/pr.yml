@@ -7,8 +7,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  type:
-    name: ʦ Type check
+  checks:
+    name: ✅ Checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,19 +17,10 @@ jobs:
           node-version: lts/*
       - name: Install dependencies
         run: npm ci
-      - run: npm run types
-
-  lint:
-    name: ⬣ Biome check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-      - name: Install dependencies
-        run: npm ci
-      - run: npm run biome:ci
+      - name: Biome check
+        run: npm run biome:ci
+      - name: Types and build checks
+        run: npm run build
 
   test:
     name: 🔚 E2E tests
