@@ -177,18 +177,17 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
             value={value}
           />
         </div>
-        <div
-          style={{display: isResultOpen ? 'block' : 'none'}}
+        <Box
+          style={{
+            display: isResultOpen ? 'block' : 'none',
+          }}
           className={classes.valueResult}
           data-open={isResultOpen}
+          c={errors ? 'red' : 'neutral.8'}
         >
-          {parsedData && <Code>{parsedData}</Code>}
-          {errors && (
-            <Text c="red" size="sm" style={{whiteSpace: 'pre-line'}}>
-              {errors}
-            </Text>
-          )}
-        </div>
+          {parsedData && JSON.stringify(JSON.parse(parsedData), null, 4)}
+          {errors && errors}
+        </Box>
       </div>
     </Box>
   )
