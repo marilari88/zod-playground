@@ -24,7 +24,7 @@ jobs:
       - name: Types and build checks
         run: npm run build
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: npm run test:init
       - name: Run Playwright tests
         run: npx playwright test
       - uses: actions/upload-artifact@v4
