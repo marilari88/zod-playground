@@ -2,7 +2,7 @@
 <br />
 <br />
 <br />
-  
+
 <img src="./public/logo.svg" width="700"/>
 
 <br />
@@ -33,13 +33,13 @@ It is a great tool for developers who are working with the Zod API and want to t
 
 ## Features
 
-- **Real-time validation**
-- **Version switch**
-- **Shareable links**
-- **User-friendly interface**
-- **Validation result panels**
-- **User-friendly validation errors**
-- **Dark/light mode**
+- Real-time validation
+- Version switch
+- Shareable links
+- User-friendly interface
+- User-friendly validation errors
+- Validation result panels
+- Dark/light mode
 
 ## Contribute
 
