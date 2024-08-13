@@ -20,13 +20,13 @@
 
 Zod Playground is a web app that allows users to interact with the Zod library API. Users can define schemas and test the validation of given values. The app is designed to be user-friendly and easy to use. It is a great tool for developers who are working with the Zod API and want to test their code on the fly without having to set up Zod locally.
 
-## Use Cases
+## Use cases
 
-- **Learning Zod by Doing**: Zod Playground shows you the validation results of multiple values immediately in the panels on the right.
-- **Testing Different Zod Versions**: Switch between different versions of Zod using the version picker.
-- **Sharing Schemas and Values**: Share your schema and values with other developers by clicking the Share button and sending the URL.
-- **Debugging Complex Schemas**: Add multiple values to debug complex schema validation results.
-- **Schema Development**: Any other activity related to building and updating Zod schemas.
+- **Learn by doing**: Zod Playground shows you the validation result in the panel on the right.
+- **Test different Zod versions**: Switch between different versions of Zod using the version picker.
+- **Share schemas and values**: Share your schema and values with other developers by clicking the Share button and sending the URL.
+- **Debug complex schemas**: Add multiple values to debug complex schema validation results.
+- **Schema development**: Any other activity related to building and updating Zod schemas.
 
 ## Features
 
