@@ -47,7 +47,7 @@ If you would like to contribute to Zod Playground, please fork the repository an
 
 ### Run locally
 
-To get started with Zod Playground, you will need to have Node.js and npm installed on your machine. Once you have these installed, you can clone the repository and run the following commands:
+To get started with Zod Playground development, you will need to have node.js and npm installed.
 
 ```sh
 npm install
