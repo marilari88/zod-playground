@@ -56,7 +56,8 @@ npm run dev
 
 ### Test
 
-Zod playground uses playwright to run E2E tests. Execute the following commands to run tests locally.
+Zod playground uses Playwright to run E2E tests.
+To run tests locally, execute the following commands:
 
 ```sh
 npm test:init
