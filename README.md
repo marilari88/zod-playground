@@ -43,15 +43,20 @@ It is a great tool for developers who are working with the Zod API and want to t
 
 ## Contribute
 
-If you would like to contribute to Zod Playground, please fork the repository and submit a pull request. We welcome contributions of all kinds, including bug fixes, new features, and documentation improvements.
+If you would like to contribute to Zod Playground, fork the repository and submit a pull request.
+If you notice a bug or want to request a feature, feel free to open an issue.
+Any kind of contribution is welcome.
 
 ### Run locally
 
 To get started with Zod Playground development, you will need to have node.js and npm installed.
 
 ```sh
-npm install
-npm run dev
+git clone https://github.com/marilari88/zod-playground.git
+cd zod-playground
+
+npm i       # Install dependencies
+npm run dev # Start the development server
 ```
 
 ### Test
