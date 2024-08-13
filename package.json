@@ -10,7 +10,7 @@
     "types": "tsc --noEmit",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "test:init": "playwright install-deps chromium firefox",
+    "test:init": "playwright install --with-deps chromium firefox",
     "biome:ci": "biome ci",
     "biome:check": "biome check",
     "biome:fix": "biome check --fix"
