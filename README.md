@@ -1,7 +1,6 @@
 <div align="center">
   
-![Zod Playground logo](./public/logo.svg)
-<img src="./public/logo.svg" width="800"/>
+<img src="./public/logo.svg" width="700"/>
 
 [https://zod-playground.vercel.app/](https://zod-playground.vercel.app/)
 
