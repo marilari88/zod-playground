@@ -33,13 +33,13 @@ It is a great tool for developers who are working with the Zod API and want to t
 
 ## Features
 
-- **Real-Time Validation**
-- **Version Switching**
-- **Shareable Links**
-- **User-Friendly Interface**
-- **Validation results Panels**
-- **User friendly validation errors**
-- **Dark/Light mode**
+- **Real-time validation**
+- **Version switch**
+- **Shareable links**
+- **User-friendly interface**
+- **Validation result panels**
+- **User-friendly validation errors**
+- **Dark/light mode**
 
 
 
