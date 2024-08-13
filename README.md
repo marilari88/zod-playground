@@ -69,8 +69,6 @@ npm test:init
 npm test
 ```
 
-This will start the development server and open the app in your default browser.
-
 ## License
 
 This project is licensed under the MIT License.
