@@ -33,6 +33,7 @@ Zod Playground is a web app that allows users to interact with the Zod library A
 - **User-Friendly Interface**
 - **Validation results Panels**
 - **User friendly validation errors**
+- **Dark/Light mode**
 
 ## Installation
 
