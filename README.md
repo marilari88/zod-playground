@@ -41,10 +41,6 @@ It is a great tool for developers who are working with the Zod API and want to t
 - **User-friendly validation errors**
 - **Dark/light mode**
 
-
-
-
-
 ## Contribute
 
 If you would like to contribute to Zod Playground, please fork the repository and submit a pull request. We welcome contributions of all kinds, including bug fixes, new features, and documentation improvements.
