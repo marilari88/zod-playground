@@ -53,7 +53,6 @@ To get started with Zod Playground development, you will need to have node.js an
 npm install
 npm run dev
 ```
-This will start the development server and open the app in your default browser.
 
 ### Test
 
