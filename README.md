@@ -5,6 +5,9 @@
   
 <img src="./public/logo.svg" width="700"/>
 
+<br />
+<br />
+
 [https://zod-playground.vercel.app/](https://zod-playground.vercel.app/)
 
 <br />
@@ -35,7 +38,15 @@ Zod Playground is a web app that allows users to interact with the Zod library A
 - **User friendly validation errors**
 - **Dark/Light mode**
 
-## Installation
+
+
+
+
+## Contribute
+
+If you would like to contribute to Zod Playground, please fork the repository and submit a pull request. We welcome contributions of all kinds, including bug fixes, new features, and documentation improvements.
+
+### Run locally
 
 To get started with Zod Playground, you will need to have Node.js and npm installed on your machine. Once you have these installed, you can clone the repository and run the following commands:
 
@@ -43,12 +54,18 @@ To get started with Zod Playground, you will need to have Node.js and npm instal
 npm install
 npm run dev
 ```
-
 This will start the development server and open the app in your default browser.
 
-## Contributing
+### Test
 
-If you would like to contribute to Zod Playground, please fork the repository and submit a pull request. We welcome contributions of all kinds, including bug fixes, new features, and documentation improvements.
+Zod playground uses playwright to run E2E tests. Execute the following commands to run tests locally.
+
+```sh
+npm test:init
+npm test
+```
+
+This will start the development server and open the app in your default browser.
 
 ## License
 
