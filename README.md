@@ -18,7 +18,10 @@
 
 # Zod Playground
 
-Zod Playground is a web app that allows users to interact with the Zod library API. Users can define schemas and test the validation of given values. The app is designed to be user-friendly and easy to use. It is a great tool for developers who are working with the Zod API and want to test their code on the fly without having to set up Zod locally.
+Zod Playground is a web app that allows users to interact with the Zod library API.
+Users can define schemas and test the validation of given values.
+The app is designed to be user-friendly and easy to use.
+It is a great tool for developers who are working with the Zod API and want to test their code on the fly without having to set up Zod locally.
 
 ## Use cases
 
