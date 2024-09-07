@@ -31,7 +31,9 @@ interface Props {
   onClear: (clearedIndex: number) => void
 }
 
-const editorOptions: editor.IStandaloneEditorConstructionOptions = {
+const editorOptions: Omit<editor.IStandaloneEditorConstructionOptions, 'lightbulb'> & {
+  lightbulb: object
+} = {
   minimap: {enabled: false},
   scrollBeyondLastLine: false,
   showUnused: false,
@@ -47,6 +49,8 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   hideCursorInOverviewRuler: true,
   automaticLayout: true,
   renderLineHighlight: 'none',
+  hover: {enabled: false},
+  lightbulb: {enabled: false},
 }
 
 export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onClear}: Props) => {
