@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "rm -rf dist/ && tsc && vite build",
     "preview": "vite preview",
     "types": "tsc --noEmit",
     "test": "playwright test",
