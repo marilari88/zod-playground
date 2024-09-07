@@ -17,13 +17,19 @@ export const EDITOR_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   renderLineHighlight: 'none',
 }
 
+const schema = `z.object({
+  name: z.string(),
+  birth_year: z.number().optional()
+})`
+
+const values = ['{name: "John"}']
+
+const version = (await zod.getVersions('latest'))[0]
+
 export const DEFAULT_APP_DATA = {
-  schema: `z.object({
-    name: z.string(),
-    birth_year: z.number().optional()
-  })`,
-  values: ['{name: "John"}'],
-  version: (await zod.getVersions('latest'))[0],
+  schema,
+  values,
+  version,
 }
 
 export const STORAGE_KEY = 'zod-playground'
