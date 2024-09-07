@@ -37,7 +37,6 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   showUnused: false,
   inlayHints: {enabled: 'off'},
   scrollbar: {
-    // Subtle shadows to the left & top. Defaults to true.
     useShadows: false,
     vertical: 'auto',
     verticalScrollbarSize: 10,
@@ -47,8 +46,6 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   overviewRulerBorder: false,
   hideCursorInOverviewRuler: true,
   automaticLayout: true,
-  formatOnType: true,
-  formatOnPaste: true,
   renderLineHighlight: 'none',
 }
 
