@@ -50,7 +50,7 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   hover: {enabled: false},
   lightbulb: {
     // @ts-expect-error: lightbulb enabled type is wrong
-    enabled: false
+    enabled: false,
   },
 }
 
