@@ -32,7 +32,7 @@ interface Props {
 }
 
 const editorOptions: Omit<editor.IStandaloneEditorConstructionOptions, 'lightbulb'> & {
-  lightbulb: object
+  lightbulb: {enabled: boolean}
 } = {
   minimap: {enabled: false},
   scrollBeyondLastLine: false,
