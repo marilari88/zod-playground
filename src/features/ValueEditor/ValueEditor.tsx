@@ -31,13 +31,14 @@ interface Props {
   onClear: (clearedIndex: number) => void
 }
 
-const editorOptions: editor.IStandaloneEditorConstructionOptions = {
+const editorOptions: Omit<editor.IStandaloneEditorConstructionOptions, 'lightbulb'> & {
+  lightbulb: {enabled: boolean}
+} = {
   minimap: {enabled: false},
   scrollBeyondLastLine: false,
   showUnused: false,
   inlayHints: {enabled: 'off'},
   scrollbar: {
-    // Subtle shadows to the left & top. Defaults to true.
     useShadows: false,
     vertical: 'auto',
     verticalScrollbarSize: 10,
@@ -47,9 +48,9 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   overviewRulerBorder: false,
   hideCursorInOverviewRuler: true,
   automaticLayout: true,
-  formatOnType: true,
-  formatOnPaste: true,
   renderLineHighlight: 'none',
+  hover: {enabled: false},
+  lightbulb: {enabled: false},
 }
 
 export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onClear}: Props) => {
