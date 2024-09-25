@@ -16,24 +16,24 @@
     "biome:fix": "biome check --fix"
   },
   "dependencies": {
-    "@mantine/core": "^7.12.2",
-    "@mantine/hooks": "^7.12.2",
-    "@mantine/notifications": "^7.12.2",
+    "@mantine/core": "^7.13.0",
+    "@mantine/hooks": "^7.13.0",
+    "@mantine/notifications": "^7.13.0",
     "@monaco-editor/react": "^4.6.0",
     "lz-string": "^1.5.0",
-    "monaco-editor": "^0.51.0",
+    "monaco-editor": "^0.52.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.3.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.8.3",
-    "@playwright/test": "^1.46.1",
-    "@types/node": "^22.5.4",
-    "@types/react": "^18.3.5",
+    "@biomejs/biome": "^1.9.2",
+    "@playwright/test": "1.46.1",
+    "@types/node": "^22.7.0",
+    "@types/react": "^18.3.9",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
-    "typescript": "^5.5.4",
-    "vite": "^5.4.3"
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8"
   }
 }
