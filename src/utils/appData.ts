@@ -1,6 +1,6 @@
 import LZString from 'lz-string'
 
-import {STORAGE_KEY} from '../constants'
+import {DEFAULT_APP_DATA, STORAGE_KEY} from '../constants'
 
 export type AppData = {
   schema: string
@@ -8,9 +8,19 @@ export type AppData = {
   version: string
 } | null
 
+function parseAppData(appData: string): AppData {
+    const parsed = JSON.parse(appData)
+
+    // backward compatibility
+    if (!parsed.version)
+        parsed.version = DEFAULT_APP_DATA.version
+
+    return parsed
+}
+
 export function getAppDataFromLocalStorage(): AppData {
-  const persisted = localStorage.getItem(STORAGE_KEY)
-  return persisted ? JSON.parse(persisted) : null
+  const appData = localStorage.getItem(STORAGE_KEY)
+  return appData ? parseAppData(appData) : null
 }
 
 export function getAppDataFromSearchParams(): AppData {
@@ -19,7 +29,7 @@ export function getAppDataFromSearchParams(): AppData {
 
   if (compressedAppData) {
     const appData = LZString.decompressFromEncodedURIComponent(compressedAppData)
-    return JSON.parse(appData)
+    return parseAppData(appData)
   }
 
   return null
