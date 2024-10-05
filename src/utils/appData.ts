@@ -9,13 +9,12 @@ export type AppData = {
 } | null
 
 function parseAppData(appData: string): AppData {
-    const parsed = JSON.parse(appData)
+  const parsed = JSON.parse(appData)
 
-    // backward compatibility
-    if (!parsed.version)
-        parsed.version = DEFAULT_APP_DATA.version
+  // backward compatibility
+  if (!parsed.version) parsed.version = DEFAULT_APP_DATA.version
 
-    return parsed
+  return parsed
 }
 
 export function getAppDataFromLocalStorage(): AppData {
