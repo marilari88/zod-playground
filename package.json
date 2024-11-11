@@ -18,7 +18,7 @@
   "dependencies": {
     "@mantine/core": "^7.13.0",
     "@mantine/hooks": "^7.13.0",
-    "@mantine/notifications": "^7.13.0",
+    "@mantine/notifications": "^7.13.5",
     "@monaco-editor/react": "^4.6.0",
     "lz-string": "^1.5.0",
     "monaco-editor": "^0.52.0",
