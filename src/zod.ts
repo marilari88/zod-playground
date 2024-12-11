@@ -1,3 +1,5 @@
+import ts from 'typescript'
+
 let _metadata: JsDelivrMetadata
 let _z: unknown
 
@@ -42,7 +44,8 @@ export function validateSchema(schema: string): SchemaValidation {
   try {
     if (schema.length < 3) throw new Error('Schema is too short')
 
-    const data = new Function('z', `return ${schema}`)(_z) as ZodSchema
+    const js = ts.transpile(schema)
+    const data = new Function('z', `return ${js}`)(_z) as ZodSchema
 
     return {
       success: true,
