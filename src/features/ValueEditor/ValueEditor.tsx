@@ -68,7 +68,9 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
 
   const errors = !validation.success && validation.error
 
-  const computedColorScheme = useComputedColorScheme('light')
+  const computedColorScheme = useComputedColorScheme('light', {
+    getInitialValueInEffect: false,
+  })
 
   return (
     <Box className={classes.valueContainer}>
