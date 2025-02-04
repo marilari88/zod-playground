@@ -7,6 +7,9 @@
   font-size: var(--mantine-font-size-xl);
   font-weight: 700;
   margin: 0;
+  @media screen and (max-width: 768px) {
+    font-size: var(--mantine-font-size-sm);
+  }
 }
 
 .header__logo {
