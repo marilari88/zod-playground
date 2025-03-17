@@ -16,7 +16,7 @@
     "biome:fix": "biome check --fix"
   },
   "dependencies": {
-    "@mantine/core": "^7.17.1",
+    "@mantine/core": "^7.17.2",
     "@mantine/hooks": "^7.17.1",
     "@mantine/notifications": "^7.17.1",
     "@monaco-editor/react": "^4.7.0",
