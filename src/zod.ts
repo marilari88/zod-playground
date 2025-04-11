@@ -26,7 +26,7 @@ export async function getVersions(tag?: string): Promise<string[]> {
 
     if (ver.startsWith('1')) continue
 
-    if (['alpha', 'canary'].some((v) => ver.includes(v))) continue
+    if (['alpha', 'beta', 'canary'].some((v) => ver.includes(v))) continue
 
     versions.push(ver)
   }
