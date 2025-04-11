@@ -32,6 +32,7 @@ export async function getVersions(tag?: string): Promise<string[]> {
   }
 
   versions.push(_metadata.tags.canary)
+  versions.push(_metadata.tags.next)
 
   return versions.toSorted((a, b) => b.localeCompare(a, undefined, {numeric: true}))
 }
