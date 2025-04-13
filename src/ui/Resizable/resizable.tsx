@@ -1,5 +1,3 @@
-'use client'
-
 import {RxDragHandleDots2} from 'react-icons/rx'
 import * as ResizablePrimitive from 'react-resizable-panels'
 import classes from './Resizable.module.css'
@@ -17,7 +15,7 @@ const ResizableHandle = ({
   withHandle,
   className,
   ...props
-}: React.ComponentProps<typeof ResizablePrimitive.PanelResizeHandle> & {
+}: ResizablePrimitive.PanelResizeHandleProps & {
   withHandle?: boolean
 }) => (
   <ResizablePrimitive.PanelResizeHandle
