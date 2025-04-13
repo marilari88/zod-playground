@@ -1,7 +1,7 @@
 {
   "name": "zod-playground",
   "private": true,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,10 +16,10 @@
     "biome:fix": "biome check --fix"
   },
   "dependencies": {
-    "@mantine/core": "^7.15.2",
-    "@mantine/hooks": "^7.15.2",
-    "@mantine/notifications": "^7.15.2",
-    "@monaco-editor/react": "^4.6.0",
+    "@mantine/core": "^7.17.4",
+    "@mantine/hooks": "^7.17.4",
+    "@mantine/notifications": "^7.17.4",
+    "@monaco-editor/react": "^4.7.0",
     "lz-string": "^1.5.0",
     "monaco-editor": "^0.52.2",
     "react": "^18.3.1",
@@ -30,11 +30,11 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@playwright/test": "^1.49.1",
-    "@types/node": "^22.10.2",
-    "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.5",
+    "@playwright/test": "^1.51.1",
+    "@types/node": "^22.14.0",
+    "@types/react": "^18.3.20",
+    "@types/react-dom": "^18.3.6",
     "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^5.4.11"
+    "vite": "^5.4.18"
   }
 }
