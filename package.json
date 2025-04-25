@@ -16,9 +16,9 @@
     "biome:fix": "biome check --fix"
   },
   "dependencies": {
-    "@mantine/core": "^7.17.4",
-    "@mantine/hooks": "^7.17.4",
-    "@mantine/notifications": "^7.17.4",
+    "@mantine/core": "^7.17.5",
+    "@mantine/hooks": "^7.17.5",
+    "@mantine/notifications": "^7.17.5",
     "@monaco-editor/react": "^4.7.0",
     "lz-string": "^1.5.0",
     "monaco-editor": "^0.52.2",
@@ -30,11 +30,11 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@playwright/test": "^1.51.1",
-    "@types/node": "^22.14.0",
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.15.2",
     "@types/react": "^18.3.20",
     "@types/react-dom": "^18.3.6",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^4.4.1",
     "vite": "^5.4.18"
   }
 }
