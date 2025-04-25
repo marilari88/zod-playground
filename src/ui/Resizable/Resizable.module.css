@@ -1,0 +1,43 @@
+.root {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  &[data-panel-group-direction="vertical"] {
+    flex-direction: column;
+  }
+}
+
+.panel_resize--handle {
+  position: relative;
+  display: flex;
+  width: 1px;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--mantine-color-neutral-2);
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--mantine-color-primary-5);
+  }
+
+  &[data-panel-group-direction="vertical"] {
+    height: 1px;
+    width: 100%;
+  }
+
+  &[data-panel-group-direction="vertical"] > div {
+    rotate: 90deg;
+  }
+}
+
+.handle {
+  z-index: 10;
+  display: flex;
+  height: 2rem;
+  width: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--mantine-radius-sm);
+  border: 1px solid var(--mantine-color-neutral-2);
+  background-color: var(--mantine-color-body);
+}
