@@ -64,7 +64,10 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
   const validation = schema
     ? zod.validateValue(schema, value)
     : {success: false as const, error: 'Invalid schema'}
-  const parsedData = validation.success && JSON.stringify(validation.data)
+
+  const parsedData =
+    validation.success &&
+    JSON.stringify(validation.data, (_, v) => (typeof v === 'bigint' ? `${v.toString()}n` : v))
 
   const errors = !validation.success && validation.error
 
