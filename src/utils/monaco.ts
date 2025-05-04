@@ -1,5 +1,5 @@
 import {type Monaco, loader} from '@monaco-editor/react'
-import * as zod from '../zod'
+import {getDeclarationTypes} from '../metadata'
 
 export async function initMonaco() {
   const monaco = await loader.init()
@@ -9,8 +9,16 @@ export async function initMonaco() {
   })
 }
 
-export async function setMonacoDeclarationTypes(monaco: Monaco, ver: string) {
-  const declarationTypes = await zod.getDeclarationTypes(ver)
+export async function setMonacoDeclarationTypes({
+  monaco,
+  version,
+  packageName,
+}: {
+  monaco: Monaco
+  version: string
+  packageName: string
+}) {
+  const declarationTypes = await getDeclarationTypes({version, packageName})
 
   monaco.languages.typescript.typescriptDefaults.setExtraLibs([
     {

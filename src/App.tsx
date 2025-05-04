@@ -22,6 +22,7 @@ import {
 } from './utils/appData'
 import {initMonaco, setMonacoDeclarationTypes} from './utils/monaco'
 import * as zod from './zod'
+import type {ZodPackageName} from './zod'
 
 await initMonaco()
 
@@ -33,14 +34,16 @@ const App = () => {
   const [schema, setSchema] = useState<string>(() => initialAppData.schema)
   const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
   const [version, setVersion] = useState(initialAppData.version)
+  const [packageName, setPackageName] = useState<ZodPackageName>(initialAppData.packageName)
 
   const appData = useMemo(
     () => ({
       schema,
       values: values.filter((value) => typeof value === 'string'),
       version,
+      packageName,
     }),
-    [schema, values, version],
+    [schema, values, version, packageName],
   )
 
   usePersistAppData(appData)
@@ -57,15 +60,19 @@ const App = () => {
   useEffect(() => {
     if (!monaco) return
 
-    async function updateVersion(monaco: Monaco, ver: string) {
-      setIsLoading(true)
-      await zod.setVersion(ver)
-      await setMonacoDeclarationTypes(monaco, ver)
-      setIsLoading(false)
-    }
-
-    updateVersion(monaco, version)
-  }, [version, monaco])
+    setIsLoading(true)
+    zod
+      .loadVersion({version, packageName})
+      .then(() => {
+        void setMonacoDeclarationTypes({monaco, version, packageName})
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [version, monaco, packageName])
 
   return (
     <Box className={classes.layout}>
@@ -98,11 +105,12 @@ const App = () => {
           <ResizablePanel className={classes.leftPanel} defaultSize={50} minSize={28}>
             <Flex className={classes.sectionTitle} align="center" justify="space-between" gap="sm">
               <Flex gap="sm" align="center" flex={1}>
-                Zod schema
+                Schema
                 <VersionPicker
-                  value={version}
+                  value={{packageName, version}}
                   onChange={async (ver) => {
-                    setVersion(ver)
+                    setVersion(ver.version)
+                    setPackageName(ver.packageName)
                   }}
                   disabled={isLoading}
                 />

@@ -1,44 +1,37 @@
 import ts from 'typescript'
+import {getPackageVersions} from './metadata'
 
-let _metadata: JsDelivrMetadata
 let _z: unknown
 
-export async function getDeclarationTypes(ver: string): Promise<string> {
-  const res = await fetch(`https://cdn.jsdelivr.net/npm/zod@${ver}/lib/types.d.ts`)
-  return await res.text()
+export type ZodPackageName = 'zod' | '@zod/mini'
+
+const ZOD_MINI_PACKAGE_NAME = '@zod/mini'
+const ZOD_PACKAGE_NAME = 'zod'
+
+export async function getVersions(
+  tag?: string,
+): Promise<Array<{packageName: string; version: string}>> {
+  const miniVersions = (await getPackageVersions({packageName: ZOD_MINI_PACKAGE_NAME, tag})).map(
+    (v) => ({
+      packageName: ZOD_MINI_PACKAGE_NAME,
+      version: v,
+    }),
+  )
+  const zodVersions = (await getPackageVersions({packageName: ZOD_PACKAGE_NAME, tag})).map((v) => ({
+    packageName: ZOD_PACKAGE_NAME,
+    version: v,
+  }))
+
+  return [...miniVersions, ...zodVersions]
 }
 
-export async function getVersions(tag?: string): Promise<string[]> {
-  if (!_metadata) {
-    const res = await fetch('https://data.jsdelivr.com/v1/packages/npm/zod')
-    _metadata = await res.json()
-  }
-
-  if (tag) {
-    const ver = _metadata.tags[tag]
-    if (ver) return [ver]
-    throw new Error('Invalid tag')
-  }
-
-  const versions = []
-  for (const el of _metadata.versions) {
-    const ver = el.version
-
-    if (ver.startsWith('1')) continue
-
-    if (['alpha', 'beta', 'canary'].some((v) => ver.includes(v))) continue
-
-    versions.push(ver)
-  }
-
-  versions.push(_metadata.tags.canary)
-  versions.push(_metadata.tags.next)
-
-  return versions.toSorted((a, b) => b.localeCompare(a, undefined, {numeric: true}))
-}
-
-export async function setVersion(ver: string) {
-  _z = await import(/* @vite-ignore */ `https://cdn.jsdelivr.net/npm/zod@${ver}/+esm`)
+export async function loadVersion({
+  version,
+  packageName,
+}: {version: string; packageName: ZodPackageName}) {
+  _z = await import(
+    /* @vite-ignore */ `https://cdn.jsdelivr.net/npm/${packageName}@${version}/+esm`
+  )
 }
 
 export function validateSchema(schema: string): SchemaValidation {
@@ -144,20 +137,3 @@ type ValueValidation =
       success: false
       error: string
     }
-
-type JsDelivrMetadata = {
-  type: string
-  name: string
-  tags: Record<string, string>
-  versions: {
-    version: string
-    links: {
-      self: string
-      entrypoints: string
-      stats: string
-    }
-  }[]
-  links: {
-    stats: string
-  }
-}

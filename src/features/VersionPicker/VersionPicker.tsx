@@ -1,15 +1,18 @@
-import {Badge, Combobox, Loader, useCombobox} from '@mantine/core'
+import {Badge, Combobox, Loader, SegmentedControl, useCombobox} from '@mantine/core'
 import {useEffect, useState} from 'react'
 import {FiChevronDown} from 'react-icons/fi'
 import * as zod from '../../zod'
+import type {ZodPackageName} from '../../zod'
+
+type VersionPickerValue = {packageName: ZodPackageName; version: string}
 
 export function VersionPicker({
   value,
   onChange,
   disabled,
 }: {
-  value: string
-  onChange: (value: string) => void
+  value: VersionPickerValue
+  onChange: (value: VersionPickerValue) => void
   disabled: boolean
 }) {
   const combobox = useCombobox({
@@ -25,8 +28,11 @@ export function VersionPicker({
   })
 
   const [loading, setLoading] = useState(false)
-  const [versions, setVersions] = useState<string[] | null>(null)
+  const [versions, setVersions] = useState<Array<{packageName: string; version: string}> | null>(
+    null,
+  )
   const [searchValue, setSearchValue] = useState('')
+  const [selectedPackage, setSelectedPackage] = useState<ZodPackageName>('zod')
 
   useEffect(() => {
     setLoading(true)
@@ -41,11 +47,14 @@ export function VersionPicker({
       })
   }, [])
 
-  const filteredVersions = versions?.filter((el) => el.includes(searchValue)) || []
+  const filteredVersions =
+    versions?.filter(
+      (el) => el.packageName === selectedPackage && el.version.includes(searchValue),
+    ) || []
 
   const options = filteredVersions.map((item) => (
-    <Combobox.Option value={item} key={item}>
-      {item}
+    <Combobox.Option value={item.version} key={item.version}>
+      {item.version}
     </Combobox.Option>
   ))
 
@@ -53,7 +62,7 @@ export function VersionPicker({
     <Combobox
       width={300}
       onOptionSubmit={(optionValue) => {
-        onChange(optionValue)
+        onChange({packageName: selectedPackage, version: optionValue})
         setSearchValue(optionValue)
         combobox.closeDropdown()
       }}
@@ -73,11 +82,20 @@ export function VersionPicker({
           disabled={disabled}
           style={{opacity: disabled ? 0.5 : 1}}
         >
-          v{value}
+          {value.packageName} v{value.version}
         </Badge>
       </Combobox.Target>
 
       <Combobox.Dropdown hidden={versions === null}>
+        <Combobox.Header>
+          <SegmentedControl
+            data={['zod', '@zod/mini'] as const}
+            fullWidth
+            value={selectedPackage}
+            // @ts-expect-error SegmentedControl value is not properly typed
+            onChange={(v) => setSelectedPackage(v)}
+          />
+        </Combobox.Header>
         <Combobox.Search
           placeholder="Search a version"
           value={searchValue}

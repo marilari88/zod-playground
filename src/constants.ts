@@ -24,12 +24,13 @@ const schema = `z.object({
 
 const values = ['{name: "John"}']
 
-const version = (await zod.getVersions('latest'))[0]
+const version = (await zod.getVersions('latest'))[0].version
 
 export const DEFAULT_APP_DATA = {
   schema,
   values,
   version,
+  packageName: 'zod' as const,
 }
 
 export const STORAGE_KEY = 'zod-playground'
