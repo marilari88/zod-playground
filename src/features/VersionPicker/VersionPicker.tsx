@@ -32,7 +32,7 @@ export function VersionPicker({
     null,
   )
   const [searchValue, setSearchValue] = useState('')
-  const [selectedPackage, setSelectedPackage] = useState<ZodPackageName>('zod')
+  const [selectedPackage, setSelectedPackage] = useState<ZodPackageName>(value.packageName)
 
   useEffect(() => {
     setLoading(true)
