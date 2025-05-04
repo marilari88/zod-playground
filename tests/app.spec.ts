@@ -20,14 +20,32 @@ test('has header with title, share, theme toggler and github repo link', async (
 test('zod version switch', async ({page}) => {
   const latestZodVersion = (await zod.getVersions('latest'))[0]
   const anotherZodVersion = (await zod.getVersions()).find(
-    (zVersion) => zVersion !== latestZodVersion,
+    (zVersion) => zVersion.version !== latestZodVersion.version,
+  )
+  const zodMiniVersion = (await zod.getVersions()).find(
+    (zVersion) => zVersion.packageName === '@zod/mini',
   )
 
-  await page.getByRole('button', {name: `v${latestZodVersion}`}).click()
-  await page.getByRole('option', {name: anotherZodVersion}).click()
+  if (!latestZodVersion) throw new Error('No zod version found')
+  if (!anotherZodVersion) throw new Error('No another zod version found')
+  if (!zodMiniVersion) throw new Error('No zod mini version found')
 
-  await expect(page.getByRole('button', {name: `v${latestZodVersion}`})).not.toBeVisible()
-  await expect(page.getByRole('button', {name: `v${anotherZodVersion}`})).toBeVisible()
+  await page.getByRole('button', {name: `zod v${latestZodVersion.version}`}).click()
+  await page.getByRole('option', {name: anotherZodVersion.version}).click()
+
+  await expect(
+    page.getByRole('button', {name: `zod v${latestZodVersion.version}`}),
+  ).not.toBeVisible()
+
+  await page.getByRole('button', {name: `zod v${anotherZodVersion.version}`}).click()
+
+  await page.getByText('@zod/mini').click()
+  console.log(zodMiniVersion.version)
+  await page.getByRole('option', {name: zodMiniVersion.version}).click()
+
+  await expect(
+    page.getByRole('button', {name: `@zod/mini v${zodMiniVersion.version}`}),
+  ).toBeVisible()
 })
 
 test('has default schema', async ({codeEditors}) => {
