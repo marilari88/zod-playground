@@ -3,26 +3,29 @@ import {getPackageVersions} from './metadata'
 
 let _z: unknown
 
-export type ZodPackageName = 'zod' | '@zod/mini'
-
 const ZOD_MINI_PACKAGE_NAME = '@zod/mini'
 const ZOD_PACKAGE_NAME = 'zod'
+export const ZOD_PACKAGE_NAMES = [ZOD_PACKAGE_NAME, ZOD_MINI_PACKAGE_NAME] as const
+export type ZodPackageName = (typeof ZOD_PACKAGE_NAMES)[number]
+
+export function assertIsZodPackageName(
+  packageName: unknown,
+): asserts packageName is ZodPackageName {
+  if (!ZOD_PACKAGE_NAMES.includes(packageName as ZodPackageName))
+    throw Error('Invalid package name')
+}
 
 export async function getVersions(
   tag?: string,
 ): Promise<Array<{packageName: string; version: string}>> {
-  const miniVersions = (await getPackageVersions({packageName: ZOD_MINI_PACKAGE_NAME, tag})).map(
-    (v) => ({
-      packageName: ZOD_MINI_PACKAGE_NAME,
-      version: v,
-    }),
-  )
-  const zodVersions = (await getPackageVersions({packageName: ZOD_PACKAGE_NAME, tag})).map((v) => ({
-    packageName: ZOD_PACKAGE_NAME,
-    version: v,
-  }))
+  const versions = []
 
-  return [...miniVersions, ...zodVersions]
+  for (const packageName of ZOD_PACKAGE_NAMES) {
+    const packageVersions = await getPackageVersions({packageName, tag})
+    versions.push(...packageVersions.map((v) => ({packageName, version: v})))
+  }
+
+  return versions
 }
 
 export async function loadVersion({

@@ -89,11 +89,13 @@ export function VersionPicker({
       <Combobox.Dropdown hidden={versions === null}>
         <Combobox.Header>
           <SegmentedControl
-            data={['zod', '@zod/mini'] as const}
+            data={[...zod.ZOD_PACKAGE_NAMES]}
             fullWidth
             value={selectedPackage}
-            // @ts-expect-error SegmentedControl value is not properly typed
-            onChange={(v) => setSelectedPackage(v)}
+            onChange={(v) => {
+              zod.assertIsZodPackageName(v)
+              setSelectedPackage(v)
+            }}
           />
         </Combobox.Header>
         <Combobox.Search
