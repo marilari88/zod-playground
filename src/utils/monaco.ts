@@ -1,5 +1,5 @@
 import {type Monaco, loader} from '@monaco-editor/react'
-import {getDeclarationTypes} from '../metadata'
+import {getDeclarationTypes} from '../packageMetadata'
 
 export async function initMonaco() {
   const monaco = await loader.init()
