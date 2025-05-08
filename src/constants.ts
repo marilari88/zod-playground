@@ -30,7 +30,7 @@ export const DEFAULT_APP_DATA = {
   schema,
   values,
   version,
-  packageName: 'zod' as const,
+  isZodMini: false,
 }
 
 export const STORAGE_KEY = 'zod-playground'

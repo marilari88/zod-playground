@@ -1,13 +1,12 @@
 import LZString from 'lz-string'
 
 import {DEFAULT_APP_DATA, STORAGE_KEY} from '../constants'
-import type {ZodPackageName} from '../zod'
 
 export type AppData = {
   schema: string
   values: string[]
   version: string
-  packageName: ZodPackageName
+  isZodMini: boolean
 } | null
 
 function parseAppData(appData: string): AppData {
@@ -15,7 +14,7 @@ function parseAppData(appData: string): AppData {
 
   // backward compatibility
   if (!parsed.version) parsed.version = DEFAULT_APP_DATA.version
-  if (!parsed.packageName) parsed.packageName = DEFAULT_APP_DATA.packageName
+  if (!parsed.isZodMini) parsed.isZodMini = false
 
   return parsed
 }

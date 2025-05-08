@@ -1,6 +1,6 @@
 import {ActionIcon, Box, Button, Flex, Tooltip, useComputedColorScheme} from '@mantine/core'
 import {notifications} from '@mantine/notifications'
-import Editor, {type Monaco, useMonaco} from '@monaco-editor/react'
+import Editor, {useMonaco} from '@monaco-editor/react'
 import {useEffect, useMemo, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
@@ -22,7 +22,6 @@ import {
 } from './utils/appData'
 import {initMonaco, setMonacoDeclarationTypes} from './utils/monaco'
 import * as zod from './zod'
-import type {ZodPackageName} from './zod'
 
 await initMonaco()
 
@@ -34,16 +33,17 @@ const App = () => {
   const [schema, setSchema] = useState<string>(() => initialAppData.schema)
   const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
   const [version, setVersion] = useState(initialAppData.version)
-  const [packageName, setPackageName] = useState<ZodPackageName>(initialAppData.packageName)
+  const [isZodMini, setIsZodMini] = useState(initialAppData.isZodMini)
+  const packageName = isZodMini ? '@zod/mini' : 'zod'
 
   const appData = useMemo(
     () => ({
       schema,
       values: values.filter((value) => typeof value === 'string'),
       version,
-      packageName,
+      isZodMini,
     }),
-    [schema, values, version, packageName],
+    [schema, values, version, isZodMini],
   )
 
   usePersistAppData(appData)
@@ -110,7 +110,7 @@ const App = () => {
                   value={{packageName, version}}
                   onChange={async (ver) => {
                     setVersion(ver.version)
-                    setPackageName(ver.packageName)
+                    setIsZodMini(ver.packageName === zod.MINI_PACKAGE_NAME)
                   }}
                   disabled={isLoading}
                 />

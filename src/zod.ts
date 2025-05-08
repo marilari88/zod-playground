@@ -3,15 +3,10 @@ import {getPackageVersions} from './packageMetadata'
 
 let _z: unknown
 
-export const ZOD_PACKAGE_NAMES = ['zod', '@zod/mini'] as const satisfies string[]
+export const PACKAGE_NAME = 'zod'
+export const MINI_PACKAGE_NAME = '@zod/mini'
+export const ZOD_PACKAGE_NAMES = [PACKAGE_NAME, MINI_PACKAGE_NAME]
 export type ZodPackageName = (typeof ZOD_PACKAGE_NAMES)[number]
-
-export function assertIsZodPackageName(
-  packageName: unknown,
-): asserts packageName is ZodPackageName {
-  if (!ZOD_PACKAGE_NAMES.includes(packageName as ZodPackageName))
-    throw Error('Invalid package name')
-}
 
 export async function getVersions(
   tag?: string,
