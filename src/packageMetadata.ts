@@ -12,7 +12,7 @@ type JsDelivrMetadata = {
   }[]
 }
 
-const _metadata = new Map<string, JsDelivrMetadata>()
+const cache = new Map<string, JsDelivrMetadata>()
 
 async function fetchPackageMetadata(packageName: string): Promise<JsDelivrMetadata> {
   const res = await fetch(`https://data.jsdelivr.com/v1/packages/npm/${packageName}`)
@@ -20,11 +20,11 @@ async function fetchPackageMetadata(packageName: string): Promise<JsDelivrMetada
 }
 
 async function getPackageMetadata(packageName: string): Promise<JsDelivrMetadata> {
-  const packageMetadata = _metadata.get(packageName)
+  const packageMetadata = cache.get(packageName)
   if (packageMetadata) return packageMetadata
 
   const newMetadata = await fetchPackageMetadata(packageName)
-  _metadata.set(packageName, newMetadata)
+  cache.set(packageName, newMetadata)
   return newMetadata
 }
 

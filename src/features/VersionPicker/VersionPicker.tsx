@@ -89,7 +89,7 @@ export function VersionPicker({
       <Combobox.Dropdown hidden={versions === null}>
         <Combobox.Header>
           <SegmentedControl
-            data={[...zod.ZOD_PACKAGE_NAMES]}
+            data={zod.ZOD_PACKAGE_NAMES}
             fullWidth
             value={selectedPackage}
             onChange={(v) => {

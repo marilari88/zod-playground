@@ -1,11 +1,9 @@
 import ts from 'typescript'
-import {getPackageVersions} from './metadata'
+import {getPackageVersions} from './packageMetadata'
 
 let _z: unknown
 
-const ZOD_MINI_PACKAGE_NAME = '@zod/mini'
-const ZOD_PACKAGE_NAME = 'zod'
-export const ZOD_PACKAGE_NAMES = [ZOD_PACKAGE_NAME, ZOD_MINI_PACKAGE_NAME] as const
+export const ZOD_PACKAGE_NAMES = ['zod', '@zod/mini'] as const satisfies string[]
 export type ZodPackageName = (typeof ZOD_PACKAGE_NAMES)[number]
 
 export function assertIsZodPackageName(
