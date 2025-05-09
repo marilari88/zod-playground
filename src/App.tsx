@@ -34,7 +34,7 @@ const App = () => {
   const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
   const [version, setVersion] = useState(initialAppData.version)
   const [isZodMini, setIsZodMini] = useState(initialAppData.isZodMini)
-  const packageName = isZodMini ? '@zod/mini' : 'zod'
+  const packageName = isZodMini ? zod.MINI_PACKAGE_NAME : zod.PACKAGE_NAME
 
   const appData = useMemo(
     () => ({
