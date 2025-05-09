@@ -1,6 +1,6 @@
 import {ActionIcon, Box, Button, Flex, Tooltip, useComputedColorScheme} from '@mantine/core'
 import {notifications} from '@mantine/notifications'
-import Editor, {type Monaco, useMonaco} from '@monaco-editor/react'
+import Editor, {useMonaco} from '@monaco-editor/react'
 import {useEffect, useMemo, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
@@ -33,14 +33,17 @@ const App = () => {
   const [schema, setSchema] = useState<string>(() => initialAppData.schema)
   const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
   const [version, setVersion] = useState(initialAppData.version)
+  const [isZodMini, setIsZodMini] = useState(initialAppData.isZodMini)
+  const packageName = isZodMini ? zod.MINI_PACKAGE_NAME : zod.PACKAGE_NAME
 
   const appData = useMemo(
     () => ({
       schema,
       values: values.filter((value) => typeof value === 'string'),
       version,
+      isZodMini,
     }),
-    [schema, values, version],
+    [schema, values, version, isZodMini],
   )
 
   usePersistAppData(appData)
@@ -57,15 +60,19 @@ const App = () => {
   useEffect(() => {
     if (!monaco) return
 
-    async function updateVersion(monaco: Monaco, ver: string) {
-      setIsLoading(true)
-      await zod.setVersion(ver)
-      await setMonacoDeclarationTypes(monaco, ver)
-      setIsLoading(false)
-    }
-
-    updateVersion(monaco, version)
-  }, [version, monaco])
+    setIsLoading(true)
+    zod
+      .loadVersion({version, packageName})
+      .then(() => {
+        void setMonacoDeclarationTypes({monaco, version, packageName})
+      })
+      .catch((e) => {
+        console.error(e)
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [version, monaco, packageName])
 
   return (
     <Box className={classes.layout}>
@@ -98,11 +105,12 @@ const App = () => {
           <ResizablePanel className={classes.leftPanel} defaultSize={50} minSize={28}>
             <Flex className={classes.sectionTitle} align="center" justify="space-between" gap="sm">
               <Flex gap="sm" align="center" flex={1}>
-                Zod schema
+                Schema
                 <VersionPicker
-                  value={version}
+                  value={{packageName, version}}
                   onChange={async (ver) => {
-                    setVersion(ver)
+                    setVersion(ver.version)
+                    setIsZodMini(ver.packageName === zod.MINI_PACKAGE_NAME)
                   }}
                   disabled={isLoading}
                 />

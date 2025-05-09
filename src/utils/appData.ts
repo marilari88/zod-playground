@@ -6,6 +6,7 @@ export type AppData = {
   schema: string
   values: string[]
   version: string
+  isZodMini: boolean
 } | null
 
 function parseAppData(appData: string): AppData {
@@ -13,6 +14,7 @@ function parseAppData(appData: string): AppData {
 
   // backward compatibility
   if (!parsed.version) parsed.version = DEFAULT_APP_DATA.version
+  if (!parsed.isZodMini) parsed.isZodMini = false
 
   return parsed
 }

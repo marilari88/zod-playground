@@ -1,44 +1,33 @@
 import ts from 'typescript'
+import {getPackageVersions} from './packageMetadata'
 
-let _metadata: JsDelivrMetadata
 let _z: unknown
 
-export async function getDeclarationTypes(ver: string): Promise<string> {
-  const res = await fetch(`https://cdn.jsdelivr.net/npm/zod@${ver}/lib/types.d.ts`)
-  return await res.text()
-}
+export const PACKAGE_NAME = 'zod'
+export const MINI_PACKAGE_NAME = '@zod/mini'
+export const ZOD_PACKAGE_NAMES = [PACKAGE_NAME, MINI_PACKAGE_NAME]
+export type ZodPackageName = (typeof ZOD_PACKAGE_NAMES)[number]
 
-export async function getVersions(tag?: string): Promise<string[]> {
-  if (!_metadata) {
-    const res = await fetch('https://data.jsdelivr.com/v1/packages/npm/zod')
-    _metadata = await res.json()
-  }
-
-  if (tag) {
-    const ver = _metadata.tags[tag]
-    if (ver) return [ver]
-    throw new Error('Invalid tag')
-  }
-
+export async function getVersions(
+  tag?: string,
+): Promise<Array<{packageName: string; version: string}>> {
   const versions = []
-  for (const el of _metadata.versions) {
-    const ver = el.version
 
-    if (ver.startsWith('1')) continue
-
-    if (['alpha', 'beta', 'canary'].some((v) => ver.includes(v))) continue
-
-    versions.push(ver)
+  for (const packageName of ZOD_PACKAGE_NAMES) {
+    const packageVersions = await getPackageVersions({packageName, tag})
+    versions.push(...packageVersions.map((v) => ({packageName, version: v})))
   }
 
-  versions.push(_metadata.tags.canary)
-  versions.push(_metadata.tags.next)
-
-  return versions.toSorted((a, b) => b.localeCompare(a, undefined, {numeric: true}))
+  return versions
 }
 
-export async function setVersion(ver: string) {
-  _z = await import(/* @vite-ignore */ `https://cdn.jsdelivr.net/npm/zod@${ver}/+esm`)
+export async function loadVersion({
+  version,
+  packageName,
+}: {version: string; packageName: ZodPackageName}) {
+  _z = await import(
+    /* @vite-ignore */ `https://cdn.jsdelivr.net/npm/${packageName}@${version}/+esm`
+  )
 }
 
 export function validateSchema(schema: string): SchemaValidation {
@@ -144,20 +133,3 @@ type ValueValidation =
       success: false
       error: string
     }
-
-type JsDelivrMetadata = {
-  type: string
-  name: string
-  tags: Record<string, string>
-  versions: {
-    version: string
-    links: {
-      self: string
-      entrypoints: string
-      stats: string
-    }
-  }[]
-  links: {
-    stats: string
-  }
-}
