@@ -8,6 +8,9 @@ export const MINI_PACKAGE_NAME = '@zod/mini'
 export const ZOD_PACKAGE_NAMES = [PACKAGE_NAME, MINI_PACKAGE_NAME]
 export type ZodPackageName = (typeof ZOD_PACKAGE_NAMES)[number]
 
+export const ZOD_CORE_PACKAGE = '@zod/core'
+export const ZOD_CORE_VERSION = '0.11.6'
+
 export async function getVersions(
   tag?: string,
 ): Promise<Array<{packageName: string; version: string}>> {
