@@ -19,39 +19,33 @@ export async function initMonaco() {
 export function setMonacoDeclarationTypes({
   monaco,
   dtsFiles,
+  packageName,
 }: {
   monaco: Monaco
   dtsFiles: Array<{path: string; text: string}>
+  packageName: string
 }) {
   for (const {path, text} of dtsFiles) {
-    const uri = `file:///node_modules/zod/${path}`
+    const uri = `file:///node_modules/${packageName}/${path}`
     monaco.languages.typescript.typescriptDefaults.addExtraLib(text, uri)
   }
+}
 
+export function setMonacoGlobalDeclarationTypes({
+  monaco,
+  packageName,
+}: {monaco: Monaco; packageName: string}) {
   const ambient = `
   declare global {
-    const z: typeof import("zod").z;
+    const z: typeof import("${packageName}").z;
   }
 
   export {};
   `
   monaco.languages.typescript.typescriptDefaults.addExtraLib(
     ambient,
-    'file:///global/zod-global.d.ts',
+    `file:///global/${packageName}-global.d.ts`,
   )
-}
-
-export function setMonacoDeclarationTypesZodCore({
-  monaco,
-  dtsFiles,
-}: {
-  monaco: Monaco
-  dtsFiles: Array<{path: string; text: string}>
-}) {
-  for (const {path, text} of dtsFiles) {
-    const uri = `file:///node_modules/@zod/core/${path}`
-    monaco.languages.typescript.typescriptDefaults.addExtraLib(text, uri)
-  }
 }
 
 export function resetMonacoDeclarationTypes(monaco: Monaco) {
