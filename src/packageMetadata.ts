@@ -1,4 +1,4 @@
-type JsDelivrMetadata = {
+type PackageMetadata = {
   type: string
   name: string
   tags: Record<string, string>
@@ -7,19 +7,35 @@ type JsDelivrMetadata = {
     links: {
       self: string
       entrypoints: string
-      stats: string
     }
   }[]
 }
 
-const cache = new Map<string, JsDelivrMetadata>()
+type File = {
+  name: string
+  files?: File[]
+}
 
-async function fetchPackageMetadata(packageName: string): Promise<JsDelivrMetadata> {
+type VersionMetadata = {
+  files: File[]
+}
+
+const cache = new Map<string, PackageMetadata>()
+
+async function fetchPackageMetadata(packageName: string): Promise<PackageMetadata> {
   const res = await fetch(`https://data.jsdelivr.com/v1/packages/npm/${packageName}`)
   return await res.json()
 }
 
-async function getPackageMetadata(packageName: string): Promise<JsDelivrMetadata> {
+async function fetchVersionMetadata({
+  packageName,
+  version,
+}: {packageName: string; version: string}): Promise<VersionMetadata> {
+  const res = await fetch(`https://data.jsdelivr.com/v1/packages/npm/${packageName}@{version}`)
+  return await res.json()
+}
+
+async function getPackageMetadata(packageName: string): Promise<PackageMetadata> {
   const packageMetadata = cache.get(packageName)
   if (packageMetadata) return packageMetadata
 

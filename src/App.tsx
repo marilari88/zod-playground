@@ -20,8 +20,9 @@ import {
   getAppDataFromSearchParams,
   getURLwithAppData,
 } from './utils/appData'
-import {initMonaco, setMonacoDeclarationTypes} from './utils/monaco'
+import {initMonaco, resetMonacoDeclarationTypes, setMonacoDeclarationTypes} from './utils/monaco'
 import * as zod from './zod'
+import {getVersionDtsContents} from './versionMetadata'
 
 await initMonaco()
 
@@ -62,11 +63,14 @@ const App = () => {
     setIsLoading(true)
     zod
       .loadVersion({version, isZodMini})
-      .then(() => {
-        void setMonacoDeclarationTypes({monaco, version, packageName: zod.PACKAGE_NAME})
+      .then(() => getVersionDtsContents({packageName, version}))
+      .then(async (dtsFiles) => {
+        if (!dtsFiles) return
+        resetMonacoDeclarationTypes(monaco)
+        setMonacoDeclarationTypes({monaco, dtsFiles})
       })
       .catch((e) => {
-        console.error(e)
+        console.error({e})
       })
       .finally(() => {
         setIsLoading(false)
