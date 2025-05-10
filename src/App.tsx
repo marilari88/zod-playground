@@ -24,7 +24,7 @@ import {
   initMonaco,
   resetMonacoDeclarationTypes,
   setMonacoDeclarationTypes,
-  setMonacoDeclarationTypesZodCore,
+  setMonacoGlobalDeclarationTypes,
 } from './utils/monaco'
 import {getVersionDtsContents} from './versionMetadata'
 import * as zod from './zod'
@@ -68,12 +68,18 @@ const App = () => {
 
     const loadZodVersion = async () => {
       try {
+<<<<<<< HEAD
       .loadVersion({version, isZodMini})
         const primaryDtsFiles = await getVersionDtsContents({packageName, version})
+=======
+      .loadVersion({version, isZodMini})
+        const zodDtsFiles = await getVersionDtsContents({packageName, version})
+>>>>>>> ff41cb3 (Improve the zod-global.d.ts file)
 
-        if (primaryDtsFiles) {
+        if (zodDtsFiles) {
           resetMonacoDeclarationTypes(monaco)
-          setMonacoDeclarationTypes({monaco, dtsFiles: primaryDtsFiles})
+          setMonacoDeclarationTypes({monaco, dtsFiles: zodDtsFiles, packageName})
+          setMonacoGlobalDeclarationTypes({monaco, packageName})
         }
 
         // zod 4 needs @zod/core types
@@ -83,7 +89,7 @@ const App = () => {
             version: ZOD_CORE_VERSION,
           })
           if (zodCoreDtsFiles) {
-            setMonacoDeclarationTypesZodCore({monaco, dtsFiles: zodCoreDtsFiles})
+            setMonacoDeclarationTypes({monaco, dtsFiles: zodCoreDtsFiles, packageName: '@zod/core'})
           }
         }
       } catch (error) {
