@@ -13,7 +13,7 @@
     "test:init": "playwright install --with-deps chromium firefox",
     "biome:ci": "biome ci",
     "biome:check": "biome check",
-    "biome:fix": "biome check --fix"
+    "biome:write": "biome check --write"
   },
   "dependencies": {
     "@mantine/core": "^7.17.7",
