@@ -16,7 +16,7 @@ export async function initMonaco() {
   })
 }
 
-export async function setMonacoDeclarationTypes({
+export function setMonacoDeclarationTypes({
   monaco,
   dtsFiles,
 }: {
@@ -41,6 +41,19 @@ export async function setMonacoDeclarationTypes({
   )
 }
 
-export async function resetMonacoDeclarationTypes(monaco: Monaco) {
+export function setMonacoDeclarationTypesZodCore({
+  monaco,
+  dtsFiles,
+}: {
+  monaco: Monaco
+  dtsFiles: Array<{path: string; text: string}>
+}) {
+  for (const {path, text} of dtsFiles) {
+    const uri = `file:///node_modules/@zod/core/${path}`
+    monaco.languages.typescript.typescriptDefaults.addExtraLib(text, uri)
+  }
+}
+
+export function resetMonacoDeclarationTypes(monaco: Monaco) {
   monaco.languages.typescript.typescriptDefaults.setExtraLibs([])
 }

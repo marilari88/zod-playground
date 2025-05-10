@@ -20,9 +20,15 @@ import {
   getAppDataFromSearchParams,
   getURLwithAppData,
 } from './utils/appData'
-import {initMonaco, resetMonacoDeclarationTypes, setMonacoDeclarationTypes} from './utils/monaco'
-import * as zod from './zod'
+import {
+  initMonaco,
+  resetMonacoDeclarationTypes,
+  setMonacoDeclarationTypes,
+  setMonacoDeclarationTypesZodCore,
+} from './utils/monaco'
 import {getVersionDtsContents} from './versionMetadata'
+import * as zod from './zod'
+import {ZOD_CORE_PACKAGE, ZOD_CORE_VERSION} from './zod'
 
 await initMonaco()
 
@@ -60,22 +66,36 @@ const App = () => {
   useEffect(() => {
     if (!monaco) return
 
-    setIsLoading(true)
-    zod
+    const loadZodVersion = async () => {
+      try {
       .loadVersion({version, isZodMini})
-      .then(() => getVersionDtsContents({packageName, version}))
-      .then(async (dtsFiles) => {
-        if (!dtsFiles) return
-        resetMonacoDeclarationTypes(monaco)
-        setMonacoDeclarationTypes({monaco, dtsFiles})
-      })
-      .catch((e) => {
-        console.error({e})
-      })
-      .finally(() => {
+        const primaryDtsFiles = await getVersionDtsContents({packageName, version})
+
+        if (primaryDtsFiles) {
+          resetMonacoDeclarationTypes(monaco)
+          setMonacoDeclarationTypes({monaco, dtsFiles: primaryDtsFiles})
+        }
+
+        // zod 4 needs @zod/core types
+        if (version.startsWith('4')) {
+          const zodCoreDtsFiles = await getVersionDtsContents({
+            packageName: ZOD_CORE_PACKAGE,
+            version: ZOD_CORE_VERSION,
+          })
+          if (zodCoreDtsFiles) {
+            setMonacoDeclarationTypesZodCore({monaco, dtsFiles: zodCoreDtsFiles})
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load type definitions:', error)
+        // Consider adding user-facing error notification here
+      } finally {
         setIsLoading(false)
-      })
-  }, [version, monaco, isZodMini])
+      }
+    }
+
+    loadZodVersion()
+  }, [version, monaco, packageName])
 
   return (
     <Box className={classes.layout}>
