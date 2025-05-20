@@ -20,8 +20,15 @@ import {
   getAppDataFromSearchParams,
   getURLwithAppData,
 } from './utils/appData'
-import {initMonaco, setMonacoDeclarationTypes} from './utils/monaco'
+import {
+  initMonaco,
+  resetMonacoDeclarationTypes,
+  setMonacoDeclarationTypes,
+  setMonacoGlobalDeclarationTypes,
+} from './utils/monaco'
+import {getVersionDtsContents} from './versionMetadata'
 import * as zod from './zod'
+import {ZOD_CORE_PACKAGE, ZOD_CORE_VERSION} from './zod'
 
 await initMonaco()
 
@@ -60,18 +67,36 @@ const App = () => {
   useEffect(() => {
     if (!monaco) return
 
-    setIsLoading(true)
-    zod
-      .loadVersion({version, packageName})
-      .then(() => {
-        void setMonacoDeclarationTypes({monaco, version, packageName})
-      })
-      .catch((e) => {
-        console.error(e)
-      })
-      .finally(() => {
+    const loadZodVersion = async () => {
+      try {
+        await zod.loadVersion({version, packageName})
+        const zodDtsFiles = await getVersionDtsContents({packageName, version})
+
+        if (zodDtsFiles) {
+          resetMonacoDeclarationTypes(monaco)
+          setMonacoDeclarationTypes({monaco, dtsFiles: zodDtsFiles, packageName})
+          setMonacoGlobalDeclarationTypes({monaco, packageName})
+        }
+
+        // zod 4 needs @zod/core types
+        if (version.startsWith('4')) {
+          const zodCoreDtsFiles = await getVersionDtsContents({
+            packageName: ZOD_CORE_PACKAGE,
+            version: ZOD_CORE_VERSION,
+          })
+          if (zodCoreDtsFiles) {
+            setMonacoDeclarationTypes({monaco, dtsFiles: zodCoreDtsFiles, packageName: '@zod/core'})
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load type definitions:', error)
+        // Consider adding user-facing error notification here
+      } finally {
         setIsLoading(false)
-      })
+      }
+    }
+
+    loadZodVersion()
   }, [version, monaco, packageName])
 
   return (
