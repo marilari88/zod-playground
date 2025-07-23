@@ -40,6 +40,7 @@ export async function getPackageVersions({
   tag,
 }: {packageName: string; tag?: string}): Promise<string[]> {
   const packageMetadata = await getPackageMetadata(packageName)
+  console.log(packageMetadata)
 
   if (tag) {
     const ver = packageMetadata.tags[tag]
@@ -58,7 +59,6 @@ export async function getPackageVersions({
     versions.push(ver)
   }
 
-  if (packageMetadata.tags.canary) versions.push(packageMetadata.tags.canary)
   if (packageMetadata.tags.next) versions.push(packageMetadata.tags.next)
 
   return versions.toSorted((a, b) => b.localeCompare(a, undefined, {numeric: true}))
