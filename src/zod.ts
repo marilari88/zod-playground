@@ -5,9 +5,6 @@ let _z: unknown
 
 export const PACKAGE_NAME = 'zod'
 
-export const ZOD_CORE_PACKAGE = '@zod/core'
-export const ZOD_CORE_VERSION = '0.11.6'
-
 export async function getVersions(
   tag?: string,
 ): Promise<Array<{version: string; hasZodMini: boolean}>> {

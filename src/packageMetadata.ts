@@ -11,27 +11,10 @@ type PackageMetadata = {
   }[]
 }
 
-type File = {
-  name: string
-  files?: File[]
-}
-
-type VersionMetadata = {
-  files: File[]
-}
-
 const cache = new Map<string, PackageMetadata>()
 
 async function fetchPackageMetadata(packageName: string): Promise<PackageMetadata> {
   const res = await fetch(`https://data.jsdelivr.com/v1/packages/npm/${packageName}`)
-  return await res.json()
-}
-
-async function fetchVersionMetadata({
-  packageName,
-  version,
-}: {packageName: string; version: string}): Promise<VersionMetadata> {
-  const res = await fetch(`https://data.jsdelivr.com/v1/packages/npm/${packageName}@{version}`)
   return await res.json()
 }
 

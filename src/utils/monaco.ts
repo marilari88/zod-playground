@@ -34,10 +34,11 @@ export function setMonacoDeclarationTypes({
 export function setMonacoGlobalDeclarationTypes({
   monaco,
   packageName,
-}: {monaco: Monaco; packageName: string}) {
+  path = '',
+}: {monaco: Monaco; packageName: string; path?: string}) {
   const ambient = `
   declare global {
-    const z: typeof import("${packageName}").z;
+    const z: typeof import("${packageName}${path}").z;
   }
 
   export {};
