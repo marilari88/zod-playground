@@ -65,6 +65,8 @@ const App = () => {
   useEffect(() => {
     if (!monaco) return
 
+    setIsLoading(true)
+
     const loadZodVersion = async () => {
       try {
         zod.loadVersion({version, isZodMini})
