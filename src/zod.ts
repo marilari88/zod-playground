@@ -4,29 +4,25 @@ import {getPackageVersions} from './packageMetadata'
 let _z: unknown
 
 export const PACKAGE_NAME = 'zod'
-export const MINI_PACKAGE_NAME = '@zod/mini'
-export const ZOD_PACKAGE_NAMES = [PACKAGE_NAME, MINI_PACKAGE_NAME]
-export type ZodPackageName = (typeof ZOD_PACKAGE_NAMES)[number]
 
 export async function getVersions(
   tag?: string,
-): Promise<Array<{packageName: string; version: string}>> {
-  const versions = []
+): Promise<Array<{version: string; hasZodMini: boolean}>> {
+  const packageVersions = await getPackageVersions({packageName: PACKAGE_NAME, tag})
 
-  for (const packageName of ZOD_PACKAGE_NAMES) {
-    const packageVersions = await getPackageVersions({packageName, tag})
-    versions.push(...packageVersions.map((v) => ({packageName, version: v})))
-  }
+  return packageVersions.map((packageVersion) => {
+    // zod-mini has been introduced starting from v4.0.0
+    const majorVersion = Number.parseInt(packageVersion.split('.')[0], 10)
+    const hasZodMini = majorVersion >= 4
 
-  return versions
+    return {version: packageVersion, hasZodMini}
+  })
 }
 
-export async function loadVersion({
-  version,
-  packageName,
-}: {version: string; packageName: ZodPackageName}) {
+export async function loadVersion({version, isZodMini}: {version: string; isZodMini: boolean}) {
+  const pathSegment = isZodMini ? '/mini' : ''
   _z = await import(
-    /* @vite-ignore */ `https://cdn.jsdelivr.net/npm/${packageName}@${version}/+esm`
+    /* @vite-ignore */ `https://cdn.jsdelivr.net/npm/${PACKAGE_NAME}@${version}${pathSegment}/+esm`
   )
 }
 

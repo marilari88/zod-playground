@@ -2,9 +2,9 @@ import {Badge, Combobox, Loader, SegmentedControl, useCombobox} from '@mantine/c
 import {useEffect, useState} from 'react'
 import {FiChevronDown} from 'react-icons/fi'
 import * as zod from '../../zod'
-import type {ZodPackageName} from '../../zod'
 
-type VersionPickerValue = {packageName: ZodPackageName; version: string}
+const packageVariants = ['zod', 'zod/mini']
+type VersionPickerValue = {isZodMini: boolean; version: string}
 
 export function VersionPicker({
   value,
@@ -28,11 +28,11 @@ export function VersionPicker({
   })
 
   const [loading, setLoading] = useState(false)
-  const [versions, setVersions] = useState<Array<{packageName: string; version: string}> | null>(
+  const [versions, setVersions] = useState<Array<{hasZodMini: boolean; version: string}> | null>(
     null,
   )
   const [searchValue, setSearchValue] = useState('')
-  const [selectedPackage, setSelectedPackage] = useState<string>(value.packageName)
+  const [isZodMini, setIsZodMini] = useState(value.isZodMini)
 
   useEffect(() => {
     setLoading(true)
@@ -48,9 +48,8 @@ export function VersionPicker({
   }, [])
 
   const filteredVersions =
-    versions?.filter(
-      (el) => el.packageName === selectedPackage && el.version.includes(searchValue),
-    ) || []
+    versions?.filter((el) => (!isZodMini || el.hasZodMini) && el.version.includes(searchValue)) ||
+    []
 
   const options = filteredVersions.map((item) => (
     <Combobox.Option value={item.version} key={item.version}>
@@ -62,7 +61,7 @@ export function VersionPicker({
     <Combobox
       width={300}
       onOptionSubmit={(optionValue) => {
-        onChange({packageName: selectedPackage, version: optionValue})
+        onChange({isZodMini, version: optionValue})
         setSearchValue(optionValue)
         combobox.closeDropdown()
       }}
@@ -82,18 +81,18 @@ export function VersionPicker({
           disabled={disabled}
           style={{opacity: disabled ? 0.5 : 1}}
         >
-          {value.packageName} v{value.version}
+          {isZodMini ? 'Zod Mini' : 'Zod'} v{value.version}
         </Badge>
       </Combobox.Target>
 
       <Combobox.Dropdown hidden={versions === null}>
         <Combobox.Header>
           <SegmentedControl
-            data={zod.ZOD_PACKAGE_NAMES}
+            data={packageVariants}
             fullWidth
-            value={selectedPackage}
+            value={isZodMini ? 'zod/mini' : 'zod'}
             onChange={(v) => {
-              setSelectedPackage(v)
+              setIsZodMini(v === 'zod/mini')
             }}
           />
         </Combobox.Header>

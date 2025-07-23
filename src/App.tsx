@@ -34,7 +34,6 @@ const App = () => {
   const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
   const [version, setVersion] = useState(initialAppData.version)
   const [isZodMini, setIsZodMini] = useState(initialAppData.isZodMini)
-  const packageName = isZodMini ? zod.MINI_PACKAGE_NAME : zod.PACKAGE_NAME
 
   const appData = useMemo(
     () => ({
@@ -62,9 +61,9 @@ const App = () => {
 
     setIsLoading(true)
     zod
-      .loadVersion({version, packageName})
+      .loadVersion({version, isZodMini})
       .then(() => {
-        void setMonacoDeclarationTypes({monaco, version, packageName})
+        void setMonacoDeclarationTypes({monaco, version, packageName: zod.PACKAGE_NAME})
       })
       .catch((e) => {
         console.error(e)
@@ -72,7 +71,7 @@ const App = () => {
       .finally(() => {
         setIsLoading(false)
       })
-  }, [version, monaco, packageName])
+  }, [version, monaco, isZodMini])
 
   return (
     <Box className={classes.layout}>
@@ -107,10 +106,10 @@ const App = () => {
               <Flex gap="sm" align="center" flex={1}>
                 Schema
                 <VersionPicker
-                  value={{packageName, version}}
+                  value={{isZodMini, version}}
                   onChange={async (ver) => {
                     setVersion(ver.version)
-                    setIsZodMini(ver.packageName === zod.MINI_PACKAGE_NAME)
+                    setIsZodMini(ver.isZodMini)
                   }}
                   disabled={isLoading}
                 />

@@ -22,9 +22,7 @@ test('zod version switch', async ({page}) => {
   const anotherZodVersion = (await zod.getVersions()).find(
     (zVersion) => zVersion.version !== latestZodVersion.version,
   )
-  const zodMiniVersion = (await zod.getVersions()).find(
-    (zVersion) => zVersion.packageName === '@zod/mini',
-  )
+  const zodMiniVersion = (await zod.getVersions()).find((zVersion) => zVersion.hasZodMini)
 
   if (!latestZodVersion) throw new Error('No zod version found')
   if (!anotherZodVersion) throw new Error('No another zod version found')
@@ -39,12 +37,11 @@ test('zod version switch', async ({page}) => {
 
   await page.getByRole('button', {name: `zod v${anotherZodVersion.version}`}).click()
 
-  await page.getByText('@zod/mini').click()
-  console.log(zodMiniVersion.version)
+  await page.getByText('zod/mini').click()
   await page.getByRole('option', {name: zodMiniVersion.version}).click()
 
   await expect(
-    page.getByRole('button', {name: `@zod/mini v${zodMiniVersion.version}`}),
+    page.getByRole('button', {name: `zod mini v${zodMiniVersion.version}`}),
   ).toBeVisible()
 })
 
