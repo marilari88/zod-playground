@@ -12,7 +12,7 @@ export async function getVersions(
 
   return packageVersions.map((packageVersion) => {
     // zod-mini has been introduced starting from v4.0.0
-    const majorVersion = parseInt(packageVersion.split('.')[0], 10)
+    const majorVersion = Number.parseInt(packageVersion.split('.')[0], 10)
     const hasZodMini = majorVersion >= 4
 
     return {version: packageVersion, hasZodMini}
