@@ -70,7 +70,7 @@ const fetchFilesContent = async ({
 
       const pathWithoutDistEsm = path.replace('dist/esm/', '')
 
-      if (!res) return {path: pathWithoutDistEsm, text: ''}
+      if (!res.ok) return {path: pathWithoutDistEsm, text: ''}
       return {path: pathWithoutDistEsm, text: await res.text()}
     }),
   )
