@@ -26,8 +26,8 @@ import {
   setMonacoDeclarationTypes,
   setMonacoGlobalDeclarationTypes,
 } from './utils/monaco'
-import * as zod from './zod'
 import {getVersionDtsContents} from './versionMetadata'
+import * as zod from './zod'
 
 await initMonaco()
 
