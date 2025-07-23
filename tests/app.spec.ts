@@ -40,7 +40,6 @@ test('zod version switch', async ({page}) => {
   await page.getByRole('button', {name: `zod v${anotherZodVersion.version}`}).click()
 
   await page.getByText('@zod/mini').click()
-  console.log(zodMiniVersion.version)
   await page.getByRole('option', {name: zodMiniVersion.version}).click()
 
   await expect(
