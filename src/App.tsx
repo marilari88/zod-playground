@@ -20,7 +20,13 @@ import {
   getAppDataFromSearchParams,
   getURLwithAppData,
 } from './utils/appData'
-import {initMonaco, setMonacoDeclarationTypes} from './utils/monaco'
+import {
+  initMonaco,
+  resetMonacoDeclarationTypes,
+  setMonacoDeclarationTypes,
+  setMonacoGlobalDeclarationTypes,
+} from './utils/monaco'
+import {getVersionDtsContents} from './versionMetadata'
 import * as zod from './zod'
 
 await initMonaco()
@@ -60,17 +66,30 @@ const App = () => {
     if (!monaco) return
 
     setIsLoading(true)
-    zod
-      .loadVersion({version, isZodMini})
-      .then(() => {
-        void setMonacoDeclarationTypes({monaco, version, packageName: zod.PACKAGE_NAME})
-      })
-      .catch((e) => {
-        console.error(e)
-      })
-      .finally(() => {
+
+    const loadZodVersion = async () => {
+      try {
+        zod.loadVersion({version, isZodMini})
+        const zodDtsFiles = await getVersionDtsContents({packageName: zod.PACKAGE_NAME, version})
+
+        if (zodDtsFiles) {
+          resetMonacoDeclarationTypes(monaco)
+          setMonacoDeclarationTypes({monaco, dtsFiles: zodDtsFiles, packageName: zod.PACKAGE_NAME})
+          setMonacoGlobalDeclarationTypes({
+            monaco,
+            packageName: zod.PACKAGE_NAME,
+            path: isZodMini ? '/mini' : undefined,
+          })
+        }
+      } catch (error) {
+        console.error('Failed to load type definitions:', error)
+        // Consider adding user-facing error notification here
+      } finally {
         setIsLoading(false)
-      })
+      }
+    }
+
+    loadZodVersion()
   }, [version, monaco, isZodMini])
 
   return (

@@ -1,4 +1,4 @@
-type JsDelivrMetadata = {
+type PackageMetadata = {
   type: string
   name: string
   tags: Record<string, string>
@@ -7,19 +7,18 @@ type JsDelivrMetadata = {
     links: {
       self: string
       entrypoints: string
-      stats: string
     }
   }[]
 }
 
-const cache = new Map<string, JsDelivrMetadata>()
+const cache = new Map<string, PackageMetadata>()
 
-async function fetchPackageMetadata(packageName: string): Promise<JsDelivrMetadata> {
+async function fetchPackageMetadata(packageName: string): Promise<PackageMetadata> {
   const res = await fetch(`https://data.jsdelivr.com/v1/packages/npm/${packageName}`)
   return await res.json()
 }
 
-async function getPackageMetadata(packageName: string): Promise<JsDelivrMetadata> {
+async function getPackageMetadata(packageName: string): Promise<PackageMetadata> {
   const packageMetadata = cache.get(packageName)
   if (packageMetadata) return packageMetadata
 
@@ -41,6 +40,7 @@ export async function getPackageVersions({
   tag,
 }: {packageName: string; tag?: string}): Promise<string[]> {
   const packageMetadata = await getPackageMetadata(packageName)
+  console.log(packageMetadata)
 
   if (tag) {
     const ver = packageMetadata.tags[tag]
@@ -59,7 +59,6 @@ export async function getPackageVersions({
     versions.push(ver)
   }
 
-  if (packageMetadata.tags.canary) versions.push(packageMetadata.tags.canary)
   if (packageMetadata.tags.next) versions.push(packageMetadata.tags.next)
 
   return versions.toSorted((a, b) => b.localeCompare(a, undefined, {numeric: true}))
