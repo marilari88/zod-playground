@@ -65,9 +65,8 @@ const App = () => {
   useEffect(() => {
     if (!monaco) return
 
-    setIsLoading(true)
-
     const loadZodVersion = async () => {
+      setIsLoading(true)
       try {
         zod.loadVersion({version, isZodMini})
         const zodDtsFiles = await getVersionDtsContents({packageName: zod.PACKAGE_NAME, version})

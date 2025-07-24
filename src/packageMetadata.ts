@@ -40,7 +40,6 @@ export async function getPackageVersions({
   tag,
 }: {packageName: string; tag?: string}): Promise<string[]> {
   const packageMetadata = await getPackageMetadata(packageName)
-  console.log(packageMetadata)
 
   if (tag) {
     const ver = packageMetadata.tags[tag]
