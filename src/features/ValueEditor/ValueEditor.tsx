@@ -10,10 +10,9 @@ import {
   Tooltip,
   useComputedColorScheme,
 } from '@mantine/core'
+import {useDisclosure, useMediaQuery} from '@mantine/hooks'
 import Editor from '@monaco-editor/react'
 import type {editor} from 'monaco-editor'
-
-import {useDisclosure, useMediaQuery} from '@mantine/hooks'
 import {useState} from 'react'
 import {FiAlertCircle, FiCheckCircle, FiEye, FiEyeOff, FiMinus, FiPlus} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'

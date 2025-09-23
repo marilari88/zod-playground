@@ -59,7 +59,7 @@ export function validateValue(schema: ZodSchema, value: string): ValueValidation
           success: false,
           error: generateErrorMessage(validationRes.error.issues),
         }
-  } catch (e) {
+  } catch (_e) {
     return {
       success: false,
       error: 'Cannot validate value. Please check the schema',

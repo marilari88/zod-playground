@@ -1,11 +1,7 @@
 import {ActionIcon, useComputedColorScheme, useMantineColorScheme} from '@mantine/core'
 import {FiMoon, FiSun} from 'react-icons/fi'
 
-export function ColorSchemeToggle({
-  onToggle,
-}: {
-  onToggle?: (value: 'light' | 'dark') => void
-}) {
+export function ColorSchemeToggle({onToggle}: {onToggle?: (value: 'light' | 'dark') => void}) {
   const {setColorScheme} = useMantineColorScheme()
 
   const computedColorScheme = useComputedColorScheme('light')

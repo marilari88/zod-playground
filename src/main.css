@@ -1,3 +1,4 @@
 :root[data-mantine-color-scheme="dark"] {
+  /* biome-ignore lint/complexity/noImportantStyles: reason n/a */
   --mantine-color-body: var(--mantine-color-neutral-1) !important;
 }

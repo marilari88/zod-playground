@@ -1,4 +1,4 @@
-import {type Monaco, loader} from '@monaco-editor/react'
+import {loader, type Monaco} from '@monaco-editor/react'
 
 export async function initMonaco() {
   const monaco = await loader.init()
@@ -35,7 +35,11 @@ export function setMonacoGlobalDeclarationTypes({
   monaco,
   packageName,
   path = '',
-}: {monaco: Monaco; packageName: string; path?: string}) {
+}: {
+  monaco: Monaco
+  packageName: string
+  path?: string
+}) {
   const ambient = `
   declare global {
     const z: typeof import("${packageName}${path}").z;

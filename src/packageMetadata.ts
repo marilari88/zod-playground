@@ -30,7 +30,10 @@ async function getPackageMetadata(packageName: string): Promise<PackageMetadata>
 export async function getDeclarationTypes({
   version,
   packageName,
-}: {version: string; packageName: string}): Promise<string> {
+}: {
+  version: string
+  packageName: string
+}): Promise<string> {
   const res = await fetch(`https://cdn.jsdelivr.net/npm/${packageName}@${version}/lib/types.d.ts`)
   return await res.text()
 }
@@ -38,7 +41,10 @@ export async function getDeclarationTypes({
 export async function getPackageVersions({
   packageName,
   tag,
-}: {packageName: string; tag?: string}): Promise<string[]> {
+}: {
+  packageName: string
+  tag?: string
+}): Promise<string[]> {
   const packageMetadata = await getPackageMetadata(packageName)
 
   if (tag) {

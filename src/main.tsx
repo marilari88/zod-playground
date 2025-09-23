@@ -1,4 +1,4 @@
-import {MantineProvider, createTheme, virtualColor} from '@mantine/core'
+import {createTheme, MantineProvider, virtualColor} from '@mantine/core'
 import {Notifications} from '@mantine/notifications'
 import React from 'react'
 import ReactDOM from 'react-dom/client'

@@ -1,11 +1,10 @@
 import {ActionIcon, Box, Button, Flex, Tooltip, useComputedColorScheme} from '@mantine/core'
+import {useMediaQuery} from '@mantine/hooks'
 import {notifications} from '@mantine/notifications'
 import Editor, {type Monaco, useMonaco} from '@monaco-editor/react'
 import {useEffect, useMemo, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
-
-import {useMediaQuery} from '@mantine/hooks'
 import classes from './App.module.css'
 import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
 import {ColorSchemeToggle} from './features/ColorSchemeToggle'
@@ -35,7 +34,11 @@ const loadZodVersion = async ({
   version,
   isZodMini,
   monaco,
-}: {version: string; isZodMini: boolean; monaco: Monaco}) => {
+}: {
+  version: string
+  isZodMini: boolean
+  monaco: Monaco
+}) => {
   try {
     await zod.loadVersion({version, isZodMini})
     const zodDtsFiles = await getVersionDtsContents({packageName: zod.PACKAGE_NAME, version})

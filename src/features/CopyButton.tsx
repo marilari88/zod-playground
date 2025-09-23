@@ -1,4 +1,4 @@
-import {ActionIcon, Tooltip, CopyButton as _CopyButton} from '@mantine/core'
+import {CopyButton as _CopyButton, ActionIcon, Tooltip} from '@mantine/core'
 import {FiCheck, FiCopy} from 'react-icons/fi'
 
 export const CopyButton = ({value}: {value: string}) => {

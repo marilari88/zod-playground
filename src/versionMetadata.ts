@@ -14,7 +14,10 @@ const dtsFilesCache = new Map<string, Array<{path: string; text: string}>>()
 async function fetchVersionMetadata({
   packageName,
   version,
-}: {packageName: string; version: string}): Promise<VersionMetadata> {
+}: {
+  packageName: string
+  version: string
+}): Promise<VersionMetadata> {
   const res = await fetch(`https://data.jsdelivr.com/v1/packages/npm/${packageName}@${version}`)
   return await res.json()
 }
@@ -22,7 +25,10 @@ async function fetchVersionMetadata({
 export async function getVersionDtsContents({
   packageName,
   version,
-}: {packageName: string; version: string}): Promise<Array<{path: string; text: string}> | null> {
+}: {
+  packageName: string
+  version: string
+}): Promise<Array<{path: string; text: string}> | null> {
   try {
     const cacheKey = `${packageName}@${version}`
     const dtsFiles = dtsFilesCache.get(cacheKey)
