@@ -111,6 +111,9 @@ export const getMonacoContent = async ({
   locator: Locator
   formatOutput?: boolean
 }) => {
+  // Wait for Monaco editor to be fully loaded and have content
+  await locator.waitFor({state: 'visible'})
+  
   const value = await locator.textContent()
 
   if (formatOutput) {
