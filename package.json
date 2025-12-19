@@ -4,13 +4,14 @@
   "version": "1.1.4",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --clearScreen false",
     "build": "rm -rf dist/ && tsc && vite build",
     "preview": "vite preview",
     "types": "tsc --noEmit",
-    "test": "playwright test",
+    "test": "playwright test --reporter=list",
     "test:ui": "playwright test --ui",
-    "test:init": "playwright install --with-deps chromium firefox",
+    "test:install": "playwright install --with-deps chromium firefox",
+    "test:uninstall": "playwright uninstall --all",
     "biome:ci": "biome ci",
     "biome:check": "biome check",
     "biome:write": "biome check --write"
