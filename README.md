@@ -65,7 +65,7 @@ Zod playground uses Playwright to run E2E tests.
 To run tests locally, execute the following commands:
 
 ```sh
-npm test:init
+npm test:install
 npm test
 ```
 
