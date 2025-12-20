@@ -92,8 +92,16 @@ const writeInMonaco = async ({
   await locator.click()
   if (replacePreviousContent) {
     await page.keyboard.press('ControlOrMeta+KeyA')
+    await page.waitForTimeout(100) // Wait to ensure content is selected
   }
-  await page.keyboard.type(text)
+  /**
+   * Using clipboard to paste the content to avoid those issues:
+   * - keyboard.type() cannot be used for auto-closing of brackets/quotes in monaco editor
+   * - keyboard.insertText() sometimes does not work properly in firefox
+   */
+  await page.evaluate((t) => navigator.clipboard.writeText(t), text)
+  await page.keyboard.press('ControlOrMeta+KeyV')
+  await page.waitForTimeout(100) // Wait to ensure content is pasted
 }
 
 /**

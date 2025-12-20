@@ -17,12 +17,20 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: {...devices['Desktop Chrome']},
+      use: {
+        ...devices['Desktop Chrome'],
+
+        // Enable clipboard permissions for Chromium to support copy-paste in tests
+        permissions: ['clipboard-read', 'clipboard-write'],
+      },
     },
 
     {
       name: 'firefox',
-      use: {...devices['Desktop Firefox']},
+      use: {
+        ...devices['Desktop Firefox'],
+        // Firefox does not support clipboard permissions but copy-paste works by default
+      },
     },
   ],
 
