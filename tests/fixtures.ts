@@ -113,6 +113,7 @@ export const getMonacoContent = async ({
 }) => {
   // Wait for Monaco editor to be fully loaded and have content
   await locator.waitFor({state: 'visible'})
+  await new Promise((resolve) => setTimeout(resolve, 100))
 
   const value = await locator.textContent()
 
