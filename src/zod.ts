@@ -26,12 +26,61 @@ export async function loadVersion({version, isZodMini}: {version: string; isZodM
   )
 }
 
+/**
+ * Find the last standalone z.* expression in the code and wrap it with return.
+ * A standalone z.* expression is one that starts at the beginning of a line
+ * (not assigned to a variable like `const x = z.object(...)`).
+ * If no standalone z.* expression is found, the code is returned as-is.
+ */
+function addReturnToLastSchema(code: string): string {
+  const lines = code.split('\n')
+
+  // Find the last standalone z.* expression by scanning from the end
+  // We need to find lines that start with `z.` (possibly with leading whitespace)
+  // and are not part of an assignment
+  let zLineIndex = -1
+
+  // Scan from end to find the last line that starts a standalone z.* expression
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i]
+    const trimmedLine = line.trim()
+
+    // Skip empty lines
+    if (!trimmedLine) continue
+
+    // Check if this line starts a standalone z.* expression (the schema to return)
+    // It should start with z. and not be an assignment (no = before z.)
+    if (trimmedLine.startsWith('z.')) {
+      zLineIndex = i
+      break
+    }
+  }
+
+  if (zLineIndex === -1) {
+    // No standalone z.* expression found, return code as-is
+    return code
+  }
+
+  // Reconstruct the code with 'return' added before the found z.* expression
+  return [
+    ...lines.slice(0, zLineIndex), // Lines before the z.* expression
+    `return ${lines[zLineIndex]}`, // The z.* expression with 'return'
+    ...lines.slice(zLineIndex + 1), // Lines after the z.* expression
+  ].join('\n')
+}
+
 export function validateSchema(schema: string): SchemaValidation {
   try {
     if (schema.length < 3) throw new Error('Schema is too short')
 
-    const js = ts.transpile(schema)
-    const data = new Function('z', `return ${js}`)(_z) as ZodSchema
+    // Add 'return' to the last standalone z.* expression (if any)
+    const codeWithReturn = addReturnToLastSchema(schema)
+
+    // Transpile the code
+    const transpiledCode = ts.transpile(codeWithReturn)
+
+    // Execute the transpiled code
+    const data = new Function('z', transpiledCode)(_z) as ZodSchema
 
     return {
       success: true,

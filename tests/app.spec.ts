@@ -90,3 +90,99 @@ test('should hide results by default on narrow screen', async ({page, codeEditor
   await page.getByRole('button', {name: 'Hide results'}).click()
   await expect(page.getByText(/invalid schema/i)).not.toBeVisible()
 })
+
+test('supports TypeScript enum with z.nativeEnum()', async ({page, codeEditors}) => {
+  await codeEditors.writeSchema({
+    text: `enum ProductTypes {
+  AvatarDecoration = 0,
+  ProfileEffect = 1,
+  Bundle = 1000
+}
+
+z.nativeEnum(ProductTypes)`,
+  })
+
+  // Write a valid enum value
+  await codeEditors.writeValue({
+    text: '0',
+  })
+
+  // Should show Valid badge
+  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+
+  // Test invalid enum value
+  await codeEditors.writeValue({
+    text: '999',
+  })
+
+  // Should show Invalid badge
+  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+})
+
+test('supports const declarations in schema', async ({page, codeEditors}) => {
+  await codeEditors.writeSchema({
+    text: `const nameSchema = z.string().min(2)
+
+z.object({
+  name: nameSchema,
+  age: z.number()
+})`,
+  })
+
+  await codeEditors.writeValue({
+    text: '{name: "John", age: 30}',
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+})
+
+test('supports nested schemas with const declarations', async ({page, codeEditors}) => {
+  await codeEditors.writeSchema({
+    text: `const addressSchema = z.object({
+  street: z.string(),
+  city: z.string()
+})
+
+z.object({
+  name: z.string(),
+  address: addressSchema
+})`,
+  })
+
+  await codeEditors.writeValue({
+    text: '{name: "John", address: {street: "123 Main St", city: "NYC"}}',
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+
+  // Test invalid nested object
+  await codeEditors.writeValue({
+    text: '{name: "John", address: {street: "123 Main St"}}',
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+})
+
+test('supports explicit return statement in schema', async ({page, codeEditors}) => {
+  await codeEditors.writeSchema({
+    text: `enum Status {
+  Active = "active",
+  Inactive = "inactive"
+}
+
+const metaSchema = z.object({
+  createdAt: z.string()
+})
+
+return z.object({
+  status: z.nativeEnum(Status),
+  meta: metaSchema
+})`,
+  })
+
+  await codeEditors.writeValue({
+    text: '{status: "active", meta: {createdAt: "2025-01-01"}}',
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+})
