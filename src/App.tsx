@@ -123,7 +123,7 @@ const App = () => {
       </Header>
       <main style={{maxWidth: '100vw'}}>
         <ResizablePanelGroup
-          direction={isMobile ? 'vertical' : 'horizontal'}
+          orientation={isMobile ? 'vertical' : 'horizontal'}
           className={classes.main}
         >
           <ResizablePanel className={classes.leftPanel} defaultSize={50} minSize={28}>
