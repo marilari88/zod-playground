@@ -4,11 +4,11 @@ import * as zod from '../src/zod'
 import {test} from './fixtures'
 
 test('has title "Zod Playground', async ({page}) => {
-  await expect(page).toHaveTitle(/Zod Playground/)
+  await expect(page).toHaveTitle(/Zod Playground Clone 🌀/)
 })
 
 test('has header with title, share, theme toggler and github repo link', async ({page}) => {
-  await expect(page.getByText('Zod Playground')).toBeVisible()
+  await expect(page.getByText('Zod Playground Clone 🌀')).toBeVisible()
   await expect(page.getByRole('button', {name: 'Share'})).toBeVisible()
   await expect(page.getByLabel('Toggle color scheme')).toBeVisible()
   await expect(page.getByRole('banner').getByRole('link')).toHaveAttribute(
@@ -59,39 +59,53 @@ test('has invalid marker when an invalid value is in the Value Editor', async ({
     text: 'Invalid value',
   })
 
+  await page.getByLabel('Validate value').click()
+
   await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
 })
 
 test('should display results by default on wide screen', async ({page, codeEditors}) => {
   await page.setViewportSize({width: 1920, height: 1080})
+  
+  await page.getByRole('button', {name: 'Clear schema'}).click()
+  
   await codeEditors.writeSchema({
     text: '----',
   })
 
-  await expect(page.getByText(/invalid schema/i)).toBeVisible()
+  await page.getByLabel('Validate value').click()
+
+  await expect(page.getByText(/Unexpected token|expected expression|Invalid schema/i)).toBeVisible()
 
   await page.getByRole('button', {name: 'Hide results'}).click()
-  await expect(page.getByText(/invalid schema/i)).not.toBeVisible()
+  await expect(page.getByText(/Unexpected token|expected expression|Invalid schema/i)).not.toBeVisible()
 
   await page.getByRole('button', {name: 'Show results'}).click()
-  await expect(page.getByText(/invalid schema/i)).toBeVisible()
+  await expect(page.getByText(/Unexpected token|expected expression|Invalid schema/i)).toBeVisible()
 })
 
 test('should hide results by default on narrow screen', async ({page, codeEditors}) => {
   await page.setViewportSize({width: 800, height: 600})
+  
+  await page.getByRole('button', {name: 'Clear schema'}).click()
+  
   await codeEditors.writeSchema({
     text: '----',
   })
 
-  await expect(page.getByText(/invalid schema/i)).not.toBeVisible()
+  await page.getByLabel('Validate value').click()
+
+  await expect(page.getByText(/Unexpected token|expected expression|Invalid schema/i)).not.toBeVisible()
   await page.getByRole('button', {name: 'Show results'}).click()
-  await expect(page.getByText(/invalid schema/i)).toBeVisible()
+  await expect(page.getByText(/Unexpected token|expected expression|Invalid schema/i)).toBeVisible()
 
   await page.getByRole('button', {name: 'Hide results'}).click()
-  await expect(page.getByText(/invalid schema/i)).not.toBeVisible()
+  await expect(page.getByText(/Unexpected token|expected expression|Invalid schema/i)).not.toBeVisible()
 })
 
 test('supports TypeScript enum with z.nativeEnum()', async ({page, codeEditors}) => {
+  await page.getByRole('button', {name: 'Clear schema'}).click()
+  
   await codeEditors.writeSchema({
     text: `enum ProductTypes {
   AvatarDecoration = 0,
@@ -102,24 +116,28 @@ test('supports TypeScript enum with z.nativeEnum()', async ({page, codeEditors})
 z.nativeEnum(ProductTypes)`,
   })
 
-  // Write a valid enum value
+  await page.getByRole('button', {name: 'Clear value'}).click()
+  
   await codeEditors.writeValue({
     text: '0',
   })
 
-  // Should show Valid badge
+  await page.getByLabel('Validate value').click()
+
   await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
 
-  // Test invalid enum value
   await codeEditors.writeValue({
     text: '999',
   })
 
-  // Should show Invalid badge
+  await page.getByLabel('Validate').click()
+
   await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
 })
 
 test('supports const declarations in schema', async ({page, codeEditors}) => {
+  await page.getByRole('button', {name: 'Clear schema'}).click()
+  
   await codeEditors.writeSchema({
     text: `const nameSchema = z.string().min(2)
 
@@ -129,14 +147,20 @@ z.object({
 })`,
   })
 
+  await page.getByRole('button', {name: 'Clear value'}).click()
+  
   await codeEditors.writeValue({
     text: '{name: "John", age: 30}',
   })
+
+  await page.getByLabel('Validate value').click()
 
   await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
 })
 
 test('supports nested schemas with const declarations', async ({page, codeEditors}) => {
+  await page.getByRole('button', {name: 'Clear schema'}).click()
+  
   await codeEditors.writeSchema({
     text: `const addressSchema = z.object({
   street: z.string(),
@@ -149,21 +173,28 @@ z.object({
 })`,
   })
 
+  await page.getByRole('button', {name: 'Clear value'}).click()
+  
   await codeEditors.writeValue({
     text: '{name: "John", address: {street: "123 Main St", city: "NYC"}}',
   })
 
+  await page.getByLabel('Validate value').click()
+
   await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
 
-  // Test invalid nested object
   await codeEditors.writeValue({
     text: '{name: "John", address: {street: "123 Main St"}}',
   })
+
+  await page.getByLabel('Validate').click()
 
   await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
 })
 
 test('supports explicit return statement in schema', async ({page, codeEditors}) => {
+  await page.getByRole('button', {name: 'Clear schema'}).click()
+  
   await codeEditors.writeSchema({
     text: `enum Status {
   Active = "active",
@@ -180,9 +211,13 @@ return z.object({
 })`,
   })
 
+  await page.getByRole('button', {name: 'Clear value'}).click()
+  
   await codeEditors.writeValue({
     text: '{status: "active", meta: {createdAt: "2025-01-01"}}',
   })
+
+  await page.getByLabel('Validate value').click()
 
   await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
 })

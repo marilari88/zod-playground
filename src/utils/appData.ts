@@ -36,11 +36,20 @@ export function getAppDataFromSearchParams(): AppData {
   return null
 }
 
-export function getURLwithAppData(appData: AppData): string {
+export function getURLwithAppData(appData: AppData, autoValidate = false): string {
   const queryParams = new URLSearchParams()
   const compressedAppData = LZString.compressToEncodedURIComponent(JSON.stringify(appData))
 
   queryParams.set('appdata', compressedAppData)
+  
+  if (autoValidate) {
+    queryParams.set('autoValidate', 'true')
+  }
 
   return `${window.location.protocol}//${window.location.host}?${queryParams}`
+}
+
+export function shouldAutoValidate(): boolean {
+  const urlParams = new URLSearchParams(window.location.search)
+  return urlParams.get('autoValidate') === 'true'
 }

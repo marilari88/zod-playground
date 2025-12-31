@@ -24,6 +24,7 @@
   overflow: auto;
   display: flex;
   flex: 1;
+  padding-top: var(--mantine-spacing-md);
 
   & > * {
     flex-grow: 1;
@@ -31,11 +32,12 @@
 }
 
 .valueResult {
-  padding-inline: var(--mantine-spacing-sm);
+  padding-inline: var(--mantine-spacing-lg);
+  padding-top: var(--mantine-spacing-md);
   border-left: 1px solid var(--mantine-color-neutral-2);
   display: block;
   flex: 1;
 
   white-space: pre-wrap;
-  font-size: var(--mantine-font-size-sm);
+  font-size: var(--mantine-font-size-md);
 }

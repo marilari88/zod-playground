@@ -1,5 +1,4 @@
-import {Anchor, Box, Flex} from '@mantine/core'
-import {FaGithub} from 'react-icons/fa'
+import {Box, Flex, Text} from '@mantine/core'
 import classes from './Header.module.css'
 
 export const ZodLogo = () => (
@@ -147,13 +146,11 @@ export function Header({children}: {children?: React.ReactNode}) {
   return (
     <Flex component="header" className={classes.header} align="center" gap="md">
       <ZodLogo />
-      <Box className={classes.header__title}>Zod Playground</Box>
+      <Box className={classes.header__title}>Zod Playground Clone 🌀</Box>
+      <Text size="sm" c="dimmed" style={{paddingLeft: '0.25rem'}}>
+        by Mickaël et Lucas
+      </Text>
       {children}
-      <Flex gap="md" ml="auto" color="primary">
-        <Anchor href="https://github.com/marilari88/zod-playground" target="_blank" c="primary">
-          <FaGithub className={classes.githubLink} />
-        </Anchor>
-      </Flex>
     </Flex>
   )
 }

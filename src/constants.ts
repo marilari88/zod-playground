@@ -15,6 +15,7 @@ export const EDITOR_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   formatOnType: true,
   formatOnPaste: true,
   renderLineHighlight: 'none',
+  fontSize: 20,
 }
 
 const schema = `z.object({
