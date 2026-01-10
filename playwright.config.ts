@@ -8,7 +8,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   workers: 1,
-  reporter: 'html',
+  reporter: 'list',
   use: {
     baseURL: 'http://localhost:5173/',
     trace: 'on-first-retry',

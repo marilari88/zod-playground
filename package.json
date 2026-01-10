@@ -8,7 +8,7 @@
     "build": "rm -rf dist/ && tsc && vite build",
     "preview": "vite preview",
     "types": "tsc --noEmit",
-    "test": "playwright test --reporter=list",
+    "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:install": "playwright install --with-deps chromium firefox",
     "test:uninstall": "playwright uninstall --all",
