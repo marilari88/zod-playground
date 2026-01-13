@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "formatter": {
+    "indentWidth": 2,
     "indentStyle": "space",
     "lineWidth": 100
   },
@@ -8,7 +9,8 @@
     "formatter": {
       "semicolons": "asNeeded",
       "bracketSpacing": false,
-      "quoteStyle": "single"
+      "quoteStyle": "single",
+      "trailingCommas": "all"
     }
   },
   "vcs": {
