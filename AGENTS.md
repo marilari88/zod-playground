@@ -4,9 +4,16 @@ Guidelines for AI coding agents working in this repository.
 
 ## Project Overview
 
-Zod Playground is a TypeScript/React 19 web application built with Vite 7. It provides an interactive browser-based playground for testing Zod schema validation. The UI uses Mantine components and Monaco Editor for code editing.
+Zod Playground is a React web application built with Vite.
+It provides an interactive browser-based playground for testing Zod schema validation.
+The UI uses Mantine components and Monaco Editor for code editing.
 
 ## Build, Lint, and Test Commands
+
+This is an overview of the main npm scripts available in this project.
+Look at `package.json` for the full list of scripts.
+
+Do NOT use `npm run test -- --debug`, it requires a GUI environment.
 
 ### Development
 ```bash
@@ -16,50 +23,35 @@ npm run preview          # Preview production build locally
 npm run types            # Type-check only (no emit)
 ```
 
-### Linting and Formatting (Biome)
+### Linting and Formatting
 ```bash
 npm run biome:check      # Check for lint/format issues
 npm run biome:write      # Auto-fix lint/format issues
 npm run biome:ci         # CI mode (fails on issues)
 ```
 
-### Testing (Playwright E2E)
+### Testing
 ```bash
-npm test                 # Run all tests
+npm run test             # Run all tests
 npm run test:ui          # Run tests with Playwright UI
 npm run test:install     # Install browser dependencies
 
 # Run a single test file
-npx playwright test tests/app.spec.ts
+npm run test -- tests/app.spec.ts
 
 # Run a single test by name
-npx playwright test --grep "has title"
+npm run test -- --grep "has title"
 
 # Run tests in a specific browser
-npx playwright test --project=chromium
-npx playwright test --project=firefox
-
-# Debug mode
-npx playwright test --debug
+npm run test -- --project=chromium
+npm run test -- --project=firefox
 ```
 
 ## Code Style Guidelines
 
 This project uses **Biome** for linting and formatting. Configuration is in `biome.json`.
 
-### Formatting Rules
-- **Indentation**: 2 spaces (not tabs)
-- **Line width**: 100 characters max
-- **Quotes**: Single quotes for strings
-- **Semicolons**: Omit when possible (`semicolons: "asNeeded"`)
-- **Bracket spacing**: No spaces inside braces (`{foo}` not `{ foo }`)
-- **Trailing commas**: Include in multiline structures
-
 ### Import Order
-1. External libraries (React, Mantine, etc.)
-2. Internal modules (components, utils, hooks)
-3. CSS/style imports last
-
 ```typescript
 // External libraries
 import {Box, Button, Flex} from '@mantine/core'
@@ -74,7 +66,6 @@ import classes from './App.module.css'
 ```
 
 ### TypeScript Guidelines
-- **Strict mode** is enabled - no implicit any, strict null checks
 - Use `type` keyword for type-only imports: `import type {Monaco} from '@monaco-editor/react'`
 - Prefer explicit return types for exported functions
 - Use discriminated unions for result types (success/error pattern)
@@ -99,31 +90,6 @@ type ValidationResult =
 - **Types/interfaces**: PascalCase (`AppData`, `ZodSchema`)
 - **Constants**: SCREAMING_SNAKE_CASE (`STORAGE_KEY`, `EDITOR_OPTIONS`)
 - **Hooks**: Prefix with `use` (`usePersistAppData`, `useMonaco`)
-
-## Project Structure
-
-```
-src/
-├── features/           # Feature-specific components
-│   ├── ColorSchemeToggle.tsx
-│   ├── CopyButton.tsx
-│   ├── ValueEditor/
-│   └── VersionPicker/
-├── ui/                 # Reusable UI components
-│   ├── Header/
-│   └── Resizable/
-├── hooks/              # Custom React hooks
-├── utils/              # Utility functions
-├── assets/             # Static assets (SVGs)
-├── App.tsx             # Main application component
-├── main.tsx            # React entry point
-├── constants.ts        # App-wide constants
-└── zod.ts              # Zod validation logic
-
-tests/                  # Playwright E2E tests
-├── app.spec.ts         # Test specifications
-└── fixtures.ts         # Test fixtures and helpers
-```
 
 ## React Patterns
 
@@ -152,27 +118,9 @@ export function Header({children}: {children?: React.ReactNode}) {
 - Handle loading states with boolean flags
 - Use try/catch with typed error handling
 
-## Error Handling
+## Tests
 
-Use the success/error discriminated union pattern:
-
-```typescript
-function validateSchema(schema: string): SchemaValidation {
-  try {
-    // validation logic
-    return { success: true, data: result }
-  } catch (e) {
-    const error = e instanceof Error ? e.message : 'Unknown error'
-    return { success: false, error }
-  }
-}
-```
-
-## Testing Guidelines
-
-Tests use Playwright with custom fixtures defined in `tests/fixtures.ts`.
-
-### Test Structure
+### Structure
 ```typescript
 import {expect} from '@playwright/test'
 import {test} from './fixtures'
@@ -185,11 +133,6 @@ test('descriptive test name', async ({page, codeEditors}) => {
   await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
 })
 ```
-
-### Custom Fixtures
-- `codeEditors.writeSchema()` - Write to schema editor
-- `codeEditors.writeValue()` - Write to value editor
-- `codeEditors.getSchemaEditorContent()` - Read schema content
 
 ### Best Practices
 - Use role-based selectors: `page.getByRole('button', {name: 'Share'})`
