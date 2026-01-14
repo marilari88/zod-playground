@@ -1,5 +1,5 @@
 import ts from 'typescript'
-import {getPackageVersions} from './packageMetadata'
+import {getPackageVersions} from './packageMetadata.ts'
 
 let _z: unknown
 
@@ -28,45 +28,75 @@ export async function loadVersion({version, isZodMini}: {version: string; isZodM
 
 /**
  * Find the last standalone z.* expression in the code and wrap it with return.
- * A standalone z.* expression is one that starts at the beginning of a line
- * (not assigned to a variable like `const x = z.object(...)`).
+ * A standalone z.* expression is one that:
+ * 1. Appears at bracket depth 0 (not nested inside another expression)
+ * 2. Starts at the beginning of a line (only whitespace before it)
  * If no standalone z.* expression is found, the code is returned as-is.
  */
-function addReturnToLastSchema(code: string): string {
-  const lines = code.split('\n')
+export function ensureReturnInSchema(code: string): string {
+  let depth = 0
 
-  // Find the last standalone z.* expression by scanning from the end
-  // We need to find lines that start with `z.` (possibly with leading whitespace)
-  // and are not part of an assignment
-  let zLineIndex = -1
+  // Scan from the end to find the last standalone z.* expression
+  // We track bracket depth to distinguish top-level expressions from nested ones
+  for (let i = code.length - 1; i >= 1; i--) {
+    const char = code[i]
 
-  // Scan from end to find the last line that starts a standalone z.* expression
-  for (let i = lines.length - 1; i >= 0; i--) {
-    const line = lines[i]
-    const trimmedLine = line.trim()
+    // Track bracket depth (reversed since we're scanning backwards)
+    if (char === ')' || char === ']' || char === '}') {
+      depth++
+    } else if (char === '(' || char === '[' || char === '{') {
+      depth--
+    }
 
-    // Skip empty lines
-    if (!trimmedLine) continue
+    // At depth 0, check for 'return' keyword at the start of a line
+    // If found, stop - user already has an explicit return
+    if (depth === 0 && char === 'r' && code.slice(i, i + 6) === 'return') {
+      // Check 'return' is not part of a larger identifier
+      const charBefore = i > 0 ? code[i - 1] : ''
+      const charAfter = i + 6 < code.length ? code[i + 6] : ''
+      if (!/[a-zA-Z0-9_$]/.test(charBefore) && !/[a-zA-Z0-9_$]/.test(charAfter)) {
+        // Found 'return' keyword - check if it's at the start of its line
+        let lineStart = i
+        while (lineStart > 0 && code[lineStart - 1] !== '\n') {
+          lineStart--
+        }
+        const beforeReturn = code.slice(lineStart, i)
+        if (/^\s*$/.test(beforeReturn)) {
+          // Top-level return found at start of line, return code as-is
+          return code
+        }
+      }
+    }
 
-    // Check if this line starts a standalone z.* expression (the schema to return)
-    // It should start with z. and not be an assignment (no = before z.)
-    if (trimmedLine.startsWith('z.')) {
-      zLineIndex = i
-      break
+    // Look for 'z.' pattern at depth 0
+    if (depth === 0 && code[i - 1] === 'z' && char === '.') {
+      // Check z is not part of a larger identifier (e.g., not "xyz.")
+      const zIndex = i - 1
+      if (zIndex === 0 || !/[a-zA-Z0-9_$]/.test(code[zIndex - 1])) {
+        // Found a z.* at depth 0. Now check if it's at the start of its line.
+        // Find the start of the line containing this z
+        let lineStart = zIndex
+        while (lineStart > 0 && code[lineStart - 1] !== '\n') {
+          lineStart--
+        }
+
+        // Get the content from line start to z
+        const beforeZ = code.slice(lineStart, zIndex)
+
+        // Check if everything before z on this line is whitespace
+        // (This filters out assignments like "const x = z.string()")
+        if (/^\s*$/.test(beforeZ)) {
+          // This z.* is at the start of its line (ignoring whitespace)
+          // This is our return target
+          return code.slice(0, zIndex) + 'return ' + code.slice(zIndex)
+        }
+        // Otherwise, this z.* is part of an assignment or similar, continue scanning
+      }
     }
   }
 
-  if (zLineIndex === -1) {
-    // No standalone z.* expression found, return code as-is
-    return code
-  }
-
-  // Reconstruct the code with 'return' added before the found z.* expression
-  return [
-    ...lines.slice(0, zLineIndex), // Lines before the z.* expression
-    `return ${lines[zLineIndex]}`, // The z.* expression with 'return'
-    ...lines.slice(zLineIndex + 1), // Lines after the z.* expression
-  ].join('\n')
+  // No standalone z.* expression found, return code as-is
+  return code
 }
 
 export function validateSchema(schema: string): SchemaValidation {
@@ -74,7 +104,7 @@ export function validateSchema(schema: string): SchemaValidation {
     if (schema.length < 3) throw new Error('Schema is too short')
 
     // Add 'return' to the last standalone z.* expression (if any)
-    const codeWithReturn = addReturnToLastSchema(schema)
+    const codeWithReturn = ensureReturnInSchema(schema)
 
     // Transpile the code
     const transpiledCode = ts.transpile(codeWithReturn)
