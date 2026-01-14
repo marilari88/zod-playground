@@ -186,3 +186,164 @@ return z.object({
 
   await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
 })
+
+test('supports multi-line z.union with nested z.object', async ({page, codeEditors}) => {
+  await codeEditors.writeSchema({
+    text: `z.union([
+  // Multidirectional glossary entry deletion
+  z.object({
+    guid: z.string(),
+  }),
+  // Unidirectional glossary entry deletion
+  z.object({
+    term: z.object({
+      language: z.string().min(2),
+      value: z.string().min(1),
+    }),
+  })
+])`,
+  })
+
+  // Test first union variant
+  await codeEditors.writeValue({
+    text: '{guid: "abc-123"}',
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+
+  // Test second union variant
+  await codeEditors.writeValue({
+    text: '{term: {language: "en", value: "hello"}}',
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+
+  // Test invalid value
+  await codeEditors.writeValue({
+    text: '{invalid: "value"}',
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+})
+
+test('supports multi-line z.union with leading indentation', async ({page, codeEditors}) => {
+  await codeEditors.writeSchema({
+    text: `    z.union([
+  // Multidirectional glossary entry deletion
+  z.object({
+    guid: z.string(),
+  }),
+  // Unidirectional glossary entry deletion
+  z.object({
+    term: z.object({
+      language: z.string().min(2),
+      value: z.string().min(1),
+    }),
+  })
+])`,
+  })
+
+  await codeEditors.writeValue({
+    text: '{guid: "test-guid"}',
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+})
+
+test('supports multi-line z.union with consistent indentation', async ({page, codeEditors}) => {
+  await codeEditors.writeSchema({
+    text: `    z.union([
+    // Multidirectional glossary entry deletion
+    z.object({
+        guid: z.string(),
+    }),
+    // Unidirectional glossary entry deletion
+    z.object({
+        term: z.object({
+        language: z.string().min(2),
+        value: z.string().min(1),
+        }),
+    })
+    ])`,
+  })
+
+  await codeEditors.writeValue({
+    text: '{term: {language: "fr", value: "bonjour"}}',
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+})
+
+test('uses the last standalone z.* expression when iterating on schema design', async ({
+  page,
+  codeEditors,
+}) => {
+  // First attempt - simple schema with just name
+  await codeEditors.writeSchema({
+    text: `z.object({ name: z.string() })`,
+  })
+
+  await codeEditors.writeValue({
+    text: '{name: "John"}',
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+
+  // Second attempt - added age field (append to existing schema)
+  // The previous value should now be invalid because it's missing 'age'
+  await codeEditors.writeSchema({
+    text: `// First attempt - too simple
+z.object({ name: z.string() })
+
+// Second attempt - added age
+z.object({ name: z.string(), age: z.number() })`,
+  })
+
+  // Previous value {name: "John"} should be invalid now (missing age)
+  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+
+  // Update value to match second attempt schema
+  await codeEditors.writeValue({
+    text: '{name: "John", age: 30}',
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+
+  // Final version - with validation constraints (append to existing schema)
+  // The previous value should now be invalid because age must be positive
+  await codeEditors.writeSchema({
+    text: `// First attempt - too simple
+z.object({ name: z.string() })
+
+// Second attempt - added age
+z.object({ name: z.string(), age: z.number() })
+
+// Final version - with validation
+z.object({ name: z.string().min(1), age: z.number().positive() })`,
+  })
+
+  // Value {name: "John", age: 30} should still be valid
+  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+
+  // Test that validation constraints are enforced
+  await codeEditors.writeValue({
+    text: '{name: "", age: 30}',
+  })
+
+  // Should be invalid because name must have min 1 character
+  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+
+  await codeEditors.writeValue({
+    text: '{name: "John", age: -5}',
+  })
+
+  // Should be invalid because age must be positive
+  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+
+  // Valid value for final schema
+  await codeEditors.writeValue({
+    text: '{name: "John", age: 25}',
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+})
