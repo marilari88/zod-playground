@@ -88,7 +88,7 @@ export function ensureReturnInSchema(code: string): string {
         if (/^\s*$/.test(beforeZ)) {
           // This z.* is at the start of its line (ignoring whitespace)
           // This is our return target
-          return code.slice(0, zIndex) + 'return ' + code.slice(zIndex)
+          return `${code.slice(0, zIndex)}return ${code.slice(zIndex)}`
         }
         // Otherwise, this z.* is part of an assignment or similar, continue scanning
       }
