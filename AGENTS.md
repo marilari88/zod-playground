@@ -13,7 +13,7 @@ The UI uses Mantine components and Monaco Editor for code editing.
 This is an overview of the main npm scripts available in this project.
 Look at `package.json` for the full list of scripts.
 
-Do NOT use `npm run test -- --debug`, it requires a GUI environment.
+Do NOT use `npm run test:ui` and `npm run test -- --debug`, they require a GUI environment.
 
 ### Development
 ```bash
@@ -33,18 +33,21 @@ npm run biome:ci         # CI mode (fails on issues)
 ### Testing
 ```bash
 npm run test             # Run all tests
-npm run test:ui          # Run tests with Playwright UI
-npm run test:install     # Install browser dependencies
+npm run test:unit        # Run unit tests only
+npm run test:e2e         # Run e2e tests only
 
-# Run a single test file
-npm run test -- tests/app.spec.ts
+# Run a single unit test file
+node --experimental-transform-types --test tests/zod.spec.ts
 
-# Run a single test by name
-npm run test -- --grep "has title"
+# Run a single e2e test file
+npm run test:e2e -- tests/app.spec.ts
+
+# Run a single e2e test by name
+npm run test:e2e -- --grep "has title"
 
 # Run tests in a specific browser
-npm run test -- --project=chromium
-npm run test -- --project=firefox
+npm run test:e2e -- --project=chromium
+npm run test:e2e -- --project=firefox
 ```
 
 ## Code Style Guidelines

@@ -5,6 +5,9 @@ import {defineConfig, devices} from '@playwright/test'
  */
 export default defineConfig({
   testDir: './tests',
+  testIgnore: [
+    './tests/zod.spec.ts', // Not related to playwright
+  ],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   workers: 1,
