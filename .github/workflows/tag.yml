@@ -23,16 +23,10 @@ jobs:
         run: npm run biome:ci
       - name: Types and build checks
         run: npm run build
-      - name: Install Playwright Browsers
+      - name: Install test browsers
         run: npm run test:install
-      - name: Run Playwright tests
-        run: npm test
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
+      - name: Run tests
+        run: npm run test
 
   deploy:
     name: 🚀 Deploy to production
