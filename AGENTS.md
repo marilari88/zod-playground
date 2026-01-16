@@ -34,13 +34,14 @@ npm run biome:ci         # CI mode (fails on issues)
 ```bash
 npm run test             # Run all tests
 npm run test:unit        # Run unit tests only
+npm run test:perf        # Run performance tests only
 npm run test:e2e         # Run e2e tests only
 
 # Run a single unit test file
-node --experimental-transform-types --test tests/zod.spec.ts
+node --experimental-transform-types --test tests/zod.unit.ts
 
 # Run a single e2e test file
-npm run test:e2e -- tests/app.spec.ts
+npm run test:e2e -- tests/app.e2e.ts
 
 # Run a single e2e test by name
 npm run test:e2e -- --grep "has title"
@@ -85,7 +86,9 @@ type ValidationResult =
 - **Components**: PascalCase (`ColorSchemeToggle.tsx`, `Header.tsx`)
 - **Utilities/hooks**: camelCase (`appData.ts`, `usePersistAppData.ts`)
 - **CSS Modules**: `ComponentName.module.css`
-- **Tests**: `*.spec.ts`
+- **Unit tests**: `*.unit.ts`
+- **Performance tests**: `*.perf.ts`
+- **E2E tests**: `*.e2e.ts`
 
 ### Code
 - **Components**: PascalCase (`function Header()`, `const ColorSchemeToggle`)
