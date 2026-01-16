@@ -11,8 +11,8 @@ import {ensureReturnInSchema} from '../src/zod.ts'
  * so we apply a multiplier to the thresholds when running in CI.
  */
 
-// CI environments are typically slower, so we apply a multiplier
-const CI_SLOWDOWN_FACTOR = process.env.CI ? 1 : 1 // Temporary set to 1
+// CI environments sometimes are slower, so we apply a multiplier
+const CI_SLOWDOWN_FACTOR = process.env.CI ? 2 : 1
 
 /**
  * Why Iteration is Necessary in Performance Tests
