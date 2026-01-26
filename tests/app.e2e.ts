@@ -347,3 +347,23 @@ z.object({ name: z.string().min(1), age: z.number().positive() })`,
 
   await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
 })
+
+test('locale picker is visible with default locale en', async ({page}) => {
+  await expect(page.getByRole('button', {name: /en/})).toBeVisible()
+})
+
+test('can change locale via locale picker', async ({page}) => {
+  await page.getByRole('button', {name: /en/}).click()
+
+  const localeOptions = await page.getByRole('option').count()
+
+  expect(localeOptions).toBeGreaterThan(1)
+
+  const localeElements = page.getByRole('option')
+  const secondLocale = await localeElements.nth(1).textContent()
+
+  await page.getByRole('option').nth(1).click()
+
+  await expect(page.getByRole('button', {name: new RegExp(secondLocale || '')})).toBeVisible()
+  await expect(page.getByRole('button', {name: /en/})).not.toBeVisible()
+})
