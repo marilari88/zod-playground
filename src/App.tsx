@@ -9,6 +9,7 @@ import classes from './App.module.css'
 import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
 import {ColorSchemeToggle} from './features/ColorSchemeToggle'
 import {CopyButton} from './features/CopyButton'
+import {LocalePicker} from './features/LocalePicker/LocalePicker'
 import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
 import {usePersistAppData} from './hooks/usePersistAppData'
@@ -33,14 +34,16 @@ await initMonaco()
 const loadZodVersion = async ({
   version,
   isZodMini,
+  locale,
   monaco,
 }: {
   version: string
   isZodMini: boolean
+  locale: string
   monaco: Monaco
 }) => {
   try {
-    await zod.loadVersion({version, isZodMini})
+    await zod.loadVersion({version, isZodMini, locale})
     const zodDtsFiles = await getVersionDtsContents({packageName: zod.PACKAGE_NAME, version})
 
     if (zodDtsFiles) {
@@ -66,6 +69,8 @@ const App = () => {
   const [schema, setSchema] = useState<string>(() => initialAppData.schema)
   const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
   const [version, setVersion] = useState(initialAppData.version)
+  const [locales, setLocales] = useState<string[] | null>(null)
+  const [locale, setLocale] = useState<string>(initialAppData.locale)
   const [isZodMini, setIsZodMini] = useState(initialAppData.isZodMini)
 
   const appData = useMemo(
@@ -73,9 +78,10 @@ const App = () => {
       schema,
       values: values.filter((value) => typeof value === 'string'),
       version,
+      locale,
       isZodMini,
     }),
-    [schema, values, version, isZodMini],
+    [schema, values, version, locale, isZodMini],
   )
 
   usePersistAppData(appData)
@@ -93,10 +99,11 @@ const App = () => {
     if (!monaco) return
 
     setIsLoading(true)
-    loadZodVersion({version, isZodMini, monaco}).then(() => {
+    loadZodVersion({version, isZodMini, locale, monaco}).then(() => {
+      setLocales(zod.getLocaleNames())
       setIsLoading(false)
     })
-  }, [version, isZodMini, monaco])
+  }, [version, isZodMini, locale, monaco])
 
   return (
     <Box className={classes.layout}>
@@ -138,6 +145,16 @@ const App = () => {
                   }}
                   disabled={isLoading}
                 />
+                {locales && locales?.length > 0 && (
+                  <LocalePicker
+                    value={locale}
+                    locales={locales}
+                    onChange={(locale) => {
+                      setLocale(locale)
+                    }}
+                    disabled={isLoading}
+                  />
+                )}
                 <Button
                   rel="noopener noreferrer"
                   target="_blank"

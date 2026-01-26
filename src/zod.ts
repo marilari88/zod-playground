@@ -1,7 +1,13 @@
 import ts from 'typescript'
 import {getPackageVersions} from './packageMetadata.ts'
 
-let _z: unknown
+type ZodModule = {
+  config?: (locale: unknown) => void
+  locales?: Record<string, () => unknown>
+  [key: string]: unknown
+}
+
+let _z: ZodModule = {}
 
 export const PACKAGE_NAME = 'zod'
 
@@ -19,11 +25,28 @@ export async function getVersions(
   })
 }
 
-export async function loadVersion({version, isZodMini}: {version: string; isZodMini: boolean}) {
+export async function loadVersion({
+  version,
+  isZodMini,
+  locale,
+}: {
+  version: string
+  isZodMini: boolean
+  locale: string
+}) {
   const pathSegment = isZodMini ? '/mini' : ''
   _z = await import(
     /* @vite-ignore */ `https://cdn.jsdelivr.net/npm/${PACKAGE_NAME}@${version}${pathSegment}/+esm`
   )
+
+  if (_z?.config && _z?.locales?.[locale]) {
+    _z.config(_z.locales[locale]())
+  }
+}
+
+export function getLocaleNames(): string[] | null {
+  const locales = _z.locales ?? null
+  return locales ? Object.keys(locales) : null
 }
 
 /**
