@@ -39,7 +39,7 @@ export function LocalePicker({
 
   return (
     <Combobox
-      width={300}
+      width="fit-content"
       onOptionSubmit={(optionValue) => {
         onChange(optionValue)
         setSearchValue(optionValue)
