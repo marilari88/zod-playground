@@ -30,6 +30,7 @@ export const DEFAULT_APP_DATA = {
   schema,
   values,
   version,
+  locale: 'en',
   isZodMini: false,
 }
 
