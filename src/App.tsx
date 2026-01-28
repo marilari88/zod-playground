@@ -69,7 +69,6 @@ const App = () => {
   const [schema, setSchema] = useState<string>(() => initialAppData.schema)
   const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
   const [version, setVersion] = useState(initialAppData.version)
-  const [locales, setLocales] = useState<string[] | null>(null)
   const [locale, setLocale] = useState<string>(initialAppData.locale)
   const [isZodMini, setIsZodMini] = useState(initialAppData.isZodMini)
 
@@ -86,6 +85,8 @@ const App = () => {
 
   usePersistAppData(appData)
 
+  const locales = zod.getLocaleNames()
+
   const monaco = useMonaco()
   const computedColorScheme = useComputedColorScheme('light')
 
@@ -100,7 +101,6 @@ const App = () => {
 
     setIsLoading(true)
     loadZodVersion({version, isZodMini, locale, monaco}).then(() => {
-      setLocales(zod.getLocaleNames())
       setIsLoading(false)
     })
   }, [version, isZodMini, locale, monaco])
