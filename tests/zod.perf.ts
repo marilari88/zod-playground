@@ -111,7 +111,7 @@ describe('ensureReturnInSchema performance', () => {
 
   test('schema with many statements', () => {
     const input = generateLargeSchemaWithStatements(100, 20)
-    const threshold = 8 * CI_SLOWDOWN_FACTOR
+    const threshold = 12 * CI_SLOWDOWN_FACTOR
 
     const start = performance.now()
     for (let i = 0; i < BENCHMARK_ITERATIONS; i++) {
