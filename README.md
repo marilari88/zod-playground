@@ -30,6 +30,7 @@ It is a great tool for developers who are working with the Zod API and want to t
 - **Share schemas and values**: Share your schema and values with other developers by clicking the Share button and sending the URL.
 - **Debug complex schemas**: Add multiple values to debug complex schema validation results.
 - **Schema development**: Any other activity related to building and updating Zod schemas.
+- **Test Zod localization**: Switch between different locales to see how Zod handles internationalized error messages and validation responses.
 
 ## Features
 
@@ -40,6 +41,7 @@ It is a great tool for developers who are working with the Zod API and want to t
 - User-friendly validation errors
 - Validation result panels
 - Dark/light mode
+- Multi-language support
 
 ## Contribute
 
