@@ -48,8 +48,13 @@ test('zod version switch', async ({page}) => {
 test('has default schema', async ({codeEditors}) => {
   const editorValue = await codeEditors.getSchemaEditorContent()
 
-  expect(editorValue).toContain(
-    '//Configurethelocaleforerrormessages(optional)//z.config(z.locales.it())constschema=z.object({name:z.string(),birth_year:z.number().optional()})returnschema',
+  // The leading digits "123456789" come from Monaco editor's line number gutter:
+  // the DOM's textContent() includes the line numbers rendered on the left side
+  // of the editor. The default schema has 9 lines (including comments and a
+  // return statement), so Monaco renders numbers from 1 to 9 in the DOM, which
+  // get concatenated to "123456789" after whitespace stripping in getMonacoContent().
+  expect(editorValue).toEqual(
+    '123456789//Configurethelocaleforerrormessages(optional)//z.config(z.locales.it())constschema=z.object({name:z.string(),birth_year:z.number().optional()})returnschema',
   )
 })
 
