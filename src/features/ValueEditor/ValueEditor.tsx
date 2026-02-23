@@ -83,6 +83,7 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
             <Popover opened={isPopoverOpen}>
               <Popover.Target>
                 <Badge
+                  component="button"
                   variant="dot"
                   onMouseEnter={open}
                   onMouseLeave={close}
@@ -111,6 +112,7 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
             <Popover opened={isPopoverOpen} withArrow>
               <Popover.Target>
                 <Badge
+                  component="button"
                   variant="dot"
                   color="red"
                   onMouseEnter={open}
