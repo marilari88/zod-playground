@@ -66,7 +66,7 @@ test('has invalid marker when an invalid value is in the Value Editor', async ({
     text: 'Invalid value',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
 })
 
 test('should display results by default on wide screen', async ({page, codeEditors}) => {
@@ -115,7 +115,7 @@ z.nativeEnum(ProductTypes)`,
   })
 
   // Should show Valid badge
-  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
 
   // Test invalid enum value
   await codeEditors.writeValue({
@@ -123,7 +123,7 @@ z.nativeEnum(ProductTypes)`,
   })
 
   // Should show Invalid badge
-  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
 })
 
 test('supports const declarations in schema', async ({page, codeEditors}) => {
@@ -140,7 +140,7 @@ z.object({
     text: '{name: "John", age: 30}',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
 })
 
 test('setting locale then removing it resets to English', async ({page, codeEditors}) => {
@@ -157,7 +157,7 @@ return schema`,
 
   await codeEditors.writeValue({text: '{name: "a"}'})
 
-  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
   await expect(page.getByText(/demasiado|peque|caracteres/i)).toBeVisible()
 
   await codeEditors.writeSchema({
@@ -169,7 +169,7 @@ const schema = z.object({
 return schema`,
   })
 
-  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
   await expect(page.getByText(/too small|expected string|characters/i)).toBeVisible()
 })
 
@@ -190,14 +190,14 @@ z.object({
     text: '{name: "John", address: {street: "123 Main St", city: "NYC"}}',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
 
   // Test invalid nested object
   await codeEditors.writeValue({
     text: '{name: "John", address: {street: "123 Main St"}}',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
 })
 
 test('supports explicit return statement in schema', async ({page, codeEditors}) => {
@@ -221,7 +221,7 @@ return z.object({
     text: '{status: "active", meta: {createdAt: "2025-01-01"}}',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
 })
 
 test('supports multi-line z.union with nested z.object', async ({page, codeEditors}) => {
@@ -246,21 +246,21 @@ test('supports multi-line z.union with nested z.object', async ({page, codeEdito
     text: '{guid: "abc-123"}',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
 
   // Test second union variant
   await codeEditors.writeValue({
     text: '{term: {language: "en", value: "hello"}}',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
 
   // Test invalid value
   await codeEditors.writeValue({
     text: '{invalid: "value"}',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
 })
 
 test('supports multi-line z.union with leading indentation', async ({page, codeEditors}) => {
@@ -284,7 +284,7 @@ test('supports multi-line z.union with leading indentation', async ({page, codeE
     text: '{guid: "test-guid"}',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
 })
 
 test('supports multi-line z.union with consistent indentation', async ({page, codeEditors}) => {
@@ -308,7 +308,7 @@ test('supports multi-line z.union with consistent indentation', async ({page, co
     text: '{term: {language: "fr", value: "bonjour"}}',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
 })
 
 test('uses the last standalone z.* expression when iterating on schema design', async ({
@@ -324,7 +324,7 @@ test('uses the last standalone z.* expression when iterating on schema design', 
     text: '{name: "John"}',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
 
   // Second attempt - added age field (append to existing schema)
   // The previous value should now be invalid because it's missing 'age'
@@ -337,14 +337,14 @@ z.object({ name: z.string(), age: z.number() })`,
   })
 
   // Previous value {name: "John"} should be invalid now (missing age)
-  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
 
   // Update value to match second attempt schema
   await codeEditors.writeValue({
     text: '{name: "John", age: 30}',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
 
   // Final version - with validation constraints (append to existing schema)
   // The previous value should now be invalid because age must be positive
@@ -360,7 +360,7 @@ z.object({ name: z.string().min(1), age: z.number().positive() })`,
   })
 
   // Value {name: "John", age: 30} should still be valid
-  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
 
   // Test that validation constraints are enforced
   await codeEditors.writeValue({
@@ -368,19 +368,19 @@ z.object({ name: z.string().min(1), age: z.number().positive() })`,
   })
 
   // Should be invalid because name must have min 1 character
-  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
 
   await codeEditors.writeValue({
     text: '{name: "John", age: -5}',
   })
 
   // Should be invalid because age must be positive
-  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
 
   // Valid value for final schema
   await codeEditors.writeValue({
     text: '{name: "John", age: 25}',
   })
 
-  await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
 })
