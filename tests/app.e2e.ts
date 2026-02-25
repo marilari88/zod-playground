@@ -3,7 +3,7 @@ import {expect} from '@playwright/test'
 import * as zod from '../src/zod'
 import {test} from './fixtures'
 
-test('has title "Zod Playground', async ({page}) => {
+test('has title "Zod Playground"', async ({page}) => {
   await expect(page).toHaveTitle(/Zod Playground/)
 })
 
