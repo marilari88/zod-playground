@@ -48,7 +48,14 @@ test('zod version switch', async ({page}) => {
 test('has default schema', async ({codeEditors}) => {
   const editorValue = await codeEditors.getSchemaEditorContent()
 
-  expect(editorValue).toEqual('1234z.object({name:z.string(),birth_year:z.number().optional()})')
+  // The leading digits "123456789" come from Monaco editor's line number gutter:
+  // the DOM's textContent() includes the line numbers rendered on the left side
+  // of the editor. The default schema has 9 lines (including comments and a
+  // return statement), so Monaco renders numbers from 1 to 9 in the DOM, which
+  // get concatenated to "123456789" after whitespace stripping in getMonacoContent().
+  expect(editorValue).toEqual(
+    '123456789//Configurethelocaleforerrormessages(optional)//z.config(z.locales.it())constschema=z.object({name:z.string(),birth_year:z.number().optional()})returnschema',
+  )
 })
 
 test('has invalid marker when an invalid value is in the Value Editor', async ({
@@ -134,6 +141,36 @@ z.object({
   })
 
   await expect(page.locator('div').filter({hasText: /^Valid$/})).toBeVisible()
+})
+
+test('setting locale then removing it resets to English', async ({page, codeEditors}) => {
+  await codeEditors.writeSchema({
+    text: `// Configure locale to Spanish
+z.config(z.locales.es())
+
+const schema = z.object({
+  name: z.string().min(5)
+})
+
+return schema`,
+  })
+
+  await codeEditors.writeValue({text: '{name: "a"}'})
+
+  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+  await expect(page.getByText(/demasiado|peque|caracteres/i)).toBeVisible()
+
+  await codeEditors.writeSchema({
+    text: `// Remove locale config so errors fall back to English
+const schema = z.object({
+  name: z.string().min(5)
+})
+
+return schema`,
+  })
+
+  await expect(page.locator('div').filter({hasText: /^Invalid$/})).toBeVisible()
+  await expect(page.getByText(/too small|expected string|characters/i)).toBeVisible()
 })
 
 test('supports nested schemas with const declarations', async ({page, codeEditors}) => {

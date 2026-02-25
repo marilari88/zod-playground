@@ -17,10 +17,15 @@ export const EDITOR_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   renderLineHighlight: 'none',
 }
 
-const schema = `z.object({
+const schema = `// Configure the locale for error messages (optional)
+// z.config(z.locales.it())
+
+const schema = z.object({
   name: z.string(),
   birth_year: z.number().optional()
-})`
+})
+
+return schema`
 
 const values = ['{name: "John"}']
 

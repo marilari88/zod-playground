@@ -99,9 +99,32 @@ export function ensureReturnInSchema(code: string): string {
   return code
 }
 
+function isZodWithI18n(_z: unknown): _z is ZodModuleWithI18n {
+  if (typeof _z !== 'object' || _z === null) return false
+
+  const z = _z as Record<string, unknown>
+
+  return typeof z.config === 'function' && typeof z.locales === 'object' && z.locales !== null
+}
+
+/**
+ * Reset Zod's global configuration to default English locale if the loaded version supports it.
+ * This prevents stale config state when user code calls `z.config(...)` and then
+ * removes that line. Without this reset, the old config would persist.
+ */
+function resetZodConfig() {
+  if (!isZodWithI18n(_z)) return
+
+  _z.config(_z.locales.en())
+}
+
 export function validateSchema(schema: string): SchemaValidation {
   try {
     if (schema.length < 3) throw new Error('Schema is too short')
+
+    // Reset Zod config to defaults before each evaluation so that removing
+    // a z.config(...) call correctly reverts to the default state.
+    resetZodConfig()
 
     // Add 'return' to the last standalone z.* expression (if any)
     const codeWithReturn = ensureReturnInSchema(schema)
@@ -171,6 +194,11 @@ function generateErrorMessage(issues: ZodIssue[]) {
   }
 
   return messages.join('\n')
+}
+
+type ZodModuleWithI18n = {
+  config: (locale: unknown) => void
+  locales: Record<string, () => unknown>
 }
 
 export type ZodSchema = {
