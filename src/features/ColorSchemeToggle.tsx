@@ -19,7 +19,7 @@ export function ColorSchemeToggle({onToggle}: {onToggle?: (value: 'light' | 'dar
         size="lg"
         aria-label="Toggle color scheme"
       >
-        {computedColorScheme === 'light' ? <FiSun /> : <FiMoon />}
+        {computedColorScheme === 'light' ? <FiMoon /> : <FiSun />}
       </ActionIcon>
     </Tooltip>
   )
