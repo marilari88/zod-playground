@@ -1,24 +1,26 @@
-import {ActionIcon, useComputedColorScheme, useMantineColorScheme} from '@mantine/core'
+import {ActionIcon, Tooltip, useComputedColorScheme, useMantineColorScheme} from '@mantine/core'
 import {FiMoon, FiSun} from 'react-icons/fi'
 
 export function ColorSchemeToggle({onToggle}: {onToggle?: (value: 'light' | 'dark') => void}) {
   const {setColorScheme} = useMantineColorScheme()
 
   const computedColorScheme = useComputedColorScheme('light')
+  const newColorScheme = computedColorScheme === 'light' ? 'dark' : 'light'
 
   return (
-    <ActionIcon
-      color="primary"
-      variant="light"
-      onClick={() => {
-        const colorScheme = computedColorScheme === 'light' ? 'dark' : 'light'
-        setColorScheme(colorScheme)
-        onToggle?.(colorScheme)
-      }}
-      size="lg"
-      aria-label="Toggle color scheme"
-    >
-      {computedColorScheme === 'light' ? <FiSun /> : <FiMoon />}
-    </ActionIcon>
+    <Tooltip withArrow label={`Switch to ${newColorScheme} mode`}>
+      <ActionIcon
+        color="primary"
+        variant="light"
+        onClick={() => {
+          setColorScheme(newColorScheme)
+          onToggle?.(newColorScheme)
+        }}
+        size="lg"
+        aria-label={`Switch to ${newColorScheme} mode`}
+      >
+        {computedColorScheme === 'light' ? <FiMoon /> : <FiSun />}
+      </ActionIcon>
+    </Tooltip>
   )
 }

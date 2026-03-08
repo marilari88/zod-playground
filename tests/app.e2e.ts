@@ -10,7 +10,7 @@ test('has title "Zod Playground"', async ({page}) => {
 test('has header with title, share, theme toggler and github repo link', async ({page}) => {
   await expect(page.getByText('Zod Playground')).toBeVisible()
   await expect(page.getByRole('button', {name: 'Share'})).toBeVisible()
-  await expect(page.getByLabel('Toggle color scheme')).toBeVisible()
+  await expect(page.getByLabel('Switch to dark mode')).toBeVisible()
   await expect(page.getByRole('banner').getByRole('link')).toHaveAttribute(
     'href',
     'https://github.com/marilari88/zod-playground',
