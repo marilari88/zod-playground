@@ -17,7 +17,7 @@ export function ColorSchemeToggle({onToggle}: {onToggle?: (value: 'light' | 'dar
           onToggle?.(newColorScheme)
         }}
         size="lg"
-        aria-label="Toggle color scheme"
+        aria-label={`Switch to ${newColorScheme} mode`}
       >
         {computedColorScheme === 'light' ? <FiMoon /> : <FiSun />}
       </ActionIcon>
