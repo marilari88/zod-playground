@@ -60,3 +60,10 @@
     overflow-y: auto;
   }
 }
+
+.shareButton {
+  display: flex;
+  align-items: center;
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 600;
+}

@@ -103,6 +103,7 @@ const App = () => {
       <Header>
         <Tooltip withArrow label="Create a link to share the current schema and values">
           <Button
+            className={classes.shareButton}
             variant="light"
             onClick={() => {
               const urlWithAppData = getURLwithAppData(appData)
@@ -113,10 +114,13 @@ const App = () => {
                 icon: <FiLink />,
               })
             }}
-            rightSection={<FiLink />}
             color="primary"
+            px={{base: 9, xs: 'md'}}
           >
-            Share
+            <Box mr="sm" visibleFrom="xs">
+              Share
+            </Box>
+            <FiLink />
           </Button>
         </Tooltip>
         <ColorSchemeToggle />
