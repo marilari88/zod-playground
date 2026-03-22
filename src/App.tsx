@@ -4,7 +4,7 @@ import {notifications} from '@mantine/notifications'
 import Editor, {type Monaco, useMonaco} from '@monaco-editor/react'
 import {useEffect, useMemo, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
-import {LuEraser} from 'react-icons/lu'
+import {LuEraser, LuRefreshCw} from 'react-icons/lu'
 import classes from './App.module.css'
 import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
 import {ColorSchemeToggle} from './features/ColorSchemeToggle'
@@ -120,6 +120,21 @@ const App = () => {
           </Button>
         </Tooltip>
         <ColorSchemeToggle />
+        <Tooltip withArrow label="Reset app data">
+          <ActionIcon
+            variant="light"
+            aria-label="Reset app data"
+            size="lg"
+            onClick={() => {
+              setSchema(DEFAULT_APP_DATA.schema)
+              setValues(DEFAULT_APP_DATA.values)
+              setVersion(DEFAULT_APP_DATA.version)
+              setIsZodMini(DEFAULT_APP_DATA.isZodMini)
+            }}
+          >
+            <LuRefreshCw />
+          </ActionIcon>
+        </Tooltip>
       </Header>
       <main style={{maxWidth: '100vw'}}>
         <ResizablePanelGroup
