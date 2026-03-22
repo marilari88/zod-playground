@@ -116,6 +116,7 @@ const App = () => {
             }}
             color="primary"
             px={{base: 9, xs: 'md'}}
+            aria-label="Share"
           >
             <Box mr="sm" visibleFrom="xs">
               Share
