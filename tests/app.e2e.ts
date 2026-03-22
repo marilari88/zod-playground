@@ -69,6 +69,41 @@ test('has invalid marker when an invalid value is in the Value Editor', async ({
   await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
 })
 
+test('reset app data button restores schema, value and zod version', async ({
+  page,
+  codeEditors,
+}) => {
+  const latestZodVersion = (await zod.getVersions('latest'))[0]
+  const anotherZodVersion = (await zod.getVersions())[3]
+
+  await codeEditors.writeSchema({
+    text: 'z.number()',
+  })
+
+  await codeEditors.writeValue({
+    text: '"invalid"',
+  })
+
+  await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
+
+  await page.getByRole('button', {name: `zod v${latestZodVersion.version}`}).click()
+  await page.getByRole('option', {name: anotherZodVersion.version}).click()
+  await expect(page.getByRole('button', {name: `zod v${anotherZodVersion.version}`})).toBeVisible()
+
+  await page.getByLabel('Reset app data').click()
+
+  await expect(page.locator('button').filter({hasText: /^Valid$/})).toBeVisible()
+  await expect(page.getByRole('button', {name: `zod v${latestZodVersion.version}`})).toBeVisible()
+
+  const schemaValue = await codeEditors.getSchemaEditorContent()
+  expect(schemaValue).toEqual(
+    '123456789//Configurethelocaleforerrormessages(optional)//z.config(z.locales.it())constschema=z.object({name:z.string(),birth_year:z.number().optional()})returnschema',
+  )
+
+  const valueEditorContent = await codeEditors.getValueEditorsContent()
+  expect(valueEditorContent).toEqual('1{name:"John"}')
+})
+
 test('should display results by default on wide screen', async ({page, codeEditors}) => {
   await page.setViewportSize({width: 1920, height: 1080})
   await codeEditors.writeSchema({
