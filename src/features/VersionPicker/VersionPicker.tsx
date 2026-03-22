@@ -35,6 +35,10 @@ export function VersionPicker({
   const [isZodMini, setIsZodMini] = useState(value.isZodMini)
 
   useEffect(() => {
+    setIsZodMini(value.isZodMini)
+  }, [value.isZodMini])
+
+  useEffect(() => {
     setLoading(true)
 
     zod
