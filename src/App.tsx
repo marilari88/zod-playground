@@ -2,7 +2,7 @@ import {ActionIcon, Box, Button, Flex, Tooltip, useComputedColorScheme} from '@m
 import {useMediaQuery} from '@mantine/hooks'
 import {notifications} from '@mantine/notifications'
 import Editor, {type Monaco, useMonaco} from '@monaco-editor/react'
-import {useEffect, useMemo, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 import classes from './App.module.css'
@@ -68,15 +68,12 @@ const App = () => {
   const [version, setVersion] = useState(initialAppData.version)
   const [isZodMini, setIsZodMini] = useState(initialAppData.isZodMini)
 
-  const appData = useMemo(
-    () => ({
-      schema,
-      values: values.filter((value) => typeof value === 'string'),
-      version,
-      isZodMini,
-    }),
-    [schema, values, version, isZodMini],
-  )
+  const appData = {
+    schema,
+    values: values.filter((value) => typeof value === 'string'),
+    version,
+    isZodMini,
+  }
 
   usePersistAppData(appData)
 
