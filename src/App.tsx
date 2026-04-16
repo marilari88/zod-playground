@@ -82,7 +82,12 @@ const App = () => {
 
   const isMobile = useMediaQuery('(max-width: 768px)')
 
-  const schemaValidation = zod.validateSchema(schema)
+  // Skip validation while zod is loading to avoid a race condition where
+  // validateSchema runs before zod is ready, causing a false invalid schema error.
+  const schemaValidation = !isLoading
+    ? zod.validateSchema(schema)
+    : ({success: false, error: undefined} as const)
+
   const evaluatedSchema = schemaValidation.success ? schemaValidation.data : undefined
   const schemaError = !schemaValidation.success ? schemaValidation.error : undefined
 
