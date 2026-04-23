@@ -2,7 +2,7 @@ import {ActionIcon, Box, Button, Flex, Tooltip, useComputedColorScheme} from '@m
 import {useMediaQuery} from '@mantine/hooks'
 import {notifications} from '@mantine/notifications'
 import Editor, {type Monaco, useMonaco} from '@monaco-editor/react'
-import {useEffect, useMemo, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 import classes from './App.module.css'
@@ -68,15 +68,12 @@ const App = () => {
   const [version, setVersion] = useState(initialAppData.version)
   const [isZodMini, setIsZodMini] = useState(initialAppData.isZodMini)
 
-  const appData = useMemo(
-    () => ({
-      schema,
-      values: values.filter((value) => typeof value === 'string'),
-      version,
-      isZodMini,
-    }),
-    [schema, values, version, isZodMini],
-  )
+  const appData = {
+    schema,
+    values: values.filter((value) => typeof value === 'string'),
+    version,
+    isZodMini,
+  }
 
   usePersistAppData(appData)
 
@@ -85,7 +82,12 @@ const App = () => {
 
   const isMobile = useMediaQuery('(max-width: 768px)')
 
-  const schemaValidation = zod.validateSchema(schema)
+  // Skip validation while zod is loading to avoid a race condition where
+  // validateSchema runs before zod is ready, causing a false invalid schema error.
+  const schemaValidation = !isLoading
+    ? zod.validateSchema(schema)
+    : ({success: false, error: undefined} as const)
+
   const evaluatedSchema = schemaValidation.success ? schemaValidation.data : undefined
   const schemaError = !schemaValidation.success ? schemaValidation.error : undefined
 
