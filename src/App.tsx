@@ -143,6 +143,7 @@ const App = () => {
                   target="_blank"
                   size="compact-xs"
                   variant="transparent"
+                  color="primary"
                   component="a"
                   href="https://zod.dev/"
                 >

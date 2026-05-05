@@ -1,4 +1,4 @@
-import {createTheme, MantineProvider, virtualColor} from '@mantine/core'
+import {createTheme, MantineProvider, v8CssVariablesResolver, virtualColor} from '@mantine/core'
 import {Notifications} from '@mantine/notifications'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
@@ -75,7 +75,7 @@ const theme = createTheme({
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <MantineProvider defaultColorScheme="auto" theme={theme}>
+    <MantineProvider defaultColorScheme="auto" theme={theme} cssVariablesResolver={v8CssVariablesResolver}>
       <App />
       <Notifications position="bottom-right" />
     </MantineProvider>
