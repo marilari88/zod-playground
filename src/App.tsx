@@ -135,6 +135,14 @@ const App = () => {
                   onChange={async (ver) => {
                     setVersion(ver.version)
                     setIsZodMini(ver.isZodMini)
+
+                    if (!isZodMini && ver.isZodMini && schema === DEFAULT_APP_DATA.schema) {
+                      setSchema(DEFAULT_APP_DATA.zodMiniSchema)
+                    }
+
+                    if (isZodMini && !ver.isZodMini && schema === DEFAULT_APP_DATA.zodMiniSchema) {
+                      setSchema(DEFAULT_APP_DATA.schema)
+                    }
                   }}
                   disabled={isLoading}
                 />
