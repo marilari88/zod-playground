@@ -45,6 +45,49 @@ test('zod version switch', async ({page}) => {
   ).toBeVisible()
 })
 
+test('switching packages swaps the untouched default schema in both directions', async ({
+  page,
+  codeEditors,
+}) => {
+  const latestZodVersion = (await zod.getVersions('latest'))[0]
+
+  const initialSchema = await codeEditors.getSchemaEditorContent()
+  expect(initialSchema).toContain('birth_year:z.number().optional()')
+
+  await page.getByRole('button', {name: `zod v${latestZodVersion.version}`}).click()
+  await page.getByText('zod/mini').click()
+  await page.getByRole('option', {name: latestZodVersion.version}).click()
+
+  const miniSchema = await codeEditors.getSchemaEditorContent()
+  expect(miniSchema).toContain('birth_year:z.optional(z.number())')
+
+  await page.getByRole('button', {name: `zod mini v${latestZodVersion.version}`}).click()
+  await page.getByText('zod', {exact: true}).click()
+  await page.getByRole('option', {name: latestZodVersion.version}).click()
+
+  const restoredSchema = await codeEditors.getSchemaEditorContent()
+  expect(restoredSchema).toContain('birth_year:z.number().optional()')
+})
+
+test('switching packages preserves a custom schema', async ({page, codeEditors}) => {
+  const latestZodVersion = (await zod.getVersions('latest'))[0]
+
+  await codeEditors.writeSchema({text: 'z.string()'})
+  const customSchema = await codeEditors.getSchemaEditorContent()
+
+  await page.getByRole('button', {name: `zod v${latestZodVersion.version}`}).click()
+  await page.getByText('zod/mini').click()
+  await page.getByRole('option', {name: latestZodVersion.version}).click()
+
+  expect(await codeEditors.getSchemaEditorContent()).toBe(customSchema)
+
+  await page.getByRole('button', {name: `zod mini v${latestZodVersion.version}`}).click()
+  await page.getByText('zod', {exact: true}).click()
+  await page.getByRole('option', {name: latestZodVersion.version}).click()
+
+  expect(await codeEditors.getSchemaEditorContent()).toBe(customSchema)
+})
+
 test('has default schema', async ({codeEditors}) => {
   const editorValue = await codeEditors.getSchemaEditorContent()
 
