@@ -45,6 +45,20 @@ test('zod version switch', async ({page}) => {
   ).toBeVisible()
 })
 
+test('closing the version picker discards an unsubmitted package selection', async ({page}) => {
+  const latestZodVersion = (await zod.getVersions('latest'))[0]
+  const versionPicker = page.getByRole('button', {name: `zod v${latestZodVersion.version}`})
+
+  await versionPicker.click()
+  await page.getByText('zod/mini').click()
+  await page.keyboard.press('Escape')
+
+  await expect(versionPicker).toBeVisible()
+
+  await versionPicker.click()
+  await expect(page.locator('input[value="zod"]')).toBeChecked()
+})
+
 test('switching packages swaps the untouched default schema in both directions', async ({
   page,
   codeEditors,
