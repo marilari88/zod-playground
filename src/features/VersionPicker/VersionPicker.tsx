@@ -20,6 +20,7 @@ export function VersionPicker({
       combobox.resetSelectedOption()
       combobox.focusTarget()
       setSearchValue('')
+      setIsZodMini(value.isZodMini)
     },
 
     onDropdownOpen: () => {
@@ -33,6 +34,10 @@ export function VersionPicker({
   )
   const [searchValue, setSearchValue] = useState('')
   const [isZodMini, setIsZodMini] = useState(value.isZodMini)
+
+  useEffect(() => {
+    setIsZodMini(value.isZodMini)
+  }, [value.isZodMini])
 
   useEffect(() => {
     setLoading(true)
@@ -81,7 +86,7 @@ export function VersionPicker({
           disabled={disabled}
           style={{opacity: disabled ? 0.5 : 1}}
         >
-          {isZodMini ? 'Zod Mini' : 'Zod'} v{value.version}
+          {value.isZodMini ? 'Zod Mini' : 'Zod'} v{value.version}
         </Badge>
       </Combobox.Target>
 

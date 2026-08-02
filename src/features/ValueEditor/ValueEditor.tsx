@@ -4,6 +4,7 @@ import {
   Box,
   Code,
   Flex,
+  Loader,
   Popover,
   Stack,
   Text,
@@ -22,6 +23,7 @@ import classes from './ValueEditor.module.css'
 
 interface Props {
   schema?: zod.ZodSchema
+  isLoading: boolean
   value: string
   index: number
   onAdd: () => void
@@ -53,22 +55,33 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   },
 }
 
-export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onClear}: Props) => {
+export const Validation = ({
+  schema,
+  isLoading,
+  value,
+  index,
+  onChange,
+  onAdd,
+  onRemove,
+  onClear,
+}: Props) => {
   const [isPopoverOpen, {close, open}] = useDisclosure(false)
 
   const matches = useMediaQuery('(min-width: 1200px)')
   const [isResultManuallyOpen, setIsResultManuallyOpen] = useState<boolean | null>(null)
   const isResultOpen = isResultManuallyOpen ?? !!matches
 
-  const validation = schema
-    ? zod.validateValue(schema, value)
-    : {success: false as const, error: 'Invalid schema'}
+  const validation = isLoading
+    ? undefined
+    : schema
+      ? zod.validateValue(schema, value)
+      : {success: false as const, error: 'Invalid schema'}
 
   const parsedData =
-    validation.success &&
+    validation?.success &&
     JSON.stringify(validation.data, (_, v) => (typeof v === 'bigint' ? `${v.toString()}n` : v))
 
-  const errors = !validation.success && validation.error
+  const errors = validation && !validation.success ? validation.error : undefined
 
   const computedColorScheme = useComputedColorScheme('light', {
     getInitialValueInEffect: false,
@@ -79,7 +92,8 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
       <Flex align="center" className={classes.valueTitle} gap="sm" justify="space-between">
         <Flex gap="sm" align="center">
           Value #{index + 1}
-          {validation.success && (
+          {isLoading && <Loader size={18} />}
+          {validation?.success && (
             <Popover opened={isPopoverOpen}>
               <Popover.Target>
                 <Badge
@@ -108,7 +122,7 @@ export const Validation = ({schema, value, index, onChange, onAdd, onRemove, onC
               </Popover.Dropdown>
             </Popover>
           )}
-          {!validation.success && (
+          {validation && !validation.success && (
             <Popover opened={isPopoverOpen} withArrow>
               <Popover.Target>
                 <Badge

@@ -61,8 +61,11 @@ const loadZodVersion = async ({
 const initialAppData =
   getAppDataFromSearchParams() ?? getAppDataFromLocalStorage() ?? DEFAULT_APP_DATA
 
+const isDefaultSchema = (schema: string, isZodMini: boolean) =>
+  schema === (isZodMini ? DEFAULT_APP_DATA.zodMiniSchema : DEFAULT_APP_DATA.schema)
+
 const App = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [schema, setSchema] = useState<string>(() => initialAppData.schema)
   const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
   const [version, setVersion] = useState(initialAppData.version)
@@ -85,9 +88,10 @@ const App = () => {
 
   const isMobile = useMediaQuery('(max-width: 768px)')
 
-  const schemaValidation = zod.validateSchema(schema)
-  const evaluatedSchema = schemaValidation.success ? schemaValidation.data : undefined
-  const schemaError = !schemaValidation.success ? schemaValidation.error : undefined
+  const schemaValidation = isLoading ? undefined : zod.validateSchema(schema)
+  const evaluatedSchema = schemaValidation?.success ? schemaValidation.data : undefined
+  const schemaError =
+    schemaValidation && !schemaValidation.success ? schemaValidation.error : undefined
 
   useEffect(() => {
     if (!monaco) return
@@ -132,7 +136,17 @@ const App = () => {
                 Schema
                 <VersionPicker
                   value={{isZodMini, version}}
-                  onChange={async (ver) => {
+                  onChange={(ver) => {
+                    if (ver.version === version && ver.isZodMini === isZodMini) return
+
+                    setIsLoading(true)
+
+                    if (isDefaultSchema(schema, isZodMini)) {
+                      setSchema(
+                        ver.isZodMini ? DEFAULT_APP_DATA.zodMiniSchema : DEFAULT_APP_DATA.schema,
+                      )
+                    }
+
                     setVersion(ver.version)
                     setIsZodMini(ver.isZodMini)
                   }}
@@ -185,6 +199,7 @@ const App = () => {
                     // biome-ignore lint/suspicious/noArrayIndexKey: items order does not change
                     key={`val${index}`}
                     schema={evaluatedSchema}
+                    isLoading={isLoading}
                     value={value}
                     index={index}
                     onAdd={() => {

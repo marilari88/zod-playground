@@ -27,12 +27,23 @@ const schema = z.object({
 
 return schema`
 
+const zodMiniSchema = `// Configure the locale for error messages (optional)
+// z.config(z.locales.it())
+
+const schema = z.object({
+  name: z.string(),
+  birth_year: z.optional(z.number())
+})
+
+return schema`
+
 const values = ['{name: "John"}']
 
 const version = (await zod.getVersions('latest'))[0].version
 
 export const DEFAULT_APP_DATA = {
   schema,
+  zodMiniSchema,
   values,
   version,
   isZodMini: false,
