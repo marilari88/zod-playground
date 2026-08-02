@@ -4,6 +4,8 @@ import * as zod from '../src/zod'
 import {test} from './fixtures'
 
 const shareCurrentAppData = async (page: Page) => {
+  // Firefox does not allow clipboard reads in Playwright, so capture the app's
+  // clipboard write instead while still verifying the URL produced by Share.
   await page.evaluate(() => {
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
