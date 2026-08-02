@@ -1,7 +1,30 @@
-import {expect} from '@playwright/test'
+import {expect, type Page} from '@playwright/test'
 
 import * as zod from '../src/zod'
 import {test} from './fixtures'
+
+const shareCurrentAppData = async (page: Page) => {
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (value: string) => {
+          document.documentElement.dataset.testClipboard = value
+        },
+      },
+    })
+  })
+
+  await page.getByRole('button', {name: 'Share'}).click()
+
+  const clipboardTarget = page.locator('html')
+  await expect(clipboardTarget).toHaveAttribute('data-test-clipboard', /appdata=/)
+
+  const sharedUrl = await clipboardTarget.getAttribute('data-test-clipboard')
+  if (!sharedUrl) throw new Error('Share did not write a URL to the clipboard')
+
+  return sharedUrl
+}
 
 test('has title "Zod Playground"', async ({page}) => {
   await expect(page).toHaveTitle(/Zod Playground/)
@@ -155,8 +178,7 @@ test('reset schema and values clears a shared URL and persists defaults', async 
   await page.getByRole('option', {name: anotherZodVersion.version}).click()
   await expect(page.getByRole('button', {name: `zod v${anotherZodVersion.version}`})).toBeVisible()
 
-  await page.getByRole('button', {name: 'Share'}).click()
-  const sharedUrl = await page.evaluate(() => navigator.clipboard.readText())
+  const sharedUrl = await shareCurrentAppData(page)
   await page.goto(sharedUrl)
 
   const resetButton = page.getByRole('button', {name: 'Reset schema and values'})
@@ -179,8 +201,7 @@ test('reset schema and values can be undone', async ({page, codeEditors}) => {
   await codeEditors.writeSchema({text: 'z.string()'})
   await codeEditors.writeValue({text: '"before reset"'})
 
-  await page.getByRole('button', {name: 'Share'}).click()
-  const sharedUrl = await page.evaluate(() => navigator.clipboard.readText())
+  const sharedUrl = await shareCurrentAppData(page)
   await page.goto(sharedUrl)
 
   const resetButton = page.getByRole('button', {name: 'Reset schema and values'})
