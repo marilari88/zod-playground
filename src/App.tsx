@@ -191,10 +191,14 @@ const App = () => {
                 icon: <FiLink />,
               })
             }}
-            rightSection={<FiLink />}
             color="primary"
+            px={{base: 9, xs: 'md'}}
+            aria-label="Share"
           >
-            Share
+            <Box mr="sm" visibleFrom="xs">
+              Share
+            </Box>
+            <FiLink />
           </Button>
         </Tooltip>
         <ColorSchemeToggle />

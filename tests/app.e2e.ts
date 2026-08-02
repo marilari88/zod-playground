@@ -18,6 +18,16 @@ test('has header with title, share, theme toggler and github repo link', async (
   )
 })
 
+test('shows the share label from the xs breakpoint', async ({page}) => {
+  const shareLabel = page.getByText('Share', {exact: true})
+
+  await page.setViewportSize({width: 560, height: 600})
+  await expect(shareLabel).not.toBeVisible()
+
+  await page.setViewportSize({width: 600, height: 600})
+  await expect(shareLabel).toBeVisible()
+})
+
 test('zod version switch', async ({page}) => {
   const latestZodVersion = (await zod.getVersions('latest'))[0]
   const anotherZodVersion = (await zod.getVersions()).find(
