@@ -4,7 +4,7 @@ import {notifications} from '@mantine/notifications'
 import Editor, {type Monaco, useMonaco} from '@monaco-editor/react'
 import {useEffect, useMemo, useRef, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
-import {LuEraser} from 'react-icons/lu'
+import {LuEraser, LuRefreshCw} from 'react-icons/lu'
 import classes from './App.module.css'
 import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
 import {ColorSchemeToggle} from './features/ColorSchemeToggle'
@@ -15,9 +15,12 @@ import {usePersistAppData} from './hooks/usePersistAppData'
 import {Header} from './ui/Header/Header'
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from './ui/Resizable/resizable'
 import {
+  type AppData,
   getAppDataFromLocalStorage,
   getAppDataFromSearchParams,
   getURLwithAppData,
+  getURLwithoutAppData,
+  persistAppData,
 } from './utils/appData'
 import {
   initMonaco,
@@ -65,6 +68,15 @@ const loadZodVersion = async ({
 const initialAppData =
   getAppDataFromSearchParams() ?? getAppDataFromLocalStorage() ?? DEFAULT_APP_DATA
 
+const RESET_NOTIFICATION_ID = 'app-data-reset'
+
+const getDefaultAppData = (): AppData => ({
+  schema: DEFAULT_APP_DATA.schema,
+  values: [...DEFAULT_APP_DATA.values],
+  version: DEFAULT_APP_DATA.version,
+  isZodMini: DEFAULT_APP_DATA.isZodMini,
+})
+
 const isDefaultSchema = (schema: string, isZodMini: boolean) =>
   schema === (isZodMini ? DEFAULT_APP_DATA.zodMiniSchema : DEFAULT_APP_DATA.schema)
 
@@ -87,6 +99,56 @@ const App = () => {
   )
 
   usePersistAppData(appData)
+
+  const applyAppData = (data: AppData) => {
+    setSchema(data.schema)
+    setValues([...data.values])
+    setVersion(data.version)
+    setIsZodMini(data.isZodMini)
+    persistAppData(data)
+  }
+
+  const isAppDataDefault =
+    schema === DEFAULT_APP_DATA.schema &&
+    values.length === DEFAULT_APP_DATA.values.length &&
+    values.every((value, index) => value === DEFAULT_APP_DATA.values[index]) &&
+    version === DEFAULT_APP_DATA.version &&
+    isZodMini === DEFAULT_APP_DATA.isZodMini
+
+  const resetAppData = () => {
+    const previousAppData: AppData = {...appData, values: [...appData.values]}
+    const previousUrl = window.location.href
+    const previousUrlHadAppData = new URL(previousUrl).searchParams.has('appdata')
+
+    applyAppData(getDefaultAppData())
+    window.history.replaceState(window.history.state, '', getURLwithoutAppData())
+
+    notifications.show({
+      id: RESET_NOTIFICATION_ID,
+      title: 'App data reset',
+      message: (
+        <Flex align="center" gap="sm">
+          <Box>Schema, values, and Zod version were restored to defaults.</Box>
+          <Button
+            variant="subtle"
+            size="compact-xs"
+            onClick={() => {
+              applyAppData(previousAppData)
+              const undoUrl = previousUrlHadAppData
+                ? getURLwithAppData(previousAppData, previousUrl)
+                : previousUrl
+              window.history.replaceState(window.history.state, '', undoUrl)
+              notifications.hide(RESET_NOTIFICATION_ID)
+            }}
+          >
+            Undo
+          </Button>
+        </Flex>
+      ),
+      icon: <LuRefreshCw />,
+      autoClose: 8000,
+    })
+  }
 
   const monaco = useMonaco()
   const computedColorScheme = useComputedColorScheme('light')
@@ -136,6 +198,22 @@ const App = () => {
           </Button>
         </Tooltip>
         <ColorSchemeToggle />
+        <Tooltip
+          withArrow
+          label={isAppDataDefault ? 'App data already uses defaults' : 'Reset app data'}
+        >
+          <span>
+            <ActionIcon
+              variant="light"
+              aria-label="Reset app data"
+              size="lg"
+              disabled={isLoading || isAppDataDefault}
+              onClick={resetAppData}
+            >
+              <LuRefreshCw />
+            </ActionIcon>
+          </span>
+        </Tooltip>
       </Header>
       <main style={{maxWidth: '100vw'}}>
         <ResizablePanelGroup
