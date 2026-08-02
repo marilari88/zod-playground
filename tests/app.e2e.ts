@@ -10,7 +10,7 @@ test('has title "Zod Playground"', async ({page}) => {
 test('has header with title, share, theme toggler and github repo link', async ({page}) => {
   await expect(page.getByText('Zod Playground')).toBeVisible()
   await expect(page.getByRole('button', {name: 'Share'})).toBeVisible()
-  await expect(page.getByRole('button', {name: 'Reset app data'})).toBeVisible()
+  await expect(page.getByRole('button', {name: 'Reset schema and values'})).toBeVisible()
   await expect(page.getByLabel('Switch to dark mode')).toBeVisible()
   await expect(page.getByRole('banner').getByRole('link')).toHaveAttribute(
     'href',
@@ -137,7 +137,10 @@ test('has invalid marker when an invalid value is in the Value Editor', async ({
   await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
 })
 
-test('reset app data clears a shared URL and persists defaults', async ({page, codeEditors}) => {
+test('reset schema and values clears a shared URL and persists defaults', async ({
+  page,
+  codeEditors,
+}) => {
   const latestZodVersion = (await zod.getVersions('latest'))[0]
   const anotherZodVersion = (await zod.getVersions()).find(
     (zVersion) => zVersion.version !== latestZodVersion.version,
@@ -156,7 +159,7 @@ test('reset app data clears a shared URL and persists defaults', async ({page, c
   const sharedUrl = await page.evaluate(() => navigator.clipboard.readText())
   await page.goto(sharedUrl)
 
-  const resetButton = page.getByRole('button', {name: 'Reset app data'})
+  const resetButton = page.getByRole('button', {name: 'Reset schema and values'})
   await expect(resetButton).toBeEnabled()
   await resetButton.click()
 
@@ -172,7 +175,7 @@ test('reset app data clears a shared URL and persists defaults', async ({page, c
   expect(await codeEditors.getValueEditorsContent()).toContain('{name:"John"}')
 })
 
-test('reset app data can be undone', async ({page, codeEditors}) => {
+test('reset schema and values can be undone', async ({page, codeEditors}) => {
   await codeEditors.writeSchema({text: 'z.string()'})
   await codeEditors.writeValue({text: '"before reset"'})
 
@@ -180,7 +183,7 @@ test('reset app data can be undone', async ({page, codeEditors}) => {
   const sharedUrl = await page.evaluate(() => navigator.clipboard.readText())
   await page.goto(sharedUrl)
 
-  const resetButton = page.getByRole('button', {name: 'Reset app data'})
+  const resetButton = page.getByRole('button', {name: 'Reset schema and values'})
   await expect(resetButton).toBeEnabled()
   await resetButton.click()
   await page.getByRole('button', {name: 'Undo'}).click()

@@ -125,7 +125,7 @@ const App = () => {
 
     notifications.show({
       id: RESET_NOTIFICATION_ID,
-      title: 'App data reset',
+      title: 'Schema and values reset',
       message: (
         <Flex direction="column" align="flex-start" gap={6}>
           <Box>Schema, values, and Zod version were restored to defaults.</Box>
@@ -205,12 +205,14 @@ const App = () => {
         <ColorSchemeToggle />
         <Tooltip
           withArrow
-          label={isAppDataDefault ? 'Schema and values already use defaults' : 'Reset app data'}
+          label={
+            isAppDataDefault ? 'Schema and values already use defaults' : 'Reset schema and values'
+          }
         >
           <span>
             <ActionIcon
               variant="light"
-              aria-label="Reset app data"
+              aria-label="Reset schema and values"
               size="lg"
               disabled={isLoading || isAppDataDefault}
               onClick={resetAppData}
