@@ -127,11 +127,12 @@ const App = () => {
       id: RESET_NOTIFICATION_ID,
       title: 'App data reset',
       message: (
-        <Flex align="center" gap="sm">
+        <Flex direction="column" align="flex-start" gap={6}>
           <Box>Schema, values, and Zod version were restored to defaults.</Box>
           <Button
-            variant="subtle"
+            variant="light"
             size="compact-xs"
+            ml="auto"
             onClick={() => {
               applyAppData(previousAppData)
               const undoUrl = previousUrlHadAppData
@@ -204,7 +205,7 @@ const App = () => {
         <ColorSchemeToggle />
         <Tooltip
           withArrow
-          label={isAppDataDefault ? 'App data already uses defaults' : 'Reset app data'}
+          label={isAppDataDefault ? 'Schema and values already use defaults' : 'Reset app data'}
         >
           <span>
             <ActionIcon
