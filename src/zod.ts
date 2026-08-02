@@ -19,11 +19,24 @@ export async function getVersions(
   })
 }
 
-export async function loadVersion({version, isZodMini}: {version: string; isZodMini: boolean}) {
+export async function loadVersion({
+  version,
+  isZodMini,
+  shouldApply = () => true,
+}: {
+  version: string
+  isZodMini: boolean
+  shouldApply?: () => boolean
+}) {
   const pathSegment = isZodMini ? '/mini' : ''
-  _z = await import(
+  const loadedZod = await import(
     /* @vite-ignore */ `https://cdn.jsdelivr.net/npm/${PACKAGE_NAME}@${version}${pathSegment}/+esm`
   )
+
+  if (!shouldApply()) return false
+
+  _z = loadedZod
+  return true
 }
 
 /**
