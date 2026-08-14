@@ -1,13 +1,12 @@
 import {useEffect, useRef} from 'react'
-import {STORAGE_KEY} from '../constants'
-import type {AppData} from '../utils/appData'
+import {type AppData, persistAppData} from '../utils/appData'
 
 export function usePersistAppData(data: AppData) {
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const saveData = () => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+      persistAppData(data)
     }
 
     timeoutRef.current = setTimeout(() => {
@@ -21,6 +20,7 @@ export function usePersistAppData(data: AppData) {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
       }
+      window.removeEventListener('beforeunload', saveData)
     }
   }, [data])
 }

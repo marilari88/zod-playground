@@ -1,7 +1,32 @@
-import {expect} from '@playwright/test'
+import {expect, type Page} from '@playwright/test'
 
 import * as zod from '../src/zod'
 import {test} from './fixtures'
+
+const shareCurrentAppData = async (page: Page) => {
+  // Firefox does not allow clipboard reads in Playwright, so capture the app's
+  // clipboard write instead while still verifying the URL produced by Share.
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (value: string) => {
+          document.documentElement.dataset.testClipboard = value
+        },
+      },
+    })
+  })
+
+  await page.getByRole('button', {name: 'Share'}).click()
+
+  const clipboardTarget = page.locator('html')
+  await expect(clipboardTarget).toHaveAttribute('data-test-clipboard', /appdata=/)
+
+  const sharedUrl = await clipboardTarget.getAttribute('data-test-clipboard')
+  if (!sharedUrl) throw new Error('Share did not write a URL to the clipboard')
+
+  return sharedUrl
+}
 
 test('has title "Zod Playground"', async ({page}) => {
   await expect(page).toHaveTitle(/Zod Playground/)
@@ -10,11 +35,22 @@ test('has title "Zod Playground"', async ({page}) => {
 test('has header with title, share, theme toggler and github repo link', async ({page}) => {
   await expect(page.getByText('Zod Playground')).toBeVisible()
   await expect(page.getByRole('button', {name: 'Share'})).toBeVisible()
+  await expect(page.getByRole('button', {name: 'Reset schema and values'})).toBeVisible()
   await expect(page.getByLabel('Switch to dark mode')).toBeVisible()
   await expect(page.getByRole('banner').getByRole('link')).toHaveAttribute(
     'href',
     'https://github.com/marilari88/zod-playground',
   )
+})
+
+test('shows the share label from the xs breakpoint', async ({page}) => {
+  const shareLabel = page.getByText('Share', {exact: true})
+
+  await page.setViewportSize({width: 560, height: 600})
+  await expect(shareLabel).not.toBeVisible()
+
+  await page.setViewportSize({width: 600, height: 600})
+  await expect(shareLabel).toBeVisible()
 })
 
 test('zod version switch', async ({page}) => {
@@ -124,6 +160,60 @@ test('has invalid marker when an invalid value is in the Value Editor', async ({
   })
 
   await expect(page.locator('button').filter({hasText: /^Invalid$/})).toBeVisible()
+})
+
+test('reset schema and values clears a shared URL and persists defaults', async ({
+  page,
+  codeEditors,
+}) => {
+  const latestZodVersion = (await zod.getVersions('latest'))[0]
+  const anotherZodVersion = (await zod.getVersions()).find(
+    (zVersion) => zVersion.version !== latestZodVersion.version,
+  )
+
+  if (!anotherZodVersion) throw new Error('No another zod version found')
+
+  await codeEditors.writeSchema({text: 'z.string()'})
+  await codeEditors.writeValue({text: '123'})
+
+  await page.getByRole('button', {name: `zod v${latestZodVersion.version}`}).click()
+  await page.getByRole('option', {name: anotherZodVersion.version}).click()
+  await expect(page.getByRole('button', {name: `zod v${anotherZodVersion.version}`})).toBeVisible()
+
+  const sharedUrl = await shareCurrentAppData(page)
+  await page.goto(sharedUrl)
+
+  const resetButton = page.getByRole('button', {name: 'Reset schema and values'})
+  await expect(resetButton).toBeEnabled()
+  await resetButton.click()
+
+  await expect(page).not.toHaveURL(/appdata=/)
+  await expect(page.getByRole('button', {name: `zod v${latestZodVersion.version}`})).toBeVisible()
+  expect(await codeEditors.getSchemaEditorContent()).toContain('birth_year:z.number().optional()')
+  expect(await codeEditors.getValueEditorsContent()).toContain('{name:"John"}')
+
+  await page.reload()
+
+  await expect(page).not.toHaveURL(/appdata=/)
+  expect(await codeEditors.getSchemaEditorContent()).toContain('birth_year:z.number().optional()')
+  expect(await codeEditors.getValueEditorsContent()).toContain('{name:"John"}')
+})
+
+test('reset schema and values can be undone', async ({page, codeEditors}) => {
+  await codeEditors.writeSchema({text: 'z.string()'})
+  await codeEditors.writeValue({text: '"before reset"'})
+
+  const sharedUrl = await shareCurrentAppData(page)
+  await page.goto(sharedUrl)
+
+  const resetButton = page.getByRole('button', {name: 'Reset schema and values'})
+  await expect(resetButton).toBeEnabled()
+  await resetButton.click()
+  await page.getByRole('button', {name: 'Undo'}).click()
+
+  await expect(page).toHaveURL(sharedUrl)
+  expect(await codeEditors.getSchemaEditorContent()).toContain('z.string()')
+  expect(await codeEditors.getValueEditorsContent()).toContain('"beforereset"')
 })
 
 test('should display results by default on wide screen', async ({page, codeEditors}) => {

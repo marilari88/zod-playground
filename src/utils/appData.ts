@@ -7,7 +7,7 @@ export type AppData = {
   values: string[]
   version: string
   isZodMini: boolean
-} | null
+}
 
 function parseAppData(appData: string): AppData {
   const parsed = JSON.parse(appData)
@@ -19,12 +19,12 @@ function parseAppData(appData: string): AppData {
   return parsed
 }
 
-export function getAppDataFromLocalStorage(): AppData {
+export function getAppDataFromLocalStorage(): AppData | null {
   const appData = localStorage.getItem(STORAGE_KEY)
   return appData ? parseAppData(appData) : null
 }
 
-export function getAppDataFromSearchParams(): AppData {
+export function getAppDataFromSearchParams(): AppData | null {
   const urlParams = new URLSearchParams(window.location.search)
   const compressedAppData = urlParams.get('appdata')
 
@@ -36,11 +36,24 @@ export function getAppDataFromSearchParams(): AppData {
   return null
 }
 
-export function getURLwithAppData(appData: AppData): string {
-  const queryParams = new URLSearchParams()
+export function getURLwithAppData(
+  appData: AppData,
+  baseUrl = `${window.location.protocol}//${window.location.host}`,
+): string {
+  const url = new URL(baseUrl)
   const compressedAppData = LZString.compressToEncodedURIComponent(JSON.stringify(appData))
 
-  queryParams.set('appdata', compressedAppData)
+  url.searchParams.set('appdata', compressedAppData)
 
-  return `${window.location.protocol}//${window.location.host}?${queryParams}`
+  return url.toString()
+}
+
+export function getURLwithoutAppData(): string {
+  const url = new URL(window.location.href)
+  url.searchParams.delete('appdata')
+  return url.toString()
+}
+
+export function persistAppData(appData: AppData) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appData))
 }
