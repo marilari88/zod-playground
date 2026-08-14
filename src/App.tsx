@@ -128,7 +128,6 @@ const App = () => {
 
     notifications.show({
       id: RESET_NOTIFICATION_ID,
-      title: 'Schema and values reset',
       message: (
         <Flex direction="column" align="flex-start" gap={6}>
           <Box>Schema, values, and Zod version were restored to defaults.</Box>
