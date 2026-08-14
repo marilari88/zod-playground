@@ -2,7 +2,7 @@ import {ActionIcon, Box, Button, Flex, Tooltip, useComputedColorScheme} from '@m
 import {useMediaQuery} from '@mantine/hooks'
 import {notifications} from '@mantine/notifications'
 import Editor, {type Monaco, useMonaco} from '@monaco-editor/react'
-import {useEffect, useMemo, useRef, useState} from 'react'
+import {useEffect, useMemo, useState} from 'react'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser, LuRefreshCw} from 'react-icons/lu'
 import classes from './App.module.css'
@@ -37,20 +37,24 @@ const loadZodVersion = async ({
   version,
   isZodMini,
   monaco,
-  isCurrent,
+  isLoadActive,
 }: {
   version: string
   isZodMini: boolean
   monaco: Monaco
-  isCurrent: () => boolean
+  isLoadActive: () => boolean
 }) => {
   try {
-    const didApplyVersion = await zod.loadVersion({version, isZodMini, shouldApply: isCurrent})
+    const didApplyVersion = await zod.loadVersion({
+      version,
+      isZodMini,
+      shouldApply: isLoadActive,
+    })
     if (!didApplyVersion) return
 
     const zodDtsFiles = await getVersionDtsContents({packageName: zod.PACKAGE_NAME, version})
 
-    if (zodDtsFiles && isCurrent()) {
+    if (zodDtsFiles && isLoadActive()) {
       resetMonacoDeclarationTypes(monaco)
       setMonacoDeclarationTypes({monaco, dtsFiles: zodDtsFiles, packageName: zod.PACKAGE_NAME})
       setMonacoGlobalDeclarationTypes({
@@ -86,7 +90,6 @@ const App = () => {
   const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
   const [version, setVersion] = useState(initialAppData.version)
   const [isZodMini, setIsZodMini] = useState(initialAppData.isZodMini)
-  const loadRequestRef = useRef(0)
 
   const appData = useMemo(
     () => ({
@@ -164,16 +167,16 @@ const App = () => {
   useEffect(() => {
     if (!monaco) return
 
-    const requestId = ++loadRequestRef.current
-    const isCurrent = () => requestId === loadRequestRef.current
+    let cancelled = false
+    const isLoadActive = () => !cancelled
 
     setIsLoading(true)
-    loadZodVersion({version, isZodMini, monaco, isCurrent}).finally(() => {
-      if (isCurrent()) setIsLoading(false)
+    loadZodVersion({version, isZodMini, monaco, isLoadActive}).finally(() => {
+      if (isLoadActive()) setIsLoading(false)
     })
 
     return () => {
-      if (isCurrent()) loadRequestRef.current++
+      cancelled = true
     }
   }, [version, isZodMini, monaco])
 
