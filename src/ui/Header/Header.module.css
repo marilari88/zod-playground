@@ -1,0 +1,24 @@
+.header {
+  align-items: center;
+  padding-block: var(--mantine-spacing-sm);
+  color: var(--mantine-color-primary-7);
+}
+
+.header__logo {
+  flex: 0 0 auto;
+  fill-rule: evenodd;
+  clip-rule: evenodd;
+  stroke-miterlimit: 5;
+}
+
+.header__title {
+  font-weight: 700;
+}
+
+.header__actions {
+  margin-left: auto;
+}
+
+.githubLink {
+  line-height: 1;
+}

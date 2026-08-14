@@ -1,15 +1,15 @@
 import {Anchor, Box, Flex} from '@mantine/core'
 import {FaGithub} from 'react-icons/fa'
+import classes from './Header.module.css'
 
 export const ZodLogo = () => (
   <Box
     component="svg"
+    className={classes.header__logo}
     w={{base: 30, xs: 40}}
     h={{base: 30, xs: 40}}
     viewBox="0 0 1080 1080"
     version="1.1"
-    style={{fillRule: 'evenodd', clipRule: 'evenodd', strokeMiterlimit: 5}}
-    flex="0 0 auto"
   >
     <title>Zod Logo</title>
     <use
@@ -147,25 +147,23 @@ export function Header({children}: {children?: React.ReactNode}) {
   return (
     <Flex
       component="header"
-      align="center"
+      className={classes.header}
       gap={{base: 'xs', xs: 'md'}}
       px={{base: 'sm', xs: 'lg'}}
-      py="sm"
-      c="primary.7"
     >
       <ZodLogo />
-      <Box fz={{base: 'sm', sm: 'xl'}} fw={700}>
+      <Box className={classes.header__title} fz={{base: 'sm', sm: 'xl'}}>
         Zod Playground
       </Box>
       {children}
-      <Flex gap={{base: 'xs', xs: 'md'}} ml="auto" color="primary">
+      <Flex className={classes.header__actions} gap={{base: 'xs', xs: 'md'}}>
         <Anchor
           href="https://github.com/marilari88/zod-playground"
           target="_blank"
           c="primary"
-          aria-label="GitHub repository"
           fz={{base: '1.5rem', xs: '2rem'}}
-          lh={1}
+          aria-label="GitHub repository"
+          className={classes.githubLink}
         >
           <FaGithub />
         </Anchor>
