@@ -1,5 +1,9 @@
 import {loader, type Monaco} from '@monaco-editor/react'
 
+loader.config({
+  paths: {vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.56.0/min/vs'},
+})
+
 export async function initMonaco() {
   const monaco = await loader.init()
   monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({

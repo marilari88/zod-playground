@@ -48,7 +48,7 @@ const editorOptions: editor.IStandaloneEditorConstructionOptions = {
   hideCursorInOverviewRuler: true,
   automaticLayout: true,
   renderLineHighlight: 'none',
-  hover: {enabled: false},
+  hover: {enabled: 'off'},
   lightbulb: {
     // @ts-expect-error: lightbulb enabled type is wrong
     enabled: false,
