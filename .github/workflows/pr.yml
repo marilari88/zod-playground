@@ -6,15 +6,18 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   checks:
     name: ✅ Checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
-          node-version: lts/*
+          node-version: 26
       - name: Install dependencies
         run: npm ci
       - name: Biome check
@@ -27,10 +30,10 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
-          node-version: lts/*
+          node-version: 26
       - name: Install dependencies
         run: npm ci
       - name: Install test browsers
@@ -42,13 +45,13 @@ jobs:
     name: 🏗️ Build Preview
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Save PR number
         run: |
           mkdir -p ./pr-meta
           echo ${{ github.event.number }} > ./pr-meta/pr-number.txt
       - name: Upload PR number
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pr-number
           path: ./pr-meta/pr-number.txt
