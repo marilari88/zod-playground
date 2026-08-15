@@ -1,6 +1,53 @@
 import assert from 'node:assert'
 import {describe, test} from 'node:test'
-import {ensureReturnInSchema} from '../src/zod.ts'
+import {ensureReturnInSchema, transpileSchema} from '../src/zod.ts'
+
+describe('transpileSchema', () => {
+  test('strips type declarations, annotations, generics, assertions, and satisfies', () => {
+    const input = `type User = { name: string }
+const value: User = { name: "Ada" }
+const schema = z.custom<User>()
+const asserted = value as User
+const checked = asserted satisfies User
+return { schema, checked }`
+
+    const output = transpileSchema(input)
+    const customSchema = {type: 'custom'}
+    const result = new Function('z', output)({custom: () => customSchema})
+
+    assert.deepStrictEqual(result, {schema: customSchema, checked: {name: 'Ada'}})
+    assert.doesNotMatch(output, /type User|: User|<User>| as User|satisfies User/)
+  })
+
+  test('emits TypeScript enums used by z.nativeEnum', () => {
+    const input = `enum ProductType {
+  Book = "book",
+  Game = "game"
+}
+
+z.nativeEnum(ProductType)`
+
+    const output = transpileSchema(ensureReturnInSchema(input))
+    const result = new Function('z', output)({nativeEnum: (value: unknown) => value})
+
+    assert.deepStrictEqual(result, {Book: 'book', Game: 'game'})
+  })
+
+  test('preserves modern JavaScript syntax', () => {
+    const input = `const value: { nested?: { count?: number } } = { nested: {} }
+return value?.nested?.count ?? 0`
+
+    const output = transpileSchema(input)
+
+    assert.match(output, /\?\./)
+    assert.match(output, /\?\?/)
+    assert.strictEqual(new Function(output)(), 0)
+  })
+
+  test('throws for malformed TypeScript', () => {
+    assert.throws(() => transpileSchema('const value: = 1'))
+  })
+})
 
 describe('ensureReturnInSchema', () => {
   describe('correctness', () => {

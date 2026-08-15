@@ -1,4 +1,4 @@
-import ts from 'typescript'
+import {transform} from 'sucrase'
 import {getPackageVersions} from './packageMetadata.ts'
 
 let _z: unknown
@@ -112,6 +112,14 @@ export function ensureReturnInSchema(code: string): string {
   return code
 }
 
+export function transpileSchema(code: string): string {
+  return transform(code, {
+    transforms: ['typescript'],
+    // Vite already targets modern browsers, so only TypeScript syntax needs transforming here.
+    disableESTransforms: true,
+  }).code
+}
+
 function isZodWithI18n(_z: unknown): _z is ZodModuleWithI18n {
   if (typeof _z !== 'object' || _z === null) return false
 
@@ -143,7 +151,7 @@ export function validateSchema(schema: string): SchemaValidation {
     const codeWithReturn = ensureReturnInSchema(schema)
 
     // Transpile the code
-    const transpiledCode = ts.transpile(codeWithReturn)
+    const transpiledCode = transpileSchema(codeWithReturn)
 
     // Execute the transpiled code
     const data = new Function('z', transpiledCode)(_z) as ZodSchema
