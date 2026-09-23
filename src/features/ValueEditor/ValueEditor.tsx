@@ -154,7 +154,7 @@ export const Validation = ({
           )}
         </Flex>
         <Flex gap="sm">
-          <CopyButton value={value || ''} />
+          <CopyButton value={value || ''} label="Copy value" />
           <Tooltip label="Clear value" withArrow>
             <ActionIcon variant="light" aria-label="Clear value" onClick={() => onClear(index)}>
               <LuEraser />

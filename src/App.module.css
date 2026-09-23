@@ -43,8 +43,9 @@
   background-color: var(--mantine-color-primary-0);
 }
 
-.editor {
-  flex-grow: 1;
+.schemaPanels {
+  flex: 1;
+  min-height: 0;
 }
 
 .valuesStack {

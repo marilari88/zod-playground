@@ -11,6 +11,7 @@ export async function initMonaco() {
     noSyntaxValidation: true,
   })
   monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+    strict: true,
     target: monaco.languages.typescript.ScriptTarget.ES2020,
     module: monaco.languages.typescript.ModuleKind.ESNext,
     moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,

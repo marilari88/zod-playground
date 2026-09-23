@@ -35,6 +35,7 @@ It is a great tool for developers who are working with the Zod API and want to t
 ## Features
 
 - Real-time validation
+- Inferred TypeScript type preview
 - Version switch
 - Shareable links
 - User-friendly interface
