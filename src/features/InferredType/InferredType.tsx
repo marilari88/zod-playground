@@ -9,9 +9,13 @@ import {useInferredType} from './useInferredType'
 
 const COLLAPSED_HEIGHT = 40
 
-export const InferredType = (props: Parameters<typeof useInferredType>[0]) => {
+type Props = Parameters<typeof useInferredType>[0] & {defaultCollapsed: boolean}
+
+export const InferredType = ({defaultCollapsed, ...props}: Props) => {
   const {type, message, isPending} = useInferredType(props)
-  const [isOpen, setIsOpen] = useState(true)
+  // Capture the initial size so viewport changes do not override the user's choice.
+  const [defaultSize] = useState(() => (defaultCollapsed ? COLLAPSED_HEIGHT : '30%'))
+  const [isOpen, setIsOpen] = useState(!defaultCollapsed)
   const panelRef = usePanelRef()
   const titleId = useId()
   const contentId = useId()
@@ -19,7 +23,7 @@ export const InferredType = (props: Parameters<typeof useInferredType>[0]) => {
   return (
     <ResizablePanel
       panelRef={panelRef}
-      defaultSize="30%"
+      defaultSize={defaultSize}
       minSize="80px"
       collapsible
       collapsedSize={COLLAPSED_HEIGHT}

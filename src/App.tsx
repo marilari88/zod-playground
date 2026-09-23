@@ -160,7 +160,9 @@ const App = () => {
   const monaco = useMonaco()
   const computedColorScheme = useComputedColorScheme('light')
 
-  const isMobile = useMediaQuery('(max-width: 768px)')
+  const isNarrowViewport = useMediaQuery('(max-width: 768px)', undefined, {
+    getInitialValueInEffect: false,
+  })
 
   const schemaValidation = isLoading ? undefined : zod.validateSchema(schema)
   const evaluatedSchema = schemaValidation?.success ? schemaValidation.data : undefined
@@ -235,7 +237,7 @@ const App = () => {
       </Header>
       <main style={{maxWidth: '100vw'}}>
         <ResizablePanelGroup
-          orientation={isMobile ? 'vertical' : 'horizontal'}
+          orientation={isNarrowViewport ? 'vertical' : 'horizontal'}
           className={classes.main}
         >
           <ResizablePanel className={classes.leftPanel} defaultSize={50} minSize={28}>
@@ -288,7 +290,7 @@ const App = () => {
             </Flex>
 
             <ResizablePanelGroup orientation="vertical" className={classes.schemaPanels}>
-              <ResizablePanel defaultSize="70%" minSize="80px">
+              <ResizablePanel minSize="80px">
                 <Editor
                   onChange={(value) => {
                     setSchema(value ?? '')
@@ -301,6 +303,7 @@ const App = () => {
               </ResizablePanel>
               <ResizableHandle withHandle aria-label="Resize inferred type panel" />
               <InferredType
+                defaultCollapsed={isNarrowViewport}
                 schema={schema}
                 version={version}
                 isZodMini={isZodMini}
