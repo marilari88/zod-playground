@@ -305,7 +305,6 @@ const App = () => {
               <InferredType
                 defaultCollapsed={isNarrowViewport}
                 schema={schema}
-                version={version}
                 isZodMini={isZodMini}
                 isLoading={isLoading}
                 hasTypeDefinitions={hasTypeDefinitions}

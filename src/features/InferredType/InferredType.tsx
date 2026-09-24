@@ -1,4 +1,4 @@
-import {ActionIcon, Box, Flex, Loader, Text, Tooltip} from '@mantine/core'
+import {ActionIcon, Box, Flex, Text, Tooltip} from '@mantine/core'
 import {useId, useState} from 'react'
 import {FiChevronDown, FiChevronUp} from 'react-icons/fi'
 import {usePanelRef} from 'react-resizable-panels'
@@ -12,7 +12,7 @@ const COLLAPSED_HEIGHT = 40
 type Props = Parameters<typeof useInferredType>[0] & {defaultCollapsed: boolean}
 
 export const InferredType = ({defaultCollapsed, ...props}: Props) => {
-  const {type, message, isPending} = useInferredType(props)
+  const {type, message} = useInferredType(props)
   // Capture the initial size so viewport changes do not override the user's choice.
   const [defaultSize] = useState(() => (defaultCollapsed ? COLLAPSED_HEIGHT : '30%'))
   const [isOpen, setIsOpen] = useState(!defaultCollapsed)
@@ -31,10 +31,7 @@ export const InferredType = ({defaultCollapsed, ...props}: Props) => {
     >
       <section className={classes.panel} aria-labelledby={titleId}>
         <Flex className={classes.title} align="center" justify="space-between" gap="sm">
-          <Flex align="center" gap="sm">
-            <span id={titleId}>Inferred type</span>
-            {isPending && <Loader size={16} aria-label="Inferring type" />}
-          </Flex>
+          <span id={titleId}>Inferred type</span>
           <Flex gap="sm">
             <CopyButton
               value={type && !type.isAbbreviated ? type.text : ''}
@@ -56,7 +53,7 @@ export const InferredType = ({defaultCollapsed, ...props}: Props) => {
             </Tooltip>
           </Flex>
         </Flex>
-        <div id={contentId} className={classes.content} hidden={!isOpen} aria-busy={!!isPending}>
+        <div id={contentId} className={classes.content} hidden={!isOpen}>
           {type ? (
             <>
               <Box component="pre" className={classes.code}>
@@ -69,9 +66,11 @@ export const InferredType = ({defaultCollapsed, ...props}: Props) => {
               )}
             </>
           ) : (
-            <Text size="sm" c="dimmed" className={classes.message}>
-              {message}
-            </Text>
+            message && (
+              <Text size="sm" c="dimmed" className={classes.message}>
+                {message}
+              </Text>
+            )
           )}
         </div>
       </section>
