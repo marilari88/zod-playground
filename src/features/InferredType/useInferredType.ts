@@ -1,7 +1,7 @@
 import {useMonaco} from '@monaco-editor/react'
 import type {editor} from 'monaco-editor'
 import {useEffect, useMemo, useState} from 'react'
-import {getInferenceSource, getInferredType, type InferredType} from '../../utils/inferredType'
+import {getInferenceSource, getInferredTypes, type InferredTypes} from '../../utils/inferredType'
 
 let nextModelId = 0
 
@@ -18,7 +18,7 @@ export function useInferredType({
 }) {
   const monaco = useMonaco()
   const source = useMemo(() => getInferenceSource(schema, isZodMini), [schema, isZodMini])
-  const [result, setResult] = useState<{type?: InferredType; message?: string}>({})
+  const [result, setResult] = useState<{types?: InferredTypes; message?: string}>({})
 
   useEffect(() => {
     if (!schema.trim()) {
@@ -46,8 +46,8 @@ export function useInferredType({
         if (cancelled) return
         const worker = await getWorker(model.uri)
         if (cancelled) return
-        const type = await getInferredType(worker, model.uri.toString(), source)
-        if (!cancelled) setResult({type})
+        const types = await getInferredTypes(worker, model.uri.toString(), source)
+        if (!cancelled) setResult({types})
       } catch (error) {
         if (!cancelled) {
           setResult({

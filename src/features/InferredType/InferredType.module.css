@@ -20,6 +20,17 @@
   min-height: 0;
 }
 
+.heading {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.controls {
+  flex-shrink: 0;
+}
+
 .code {
   margin: 0;
   font-family: var(--mantine-font-family-monospace);

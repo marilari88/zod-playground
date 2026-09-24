@@ -8,20 +8,22 @@ export function getInferenceSource(schema: string, isZodMini: boolean): string {
 function __getSchema() {
 ${ensureReturnInSchema(schema)}
 }
-type Inferred = z.infer<ReturnType<typeof __getSchema>>
+type InferredInput = z.input<ReturnType<typeof __getSchema>>
+type InferredOutput = z.output<ReturnType<typeof __getSchema>>
 `
 }
 
 export type InferredType = {text: string; isAbbreviated: boolean}
+export type InferredTypes = {input: InferredType; output: InferredType}
 
-export async function getInferredType(
+export async function getInferredTypes(
   worker: Pick<
     typescript.TypeScriptWorker,
     'getSyntacticDiagnostics' | 'getSemanticDiagnostics' | 'getQuickInfoAtPosition'
   >,
   fileName: string,
   source: string,
-): Promise<InferredType> {
+): Promise<InferredTypes> {
   const diagnostics = [
     ...(await worker.getSyntacticDiagnostics(fileName)),
     ...(await worker.getSemanticDiagnostics(fileName)),
@@ -35,19 +37,24 @@ export async function getInferredType(
     )
   }
 
-  const info = await worker.getQuickInfoAtPosition(fileName, source.lastIndexOf('Inferred'))
-  const parts: Array<{text: string; kind: string}> | undefined = info?.displayParts
-  const text = parts?.map((part) => part.text).join('')
-  if (!text) throw new Error('Could not infer a type from this schema.')
+  const getType = async (alias: string): Promise<InferredType> => {
+    const info = await worker.getQuickInfoAtPosition(fileName, source.lastIndexOf(alias))
+    const parts: Array<{text: string; kind: string}> | undefined = info?.displayParts
+    const text = parts?.map((part) => part.text).join('')
+    if (!text) throw new Error('Could not infer a type from this schema.')
 
-  // Quick Info is a preview: TypeScript may shorten large or recursive types.
-  // Keep the indication visible and avoid offering incomplete code for copying.
-  const isAbbreviated =
-    parts?.some(
-      (part) =>
-        part.kind !== 'punctuation' &&
-        part.kind !== 'stringLiteral' &&
-        /^\.\.\.(?: \d+ more \.\.\.)?$/.test(part.text),
-    ) ?? false
-  return {text, isAbbreviated}
+    // Quick Info is a preview: TypeScript may shorten large or recursive types.
+    // Keep the indication visible and avoid offering incomplete code for copying.
+    const isAbbreviated =
+      parts?.some(
+        (part) =>
+          part.kind !== 'punctuation' &&
+          part.kind !== 'stringLiteral' &&
+          /^\.\.\.(?: \d+ more \.\.\.)?$/.test(part.text),
+      ) ?? false
+    return {text, isAbbreviated}
+  }
+
+  const [input, output] = await Promise.all([getType('InferredInput'), getType('InferredOutput')])
+  return {input, output}
 }

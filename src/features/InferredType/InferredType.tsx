@@ -1,4 +1,4 @@
-import {ActionIcon, Box, Flex, Text, Tooltip} from '@mantine/core'
+import {ActionIcon, Box, Flex, SegmentedControl, Text, Tooltip} from '@mantine/core'
 import {useId, useState} from 'react'
 import {FiChevronDown, FiChevronUp} from 'react-icons/fi'
 import {usePanelRef} from 'react-resizable-panels'
@@ -12,7 +12,9 @@ const COLLAPSED_HEIGHT = 40
 type Props = Parameters<typeof useInferredType>[0] & {defaultCollapsed: boolean}
 
 export const InferredType = ({defaultCollapsed, ...props}: Props) => {
-  const {type, message} = useInferredType(props)
+  const {types, message} = useInferredType(props)
+  const [typeView, setTypeView] = useState<'input' | 'output'>('output')
+  const type = types?.[typeView]
   // Capture the initial size so viewport changes do not override the user's choice.
   const [defaultSize] = useState(() => (defaultCollapsed ? COLLAPSED_HEIGHT : '30%'))
   const [isOpen, setIsOpen] = useState(!defaultCollapsed)
@@ -31,11 +33,23 @@ export const InferredType = ({defaultCollapsed, ...props}: Props) => {
     >
       <section className={classes.panel} aria-labelledby={titleId}>
         <Flex className={classes.title} align="center" justify="space-between" gap="sm">
-          <span id={titleId}>Inferred type</span>
-          <Flex gap="sm">
+          <span id={titleId} className={classes.heading}>
+            Inferred type
+          </span>
+          <Flex gap="xs" align="center" className={classes.controls}>
+            <SegmentedControl<'input' | 'output'>
+              aria-label="Inferred type view"
+              size="xs"
+              value={typeView}
+              onChange={setTypeView}
+              data={[
+                {value: 'input', label: 'Input'},
+                {value: 'output', label: 'Output'},
+              ]}
+            />
             <CopyButton
               value={type && !type.isAbbreviated ? type.text : ''}
-              label="Copy inferred type"
+              label={`Copy ${typeView} type`}
             />
             <Tooltip label={isOpen ? 'Hide inferred type' : 'Show inferred type'} withArrow>
               <ActionIcon
