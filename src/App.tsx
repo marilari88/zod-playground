@@ -9,6 +9,7 @@ import classes from './App.module.css'
 import {DEFAULT_APP_DATA, EDITOR_OPTIONS} from './constants'
 import {ColorSchemeToggle} from './features/ColorSchemeToggle'
 import {CopyButton} from './features/CopyButton'
+import {InferredType} from './features/InferredType/InferredType'
 import {Validation} from './features/ValueEditor/ValueEditor'
 import {VersionPicker} from './features/VersionPicker/VersionPicker'
 import {usePersistAppData} from './hooks/usePersistAppData'
@@ -43,18 +44,18 @@ const loadZodVersion = async ({
   isZodMini: boolean
   monaco: Monaco
   isLoadActive: () => boolean
-}) => {
+}): Promise<boolean> => {
   try {
     const didApplyVersion = await zod.loadVersion({
       version,
       isZodMini,
       shouldApply: isLoadActive,
     })
-    if (!didApplyVersion) return
+    if (!didApplyVersion) return false
 
     const zodDtsFiles = await getVersionDtsContents({packageName: zod.PACKAGE_NAME, version})
 
-    if (zodDtsFiles && isLoadActive()) {
+    if (zodDtsFiles?.length && isLoadActive()) {
       resetMonacoDeclarationTypes(monaco)
       setMonacoDeclarationTypes({monaco, dtsFiles: zodDtsFiles, packageName: zod.PACKAGE_NAME})
       setMonacoGlobalDeclarationTypes({
@@ -62,11 +63,13 @@ const loadZodVersion = async ({
         packageName: zod.PACKAGE_NAME,
         path: isZodMini ? '/mini' : undefined,
       })
+      return true
     }
   } catch (error) {
     console.error('Failed to load type definitions:', error)
     // Consider adding user-facing error notification here
   }
+  return false
 }
 
 const initialAppData =
@@ -86,6 +89,7 @@ const isDefaultSchema = (schema: string, isZodMini: boolean) =>
 
 const App = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [hasTypeDefinitions, setHasTypeDefinitions] = useState(false)
   const [schema, setSchema] = useState<string>(() => initialAppData.schema)
   const [values, setValues] = useState<Array<string>>(() => initialAppData.values)
   const [version, setVersion] = useState(initialAppData.version)
@@ -156,7 +160,9 @@ const App = () => {
   const monaco = useMonaco()
   const computedColorScheme = useComputedColorScheme('light')
 
-  const isMobile = useMediaQuery('(max-width: 768px)')
+  const isNarrowViewport = useMediaQuery('(max-width: 768px)', undefined, {
+    getInitialValueInEffect: false,
+  })
 
   const schemaValidation = isLoading ? undefined : zod.validateSchema(schema)
   const evaluatedSchema = schemaValidation?.success ? schemaValidation.data : undefined
@@ -170,8 +176,13 @@ const App = () => {
     const isLoadActive = () => !cancelled
 
     setIsLoading(true)
-    loadZodVersion({version, isZodMini, monaco, isLoadActive}).finally(() => {
-      if (isLoadActive()) setIsLoading(false)
+    setHasTypeDefinitions(false)
+    loadZodVersion({version, isZodMini, monaco, isLoadActive}).then((hasTypeDefinitions) => {
+      // Cancelled loads still resolve; ignore them so they cannot overwrite a newer load's state.
+      if (isLoadActive()) {
+        setHasTypeDefinitions(hasTypeDefinitions)
+        setIsLoading(false)
+      }
     })
 
     return () => {
@@ -226,7 +237,7 @@ const App = () => {
       </Header>
       <main style={{maxWidth: '100vw'}}>
         <ResizablePanelGroup
-          orientation={isMobile ? 'vertical' : 'horizontal'}
+          orientation={isNarrowViewport ? 'vertical' : 'horizontal'}
           className={classes.main}
         >
           <ResizablePanel className={classes.leftPanel} defaultSize={50} minSize={28}>
@@ -263,7 +274,7 @@ const App = () => {
                   Docs
                 </Button>
               </Flex>
-              <CopyButton value={schema} />
+              <CopyButton value={schema} label="Copy schema" />
               <Tooltip label="Clear schema" withArrow>
                 <ActionIcon variant="light" aria-label="Clear schema" onClick={() => setSchema('')}>
                   <LuEraser />
@@ -278,16 +289,27 @@ const App = () => {
               )}
             </Flex>
 
-            <Editor
-              className={classes.editor}
-              onChange={(value) => {
-                setSchema(value ?? '')
-              }}
-              defaultLanguage="typescript"
-              options={EDITOR_OPTIONS}
-              theme={computedColorScheme === 'light' ? 'vs' : 'vs-dark'}
-              value={schema}
-            />
+            <ResizablePanelGroup orientation="vertical" className={classes.schemaPanels}>
+              <ResizablePanel minSize="80px">
+                <Editor
+                  onChange={(value) => {
+                    setSchema(value ?? '')
+                  }}
+                  defaultLanguage="typescript"
+                  options={EDITOR_OPTIONS}
+                  theme={computedColorScheme === 'light' ? 'vs' : 'vs-dark'}
+                  value={schema}
+                />
+              </ResizablePanel>
+              <ResizableHandle withHandle aria-label="Resize inferred type panel" />
+              <InferredType
+                defaultCollapsed={isNarrowViewport}
+                schema={schema}
+                isZodMini={isZodMini}
+                isLoading={isLoading}
+                hasTypeDefinitions={hasTypeDefinitions}
+              />
+            </ResizablePanelGroup>
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel className={classes.rightPanel} defaultSize={50} minSize={30}>

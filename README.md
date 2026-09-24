@@ -37,8 +37,6 @@ It is a great tool for developers who are working with the Zod API and want to t
 - Real-time validation
 - Version switch
 - Shareable links
-- User-friendly interface
-- User-friendly validation errors
 - Validation result panels
 - Dark/light mode
 - Multi-language support

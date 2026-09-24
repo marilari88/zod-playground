@@ -76,7 +76,7 @@ const fetchFilesContent = async ({
 
       const pathWithoutDistEsm = path.replace('dist/esm/', '')
 
-      if (!res.ok) return {path: pathWithoutDistEsm, text: ''}
+      if (!res.ok) throw new Error(`Could not load type definitions: ${path}`)
       return {path: pathWithoutDistEsm, text: await res.text()}
     }),
   )
