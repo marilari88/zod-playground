@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.4.1",
   "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
   "scripts": {
     "dev": "vite --clearScreen false",
     "build": "rm -rf dist/ && tsc && vite build",
