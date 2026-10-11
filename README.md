@@ -1,3 +1,5 @@
+# Zod Playground
+
 Web application (https://zod-playground.vercel.app/) that allows users to interact with the Zod library API.
 Users can define schemas and test the validation of given values.
 The app is designed to be user-friendly and easy to use.
