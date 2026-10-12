@@ -1,7 +1,7 @@
 import {loader, type Monaco} from '@monaco-editor/react'
 
 loader.config({
-  paths: {vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.56.0/min/vs'},
+  paths: {vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.57.0/min/vs'},
 })
 
 export async function initMonaco() {

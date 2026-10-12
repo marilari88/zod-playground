@@ -155,7 +155,7 @@ test('loads the expected Monaco runtime with Zod TypeScript completions', async 
   page,
   codeEditors,
 }) => {
-  // Verify that the browser runs Monaco 0.56 instead of only using its npm types.
+  // Verify that the browser runs Monaco 0.57 instead of only using its npm types.
   await expect
     .poll(() =>
       page.evaluate(() => {
@@ -166,7 +166,7 @@ test('loads the expected Monaco runtime with Zod TypeScript completions', async 
 
         return (
           monacoResourceUrls.length > 0 &&
-          monacoResourceUrls.every((url) => url.includes('monaco-editor@0.56.0/min/vs'))
+          monacoResourceUrls.every((url) => url.includes('monaco-editor@0.57.0/min/vs'))
         )
       }),
     )
