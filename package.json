@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite --clearScreen false",
-    "build": "rm -rf dist/ && tsc && vite build",
+    "build": "rm -rf dist/ && tsc && vite build --logLevel warn",
     "preview": "vite preview",
     "types": "tsc --noEmit",
     "test": "npm run test:unit && npm run test:perf && npm run test:e2e",
