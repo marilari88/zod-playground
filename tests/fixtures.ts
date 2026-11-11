@@ -95,8 +95,11 @@ const writeInMonaco = async ({
     await page.waitForTimeout(100) // Wait to ensure content is selected
   }
   /**
+   * These helpers paste entire documents; rapid typing and caret stability are
+   * exercised separately in editorTyping.e2e.ts.
+   *
    * Using clipboard to paste the content to avoid those issues:
-   * - keyboard.type() cannot be used for auto-closing of brackets/quotes in monaco editor
+   * - Typing arbitrary code triggers Monaco's auto-closing of brackets/quotes
    * - keyboard.insertText() sometimes does not work properly in firefox
    */
   await page.evaluate((t) => navigator.clipboard.writeText(t), text)

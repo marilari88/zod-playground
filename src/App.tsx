@@ -3,6 +3,7 @@ import {useMediaQuery} from '@mantine/hooks'
 import {notifications} from '@mantine/notifications'
 import Editor, {type Monaco, useMonaco} from '@monaco-editor/react'
 import {useEffect, useMemo, useState} from 'react'
+import {flushSync} from 'react-dom'
 import {FiAlertCircle, FiLink} from 'react-icons/fi'
 import {LuEraser, LuRefreshCw} from 'react-icons/lu'
 import classes from './App.module.css'
@@ -293,7 +294,9 @@ const App = () => {
               <ResizablePanel minSize="80px">
                 <Editor
                   onChange={(value) => {
-                    setSchema(value ?? '')
+                    // Commit before another keystroke so the controlled value cannot
+                    // overwrite newer Monaco content and move the cursor to the end.
+                    flushSync(() => setSchema(value ?? ''))
                   }}
                   defaultLanguage="typescript"
                   options={EDITOR_OPTIONS}

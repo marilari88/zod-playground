@@ -15,6 +15,7 @@ import {useDisclosure, useMediaQuery} from '@mantine/hooks'
 import Editor from '@monaco-editor/react'
 import type {editor} from 'monaco-editor'
 import {useState} from 'react'
+import {flushSync} from 'react-dom'
 import {FiAlertCircle, FiCheckCircle, FiEye, FiEyeOff, FiMinus, FiPlus} from 'react-icons/fi'
 import {LuEraser} from 'react-icons/lu'
 import * as zod from '../../zod'
@@ -193,7 +194,8 @@ export const Validation = ({
           <Editor
             theme={computedColorScheme === 'light' ? 'vs' : 'vs-dark'}
             onChange={(value) => {
-              onChange?.(value ?? '')
+              // Keep the controlled value in sync before Monaco accepts another keystroke.
+              flushSync(() => onChange?.(value ?? ''))
             }}
             defaultLanguage="typescript"
             options={editorOptions}
