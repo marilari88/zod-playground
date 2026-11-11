@@ -2,6 +2,7 @@ import {useMonaco} from '@monaco-editor/react'
 import type {editor} from 'monaco-editor'
 import {useEffect, useMemo, useState} from 'react'
 import {getInferenceSource, getInferredTypes, type InferredTypes} from '../../utils/inferredType'
+import {getTypeScriptWorkerWhenReady} from '../../utils/typescriptWorker'
 
 let nextModelId = 0
 
@@ -42,8 +43,11 @@ export function useInferredType({
           'typescript',
           monaco.Uri.parse(`file:///inferred-type-${nextModelId++}.ts`),
         )
-        const getWorker = await monaco.typescript.getTypeScriptWorker()
-        if (cancelled) return
+        const getWorker = await getTypeScriptWorkerWhenReady(
+          () => monaco.typescript.getTypeScriptWorker(),
+          () => cancelled,
+        )
+        if (cancelled || !getWorker) return
         const worker = await getWorker(model.uri)
         if (cancelled) return
         const types = await getInferredTypes(worker, model.uri.toString(), source)

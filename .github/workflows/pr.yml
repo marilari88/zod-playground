@@ -42,7 +42,7 @@ jobs:
         run: npm run test
       - name: Check inference startup repeatedly
         if: ${{ !cancelled() }}
-        run: npm run test:e2e -- tests/inferredType.e2e.ts --repeat-each=10
+        run: npm run test:e2e -- tests/inferredType.e2e.ts --repeat-each=10 --workers=4 --max-failures=1
 
   build-preview:
     name: 🏗️ Build Preview
