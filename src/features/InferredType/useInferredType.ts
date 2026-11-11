@@ -52,7 +52,11 @@ export function useInferredType({
         if (!cancelled) {
           setResult({
             message:
-              error instanceof Error ? error.message : 'Could not infer a type from this schema.',
+              error instanceof Error
+                ? error.message
+                : typeof error === 'string'
+                  ? error
+                  : 'Could not infer a type from this schema.',
           })
         }
       } finally {
