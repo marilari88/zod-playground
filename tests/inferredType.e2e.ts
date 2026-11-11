@@ -1,5 +1,11 @@
-import {expect} from '@playwright/test'
+import {expect, type Locator} from '@playwright/test'
 import {test} from './fixtures'
+
+async function waitForInitialInference(panel: Locator) {
+  // A fresh page downloads Zod declarations and starts Monaco's TypeScript worker.
+  // Check the whole panel so a failure includes any inference error message.
+  await expect(panel).toContainText('name: string;', {timeout: 15_000})
+}
 
 test('switches between input and output for transforms, defaults, coercion, and typed schemas', async ({
   page,
@@ -9,7 +15,7 @@ test('switches between input and output for transforms, defaults, coercion, and 
   const preview = panel.locator('pre')
   const input = panel.getByRole('radio', {name: 'Input', exact: true})
   const output = panel.getByRole('radio', {name: 'Output', exact: true})
-  await expect(preview).toContainText('name: string;')
+  await waitForInitialInference(panel)
   await expect(output).toBeChecked()
 
   await codeEditors.writeSchema({text: 'z.string().transform(value => value.length)'})
@@ -47,7 +53,7 @@ test('clears stale inference on errors and empty schemas, then recovers', async 
 }) => {
   const panel = page.getByRole('region', {name: 'Inferred type', exact: true})
   const preview = panel.locator('pre')
-  await expect(preview).toContainText('name: string;')
+  await waitForInitialInference(panel)
 
   await codeEditors.writeSchema({text: 'z.missing()'})
   await expect(preview).not.toBeVisible()
@@ -64,7 +70,7 @@ test('clears stale inference on errors and empty schemas, then recovers', async 
 test('refreshes inference when switching to Mini and Zod 3', async ({page}) => {
   const panel = page.getByRole('region', {name: 'Inferred type', exact: true})
   const preview = panel.locator('pre')
-  await expect(preview).toContainText('name: string;')
+  await waitForInitialInference(panel)
 
   await panel.getByText('Input', {exact: true}).click()
   await expect(preview).toContainText('type InferredInput')

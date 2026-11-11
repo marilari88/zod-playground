@@ -41,7 +41,7 @@ export async function getInferredTypes(
     const info = await worker.getQuickInfoAtPosition(fileName, source.lastIndexOf(alias))
     const parts: Array<{text: string; kind: string}> | undefined = info?.displayParts
     const text = parts?.map((part) => part.text).join('')
-    if (!text) throw new Error('Could not infer a type from this schema.')
+    if (!text) throw new Error(`No type information was returned for ${alias}.`)
 
     // Quick Info is a preview: TypeScript may shorten large or recursive types.
     // Keep the indication visible and avoid offering incomplete code for copying.
