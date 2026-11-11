@@ -181,14 +181,14 @@ test('loads Monaco from the app with Zod TypeScript completions', async ({page, 
     suggestions.locator('.monaco-list-row').filter({hasText: 'object'}).first(),
   ).toBeVisible()
 
-  // Completions must work with real workers served by the app.
+  // Read the worker's actual location: Firefox can report an empty worker.url().
   await expect
-    .poll(() => {
-      const workers = page.workers()
-      const appOrigin = new URL(page.url()).origin
-      return (
-        workers.length > 0 && workers.every((worker) => new URL(worker.url()).origin === appOrigin)
+    .poll(async () => {
+      const workerOrigins = await Promise.all(
+        page.workers().map((worker) => worker.evaluate(() => self.location.origin)),
       )
+      const appOrigin = new URL(page.url()).origin
+      return workerOrigins.length > 0 && workerOrigins.every((origin) => origin === appOrigin)
     })
     .toBe(true)
   expect(externalMonacoRequests).toEqual([])
