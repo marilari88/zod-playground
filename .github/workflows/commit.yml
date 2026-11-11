@@ -15,12 +15,13 @@ permissions:
 jobs:
   checks:
     name: ✅ Checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 26
+          check-latest: true
       - name: Install dependencies
         run: npm ci
       - name: Biome check
@@ -31,12 +32,13 @@ jobs:
   test:
     name: 🧪 Tests
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 26
+          check-latest: true
       - name: Install dependencies
         run: npm ci
       - name: Install test browsers
