@@ -1,6 +1,13 @@
 import {loader, type Monaco} from '@monaco-editor/react'
-import * as monaco from 'monaco-editor'
+// The editor entry point exposes the core API without registering features or languages.
+// Register editor features, JS/TS highlighting, and TypeScript services explicitly
+// to avoid bundling every language from the root monaco-editor entry point.
+import * as monaco from 'monaco-editor/editor'
 import EditorWorker from 'monaco-editor/editor/editor.worker?worker'
+import 'monaco-editor/features/register.all'
+import 'monaco-editor/languages/definitions/javascript/register'
+import 'monaco-editor/languages/definitions/typescript/register'
+import * as typescript from 'monaco-editor/languages/features/typescript/register'
 import TypeScriptWorker from 'monaco-editor/languages/features/typescript/ts.worker?worker'
 
 // Vite builds and serves these workers alongside the installed Monaco runtime.
@@ -13,7 +20,8 @@ self.MonacoEnvironment = {
   },
 }
 
-loader.config({monaco})
+// Expose TypeScript services through the Monaco instance returned by the React loader.
+loader.config({monaco: {...monaco, typescript}})
 
 export async function initMonaco() {
   const monaco = await loader.init()
