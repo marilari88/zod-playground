@@ -151,26 +151,17 @@ test('has default schema', async ({codeEditors}) => {
   )
 })
 
-test('loads the expected Monaco runtime with Zod TypeScript completions', async ({
-  page,
-  codeEditors,
-}) => {
-  // Verify that the browser runs Monaco 0.57 instead of only using its npm types.
-  await expect
-    .poll(() =>
-      page.evaluate(() => {
-        const monacoResourceUrls = performance
-          .getEntriesByType('resource')
-          .map(({name}) => name)
-          .filter((url) => url.includes('cdn.jsdelivr.net/npm/monaco-editor@'))
-
-        return (
-          monacoResourceUrls.length > 0 &&
-          monacoResourceUrls.every((url) => url.includes('monaco-editor@0.57.0/min/vs'))
-        )
-      }),
-    )
-    .toBe(true)
+test('loads Monaco from the app with Zod TypeScript completions', async ({page, codeEditors}) => {
+  const externalMonacoRequests: string[] = []
+  // Block CDN loading before a fresh navigation, while allowing Zod's CDN requests.
+  await page.route(
+    /https?:\/\/(?:cdn\.jsdelivr\.net\/npm|unpkg\.com)\/monaco-editor(?:@|\/)/,
+    (route) => {
+      externalMonacoRequests.push(route.request().url())
+      return route.abort()
+    },
+  )
+  await page.reload()
 
   // Wait until the selected Zod version and its declaration files have loaded.
   await expect(
@@ -189,6 +180,18 @@ test('loads the expected Monaco runtime with Zod TypeScript completions', async 
   await expect(
     suggestions.locator('.monaco-list-row').filter({hasText: 'object'}).first(),
   ).toBeVisible()
+
+  // Completions must work with real workers served by the app.
+  await expect
+    .poll(() => {
+      const workers = page.workers()
+      const appOrigin = new URL(page.url()).origin
+      return (
+        workers.length > 0 && workers.every((worker) => new URL(worker.url()).origin === appOrigin)
+      )
+    })
+    .toBe(true)
+  expect(externalMonacoRequests).toEqual([])
 })
 
 test('has invalid marker when an invalid value is in the Value Editor', async ({

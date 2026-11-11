@@ -1,20 +1,31 @@
 import {loader, type Monaco} from '@monaco-editor/react'
+import * as monaco from 'monaco-editor'
+import EditorWorker from 'monaco-editor/editor/editor.worker?worker'
+import TypeScriptWorker from 'monaco-editor/languages/features/typescript/ts.worker?worker'
 
-loader.config({
-  paths: {vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.57.0/min/vs'},
-})
+// Vite builds and serves these workers alongside the installed Monaco runtime.
+self.MonacoEnvironment = {
+  getWorker(_, label) {
+    if (label === 'typescript' || label === 'javascript') {
+      return new TypeScriptWorker()
+    }
+    return new EditorWorker()
+  },
+}
+
+loader.config({monaco})
 
 export async function initMonaco() {
   const monaco = await loader.init()
-  monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+  monaco.typescript.typescriptDefaults.setDiagnosticsOptions({
     noSemanticValidation: true,
     noSyntaxValidation: true,
   })
-  monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+  monaco.typescript.typescriptDefaults.setCompilerOptions({
     strict: true,
-    target: monaco.languages.typescript.ScriptTarget.ES2020,
-    module: monaco.languages.typescript.ModuleKind.ESNext,
-    moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+    target: monaco.typescript.ScriptTarget.ES2020,
+    module: monaco.typescript.ModuleKind.ESNext,
+    moduleResolution: monaco.typescript.ModuleResolutionKind.NodeJs,
     allowNonTsExtensions: true,
     esModuleInterop: true,
     allowSyntheticDefaultImports: true,
@@ -32,7 +43,7 @@ export function setMonacoDeclarationTypes({
 }) {
   for (const {path, text} of dtsFiles) {
     const uri = `file:///node_modules/${packageName}/${path}`
-    monaco.languages.typescript.typescriptDefaults.addExtraLib(text, uri)
+    monaco.typescript.typescriptDefaults.addExtraLib(text, uri)
   }
 }
 
@@ -52,12 +63,12 @@ export function setMonacoGlobalDeclarationTypes({
 
   export {};
   `
-  monaco.languages.typescript.typescriptDefaults.addExtraLib(
+  monaco.typescript.typescriptDefaults.addExtraLib(
     ambient,
     `file:///global/${packageName}-global.d.ts`,
   )
 }
 
 export function resetMonacoDeclarationTypes(monaco: Monaco) {
-  monaco.languages.typescript.typescriptDefaults.setExtraLibs([])
+  monaco.typescript.typescriptDefaults.setExtraLibs([])
 }
